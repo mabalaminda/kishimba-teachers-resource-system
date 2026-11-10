@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kishimba Teachers Portal</title>
+
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -11,6 +13,7 @@ body {
   margin: 0;
   padding: 30px 15px;
 }
+
 .container {
   max-width: 420px;
   margin: 50px auto;
@@ -19,11 +22,17 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 15px #ccc;
 }
+
 h2 {
   text-align: center;
   color: #123b65;
 }
-p { text-align: center; color: #555; }
+
+p {
+  text-align: center;
+  color: #555;
+}
+
 input {
   width: 100%;
   padding: 13px;
@@ -32,6 +41,7 @@ input {
   border: 1px solid #ccc;
   border-radius: 6px;
 }
+
 button {
   width: 100%;
   padding: 13px;
@@ -42,101 +52,193 @@ button {
   cursor: pointer;
   font-size: 16px;
 }
+
 #message {
   margin-top: 15px;
   color: #b42318;
   overflow-wrap: anywhere;
 }
-#dashboard { display: none; }
+
+#dashboard {
+  display: none;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
-  <h2>KISHIMBA SECONDARY SCHOOL</h2>
-  <p>Teachers Resource Management System</p>
 
-  <div id="login">
-    <form id="loginForm">
-      <input id="email" type="email"
-        placeholder="Email Address" required>
+<h2>KISHIMBA SECONDARY SCHOOL</h2>
 
-      <input id="password" type="password"
-        placeholder="Password" required>
+<p>Teachers Resource Management System</p>
 
-      <button type="submit" id="loginButton">
-        Login
-      </button>
-    </form>
-  </div>
+<div id="login">
 
-  <div id="dashboard">
-    <h3>Welcome to Kishimba Teachers Portal</h3>
-    <p id="userEmail"></p>
-    <p>You have successfully logged in.</p>
-    <button id="logoutButton">Logout</button>
-  </div>
+<form id="loginForm">
 
-  <p id="message"></p>
+<input
+id="email"
+type="email"
+placeholder="Email Address"
+required
+>
+
+<input
+id="password"
+type="password"
+placeholder="Password"
+required
+>
+
+<button type="submit" id="loginButton">
+Login
+</button>
+
+</form>
+</div>
+
+<div id="dashboard">
+
+<h3>Welcome to Kishimba Teachers Portal</h3>
+
+<p id="userEmail"></p>
+
+<p>You have successfully logged in.</p>
+
+<button id="logoutButton">
+Logout
+</button>
+
+</div>
+
+<p id="message"></p>
+
 </div>
 
 <script type="module">
+
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2';
 
-const SUPABASE_URL = 'https://dvgzvgnazghvowyeeapz.supabase.co/rest/v1/;
-const SUPABASE_KEY = 'sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u;
+// SUPABASE CONNECTION
+
+const SUPABASE_URL =
+'https://dvgzvgnazghvowyeeapz.supabase.co';
+
+const SUPABASE_KEY =
+'sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u'
 
 const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
-const loginForm = document.getElementById('loginForm');
-const message = document.getElementById('message');
+const loginForm =
+document.getElementById('loginForm');
+
+const message =
+document.getElementById('message');
+
+const loginButton =
+document.getElementById('loginButton');
+
+// LOGIN FUNCTION
 
 loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
 
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+e.preventDefault();
 
-  message.textContent = 'Please wait...';
+const email =
+document.getElementById('email').value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+const password =
+document.getElementById('password').value;
 
-  if (error) {
-    message.textContent = 'Login failed: ' + error.message;
-    return;
-  }
+loginButton.disabled = true;
+message.textContent = 'Please wait...';
 
-  showDashboard(data.user);
+try {
+
+const { data, error } =
+await supabase.auth.signInWithPassword({
+email,
+password
 });
 
-function showDashboard(user) {
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  document.getElementById('userEmail').textContent = user.email;
-  message.textContent = '';
+if (error) {
+message.textContent =
+'Login failed: ' + error.message;
+return;
 }
+
+showDashboard(data.user);
+
+} catch (error) {
+
+message.textContent =
+'Connection error: ' + error.message;
+
+} finally {
+
+loginButton.disabled = false;
+
+}
+
+});
+
+// SHOW DASHBOARD
+
+function showDashboard(user) {
+
+document.getElementById('login').style.display =
+'none';
+
+document.getElementById('dashboard').style.display =
+'block';
+
+document.getElementById('userEmail').textContent =
+user.email;
+
+message.textContent = '';
+
+}
+
+// LOGOUT FUNCTION
 
 document.getElementById('logoutButton')
 .addEventListener('click', async () => {
-  await supabase.auth.signOut();
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login').style.display = 'block';
-  loginForm.reset();
+
+const { error } = await supabase.auth.signOut();
+
+if (error) {
+message.textContent = error.message;
+return;
+}
+
+document.getElementById('dashboard').style.display =
+'none';
+
+document.getElementById('login').style.display =
+'block';
+
+loginForm.reset();
+
 });
 
-const { data: sessionData } = await supabase.auth.getSession();
+// CHECK EXISTING SESSION
 
-if (sessionData.session) {
-  showDashboard(sessionData.session.user);
+const { data: sessionData, error: sessionError } =
+await supabase.auth.getSession();
+
+if (!sessionError && sessionData.session) {
+
+showDashboard(sessionData.session.user);
+
 }
+
 </script>
 
 </body>
 </html>
+
