@@ -274,6 +274,7 @@ async function loadMaterials() {
     entry.textContent =
       item.title + " - " + item.material_type +
       " - " + item.subject +
+      " - " + item.class_name +
       " - " + (item.review_status || "Pending");
     list.appendChild(entry);
   });
