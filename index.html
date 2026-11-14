@@ -186,6 +186,11 @@ async function showDashboard(user) {
 
   document.getElementById("userRole").textContent =
     "Role: " + profile.role;
+  if (profile.role === "admin") {
+  document.getElementById("adminDashboard").style.display = "block";
+} else {
+  document.getElementById("adminDashboard").style.display = "none";
+}
 
   await loadMaterials();
 }
