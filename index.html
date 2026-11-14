@@ -246,9 +246,49 @@ const message = document.getElementById("uploadMessage");
   document.getElementById("file").value = "";
 
   await loadMaterials();
-}
 
 async function loadMaterials() {
+  const list = document.getElementById("materialsList");
+
+  let query = db
+    .from("teaching_materials")
+    .select("title, material_type, subject, class_name, review_status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (currentTeacher.role !== "admin") {
+    query = query.eq("teacher_id", currentUser.id);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    list.textContent = error.message;
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data || data.length === 0) {
+    list.textContent = "No materials uploaded yet.";
+    return;
+  }
+
+  data.forEach(item => {
+    const entry = document.createElement("p");
+
+    entry.textContent =
+      item.title + " - " +
+      item.material_type + " - " +
+      item.subject + " - " +
+      item.class_name + " - " +
+      (item.review_status || "Pending");
+
+    list.appendChild(entry);
+  });
+}
+
+
+
   const list = document.getElementById("materialsList");
 
   const { data, error } = await db
