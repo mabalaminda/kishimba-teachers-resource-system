@@ -359,9 +359,18 @@ async function loadMaterials(){
       (item.class_name||"")+" | "+
       (item.review_status||"Pending");
 
-    const downloadButton=document.createElement("button");
-    downloadButton.textContent="VIEW / DOWNLOAD";
-    downloadButton.onclick=()=>downloadMaterial(item.file_path);
+// VIEW BUTTON
+const viewButton=document.createElement("button");
+viewButton.textContent="VIEW";
+viewButton.onclick=()=>viewMaterial(item.file_path);
+
+// DOWNLOAD BUTTON
+const downloadButton=document.createElement("button");
+downloadButton.textContent="DOWNLOAD";
+downloadButton.onclick=()=>downloadMaterial(item.file_path);
+
+entry.appendChild(viewButton);
+entry.appendChild(downloadButton);
 
     entry.appendChild(heading);
     entry.appendChild(details);
@@ -426,7 +435,25 @@ async function downloadMaterial(path){
 
   window.open(data.signedUrl,"_blank");
 }
+// VIEW MATERIAL
+async function viewMaterial(path){
 
+  if(!path){
+    alert("File path not found.");
+    return;
+  }
+
+  const {data,error}=await db.storage
+    .from(BUCKET)
+    .createSignedUrl(path,3600);
+
+  if(error){
+    alert("VIEW ERROR: "+error.message);
+    return;
+  }
+
+  window.open(data.signedUrl,"_blank");
+}
 // LOGOUT
 async function logout(){
   const {error}=await db.auth.signOut();
