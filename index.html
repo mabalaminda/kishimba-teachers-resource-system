@@ -22,6 +22,9 @@ header {
   text-align: center;
   border-radius: 10px;
 }
+header h2 {
+  color: white;
+}
 .card {
   background: white;
   padding: 18px;
@@ -45,7 +48,7 @@ button {
   background: #b42318;
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 .item {
   border: 1px solid #ddd;
@@ -53,7 +56,7 @@ button {
   margin: 10px 0;
   border-radius: 7px;
 }
-h2, h3 {
+h3, h4 {
   color: #176b45;
 }
 </style>
@@ -72,22 +75,23 @@ h2, h3 {
 <input id="email" type="email" placeholder="Email Address">
 <input id="password" type="password" placeholder="Password">
 
-<button onclick="login()">LOGIN</button>
+<button id="loginBtn" onclick="login()">LOGIN</button>
+
 <p id="loginMessage"></p>
 </section>
 
 <section id="dashboard" class="hidden">
 
 <div class="card">
-<h3 id="welcome"></h3>
+<h3 id="welcome">WELCOME</h3>
 <p id="roleDisplay"></p>
 <button class="logout" onclick="logout()">LOG OUT</button>
 </div>
 
 <div id="adminSection" class="card hidden">
 <h3>ADMIN DASHBOARD</h3>
-<h4>Registered Teachers</h4>
-<div id="teachersList">Loading teachers...</div>
+<h4>REGISTERED TEACHERS</h4>
+<div id="teachersList"></div>
 </div>
 
 <div class="card">
@@ -112,102 +116,170 @@ h2, h3 {
 
 <input id="file" type="file">
 
-<button onclick="uploadMaterial()">UPLOAD MATERIAL</button>
+<button id="uploadBtn" onclick="uploadMaterial()">
+UPLOAD MATERIAL
+</button>
 
 <p id="uploadMessage"></p>
 </div>
 
 <div class="card">
 <h3>TEACHING MATERIALS</h3>
-<div id="materialsList">Loading materials...</div>
+<div id="materialsList"></div>
 </div>
 
 </section>
 
 <script>
 
+// =================================
 // SUPABASE CONNECTION
+// =================================
 
+const SUPABASE_URL = "https://dvgzvgnazghvowyeeapz.supabase.co";
 
-const SUPABASE_URL = https://dvgzvgnazghvowyeeapz.supabase.co;
-constsb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u ";
+const SUPABASE_KEY = "sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u;
+
+const BUCKET = "kishimba-teaching-materials";
 
 const db = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
 
-const BUCKET = "kishimba-teaching-materials";
-
 let currentUser = null;
 let currentTeacher = null;
 
 
+// =================================
 // LOGIN
+// =================================
+
 async function login() {
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+
   const message = document.getElementById("loginMessage");
+  const button = document.getElementById("loginBtn");
 
-  message.textContent = "Please wait...";
-
-  const { data, error } = await db.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  if (error) {
-    message.textContent = error.message;
+  if (!email || !password) {
+    message.textContent = "Enter email and password.";
     return;
   }
 
-  await loadDashboard(data.user);
+  button.disabled = true;
+  message.textContent = "Please wait...";
+
+  try {
+
+    const { data, error } = await db.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    await loadDashboard(data.user);
+
+  } catch (error) {
+
+    message.textContent = error.message;
+
+  } finally {
+
+    button.disabled = false;
+
+  }
 }
 
 
+// =================================
 // LOAD DASHBOARD
+// =================================
+
 async function loadDashboard(user) {
+
+  const message = document.getElementById("loginMessage");
 
   currentUser = user;
 
-  const { data: teacher, error } = await db
-    .from("teachers")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  try {
 
-  if (error || !teacher) {
-    document.getElementById("loginMessage").textContent =
-      "Teacher profile not found. Contact Administrator.";
-    await db.auth.signOut();
-    return;
+    const { data: teacher, error } = await db
+      .from("teachers")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      message.textContent = "Profile error: " + error.message;
+      return;
+    }
+
+    if (!teacher) {
+      message.textContent =
+        "Teacher profile not found. Contact Administrator.";
+
+      await db.auth.signOut();
+      currentUser = null;
+      return;
+    }
+
+    currentTeacher = teacher;
+
+    const role = String(teacher.role || "")
+      .trim()
+      .toLowerCase();
+
+    document.getElementById("login").classList.add("hidden");
+
+    document.getElementById("dashboard")
+      .classList.remove("hidden");
+
+    document.getElementById("welcome").textContent =
+      "WELCOME " + (teacher.full_name || user.email);
+
+    document.getElementById("roleDisplay").textContent =
+      "Role: " + teacher.role;
+
+    if (role === "admin" || role === "administrator") {
+
+      document.getElementById("adminSection")
+        .classList.remove("hidden");
+
+      await loadTeachers();
+
+    } else {
+
+      document.getElementById("adminSection")
+        .classList.add("hidden");
+
+    }
+
+    await loadMaterials();
+
+  } catch (error) {
+
+    message.textContent = error.message;
+
   }
 
-  currentTeacher = teacher;
-
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-
-  document.getElementById("welcome").textContent =
-    "WELCOME " + (teacher.full_name || user.email);
-
-  document.getElementById("roleDisplay").textContent =
-    "Role: " + teacher.role;
-
-  if (teacher.role === "admin") {
-    document.getElementById("adminSection").classList.remove("hidden");
-    loadTeachers();
-  }
-
-  loadMaterials();
 }
 
 
-// LOAD TEACHERS FOR ADMIN
+// =================================
+// LOAD TEACHERS
+// =================================
+
 async function loadTeachers() {
 
   const list = document.getElementById("teachersList");
+
+  list.textContent = "Loading teachers...";
 
   const { data, error } = await db
     .from("teachers")
@@ -215,11 +287,20 @@ async function loadTeachers() {
     .order("full_name");
 
   if (error) {
+
     list.textContent = error.message;
     return;
+
   }
 
   list.innerHTML = "";
+
+  if (!data || data.length === 0) {
+
+    list.textContent = "No teachers found.";
+    return;
+
+  }
 
   data.forEach(teacher => {
 
@@ -232,12 +313,22 @@ async function loadTeachers() {
       " | " + (teacher.role || "teacher");
 
     list.appendChild(item);
+
   });
+
 }
 
 
-// UPLOAD MATERIAL
+// =================================
+// UPLOAD MATERIALS
+// =================================
+
 async function uploadMaterial() {
+
+  if (!currentUser || !currentTeacher) {
+    alert("Please login first.");
+    return;
+  }
 
   const title = document.getElementById("title").value.trim();
   const type = document.getElementById("materialType").value;
@@ -247,88 +338,135 @@ async function uploadMaterial() {
   const file = document.getElementById("file").files[0];
 
   const message = document.getElementById("uploadMessage");
+  const button = document.getElementById("uploadBtn");
 
   if (!title || !type || !subject || !file) {
-    message.textContent = "Please fill all required fields and select a file.";
+
+    message.textContent =
+      "Please fill title, material type, subject and select file.";
+
     return;
+
   }
 
-  message.textContent = "Uploading file...";
+  button.disabled = true;
+  message.textContent = "Uploading material...";
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
   const filePath =
     currentUser.id + "/" + Date.now() + "_" + safeName;
 
-  const { error: storageError } = await db.storage
-    .from(BUCKET)
-    .upload(filePath, file);
+  try {
 
-  if (storageError) {
-    message.textContent = "Storage error: " + storageError.message;
-    return;
-  }
+    const { error: storageError } = await db.storage
+      .from(BUCKET)
+      .upload(filePath, file);
 
-  const { error: insertError } = await db
-    .from("teaching_materials")
-    .insert({
-      teacher_id: currentUser.id,
-      title: title,
-      material_type: type,
-      subject: subject,
-      class_name: className,
-      academic_year: year,
-      file_path: filePath,
-      review_status: "Pending"
-    });
+    if (storageError) {
 
-  if (insertError) {
+      message.textContent =
+        "STORAGE ERROR: " + storageError.message;
+
+      return;
+
+    }
+
+    const { error: insertError } = await db
+      .from("teaching_materials")
+      .insert({
+
+        teacher_id: currentUser.id,
+        title: title,
+        material_type: type,
+        subject: subject,
+        class_name: className,
+        academic_year: year,
+        file_path: filePath,
+        review_status: "Pending"
+
+      });
+
+    if (insertError) {
+
+      message.textContent =
+        "DATABASE ERROR: " + insertError.message;
+
+      return;
+
+    }
+
     message.textContent =
-      "Database error: " + insertError.message;
-    return;
+      "Material uploaded successfully!";
+
+    document.getElementById("title").value = "";
+    document.getElementById("materialType").value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("className").value = "";
+    document.getElementById("academicYear").value = "";
+    document.getElementById("file").value = "";
+
+    await loadMaterials();
+
+  } catch (error) {
+
+    message.textContent = error.message;
+
+  } finally {
+
+    button.disabled = false;
+
   }
 
-  message.textContent = "Material uploaded successfully!";
-
-  document.getElementById("title").value = "";
-  document.getElementById("materialType").value = "";
-  document.getElementById("subject").value = "";
-  document.getElementById("className").value = "";
-  document.getElementById("academicYear").value = "";
-  document.getElementById("file").value = "";
-
-  loadMaterials();
 }
 
 
+// =================================
 // LOAD MATERIALS
+// =================================
+
 async function loadMaterials() {
 
   const list = document.getElementById("materialsList");
 
   list.textContent = "Loading materials...";
 
+  if (!currentTeacher || !currentUser) {
+    list.textContent = "Please login first.";
+    return;
+  }
+
   let query = db
     .from("teaching_materials")
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (currentTeacher.role !== "admin") {
+  const role = String(currentTeacher.role || "")
+    .trim()
+    .toLowerCase();
+
+  if (role !== "admin" && role !== "administrator") {
+
     query = query.eq("teacher_id", currentUser.id);
+
   }
 
   const { data, error } = await query;
 
   if (error) {
+
     list.textContent = error.message;
     return;
+
   }
 
   list.innerHTML = "";
 
   if (!data || data.length === 0) {
+
     list.textContent = "No teaching materials available.";
     return;
+
   }
 
   data.forEach(item => {
@@ -340,73 +478,120 @@ async function loadMaterials() {
     heading.textContent = item.title;
 
     const details = document.createElement("p");
+
     details.textContent =
-      item.material_type + " | " +
-      item.subject + " | " +
+      (item.material_type || "") + " | " +
+      (item.subject || "") + " | " +
       (item.class_name || "") + " | " +
       (item.review_status || "Pending");
 
     const downloadButton = document.createElement("button");
+
     downloadButton.textContent = "VIEW / DOWNLOAD";
 
-    downloadButton.onclick = () => downloadMaterial(item.file_path);
+    downloadButton.onclick = function() {
+      downloadMaterial(item.file_path);
+    };
 
     entry.appendChild(heading);
     entry.appendChild(details);
     entry.appendChild(downloadButton);
 
     list.appendChild(entry);
+
   });
+
 }
 
 
+// =================================
 // DOWNLOAD MATERIAL
+// =================================
+
 async function downloadMaterial(path) {
+
+  if (!path) {
+    alert("File path not found.");
+    return;
+  }
 
   const { data, error } = await db.storage
     .from(BUCKET)
     .createSignedUrl(path, 3600);
 
   if (error) {
-    alert(error.message);
+
+    alert("DOWNLOAD ERROR: " + error.message);
     return;
+
   }
 
   window.open(data.signedUrl, "_blank");
+
 }
 
 
+// =================================
 // LOGOUT
+// =================================
+
 async function logout() {
 
   const { error } = await db.auth.signOut();
 
   if (error) {
+
     alert(error.message);
     return;
+
   }
 
   currentUser = null;
   currentTeacher = null;
 
-  document.getElementById("dashboard").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("dashboard")
+    .classList.add("hidden");
+
+  document.getElementById("login")
+    .classList.remove("hidden");
+
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+
+  document.getElementById("loginMessage").textContent =
+    "You have logged out successfully.";
 
 }
 
 
-// RESTORE LOGIN SESSION
+// =================================
+// CHECK EXISTING SESSION
+// =================================
+
 async function checkSession() {
 
-  const { data } = await db.auth.getSession();
+  const { data, error } = await db.auth.getSession();
+
+  if (error) {
+
+    document.getElementById("loginMessage").textContent =
+      error.message;
+
+    return;
+
+  }
 
   if (data.session) {
+
     await loadDashboard(data.session.user);
+
   }
+
 }
 
 checkSession();
 
 </script>
+
 </body>
 </html>
