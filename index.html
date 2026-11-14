@@ -261,29 +261,25 @@ const message = document.getElementById("uploadMessage");
 
   await loadMaterials();
 
-async function loadMaterials() {
+  async function loadMaterials() {
   const list = document.getElementById("materialsList");
 
-  let query = db
+  list.innerHTML = "Loading materials...";
+
+  const { data, error } = await db
     .from("teaching_materials")
     .select("title, material_type, subject, class_name, review_status, created_at")
     .order("created_at", { ascending: false });
 
-  if (currentTeacher.role !== "admin") {
-    query = query.eq("teacher_id", currentUser.id);
-  }
-
-  const { data, error } = await query;
-
   if (error) {
-    list.textContent = error.message;
+    list.innerHTML = "Error: " + error.message;
     return;
   }
 
-  list.replaceChildren();
+  list.innerHTML = "";
 
   if (!data || data.length === 0) {
-    list.textContent = "No materials uploaded yet.";
+    list.innerHTML = "No teaching materials found.";
     return;
   }
 
@@ -297,39 +293,6 @@ async function loadMaterials() {
       item.class_name + " - " +
       (item.review_status || "Pending");
 
-    list.appendChild(entry);
-  });
-}
-
-
-
-  const list = document.getElementById("materialsList");
-
-  const { data, error } = await db
-    .from("teaching_materials")
-    .select("title, material_type, subject, class_name, review_status, created_at")
-    .eq("teacher_id", currentUser.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    list.textContent = error.message;
-    return;
-  }
-
-  list.replaceChildren();
-
-  if (!data.length) {
-    list.textContent = "No materials uploaded yet.";
-    return;
-  }
-
-  data.forEach(item => {
-    const entry = document.createElement("p");
-    entry.textContent =
-      item.title + " - " + item.material_type +
-      " - " + item.subject +
-      " - " + item.class_name +
-      " - " + (item.review_status || "Pending");
     list.appendChild(entry);
   });
 }
