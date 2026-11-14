@@ -4,137 +4,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kishimba Secondary School Portal</title>
+<title>Kishimba Teachers Resource System</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #f1f5f9;
   margin: 0;
-  color: #1e293b;
-}
-header {
-  background: #075985;
-  color: white;
   padding: 20px;
-  text-align: center;
 }
-main {
-  max-width: 650px;
-  margin: 25px auto;
-  padding: 20px;
+.container {
+  max-width: 850px;
+  margin: auto;
 }
 .card {
   background: white;
-  padding: 22px;
-  margin-bottom: 18px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #00000015;
+}
+h1, h2, h3 {
+  color: #123b63;
 }
 input, select, button {
   width: 100%;
-  box-sizing: border-box;
   padding: 12px;
-  margin: 8px 0;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  margin: 7px 0;
+  box-sizing: border-box;
 }
 button {
-  background: #075985;
+  background: #12613b;
   color: white;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
 }
-.hidden { display: none; }
-.notice { padding: 10px; background: #e0f2fe; }
+button:hover {
+  background: #0b472a;
+}
+.hidden {
+  display: none !important;
+}
+#loginMessage, #uploadMessage {
+  color: #b42318;
+  overflow-wrap: anywhere;
+}
+.material {
+  background: #eef4f8;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 6px;
+}
 </style>
 </head>
+
 <body>
+<div class="container">
 
-<header>
-<h2>KISHIMBA SECONDARY SCHOOL</h2>
-<p>Teachers Resource Management System</p>
-</header>
-
-<main>
+<h1>Kishimba Secondary School</h1>
+<h2>Teachers Resource Management System</h2>
 
 <section id="login" class="card">
-<h3>Teacher / Admin Login</h3>
-<input id="email" type="email" placeholder="Email Address">
-<input id="password" type="password" placeholder="Password">
-<button onclick="alert('BUTTON CLICKED'); loginUser()">Login</button>
-<p id="loginMessage"></p>
+  <h3>Teacher / Admin Login</h3>
+
+  <input id="email" type="email" placeholder="Email Address">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="loginUser()">Login</button>
+
+  <p id="loginMessage"></p>
 </section>
 
 <section id="dashboard" class="hidden">
-<div class="card">
-<h3>Welcome to Kishimba Teachers Portal</h3>
-<p id="userName"></p>
-<p id="userRole"></p>
-<button onclick="logoutUser()">Logout</button>
-</div>
 
-<div class="card">
-<h3>Upload Teaching Materials</h3>
+  <div class="card">
+    <h3>Welcome to Kishimba Portal</h3>
+    <p id="userName"></p>
+    <p id="userRole"></p>
+    <button onclick="logoutUser()">Logout</button>
+  </div>
 
-<input id="title" placeholder="Material Title">
+  <section id="adminDashboard" class="card hidden">
+    <h3>Administrator Dashboard</h3>
+    <p>Manage teachers and review teaching materials.</p>
+    <h3>Teaching Materials</h3>
+    <div id="materialsList"></div>
+  </section>
 
-<select id="materialType">
-<option value="">Select Material Type</option>
-<option>Scheme of Work</option>
-<option>Lesson Plan</option>
-<option>Lesson Notes</option>
-<option>Notices</option>
-<option>Tests and Exams</option>
-<option>Question Bank</option>
-<option>Teaching Resources</option>
-</select>
-<label for="subject">Subject</label>
-<input id="subject" placeholder="Subject" required>
+  <section id="teacherDashboard" class="card hidden">
+    <h3>Teacher Dashboard</h3>
 
-<label for="className">Select Class</label>
-<select id="className" required>
-  <option value="">Select Class</option>
-  <option>Form One</option>
-  <option>Form Two</option>
-  <option>Form Three</option>
-  <option>Form Four</option>
-  <option>Form Five</option>
-  <option>Form Six</option>
-</select>
+    <h3>Upload Teaching Materials</h3>
 
+    <input id="title" placeholder="Material Title">
 
-<input id="academicYear" type="number" placeholder="Academic Year">
-<input id="file" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4">
+    <select id="materialType">
+      <option value="">Select Material Type</option>
+      <option>Scheme of Work</option>
+      <option>Lesson Plan</option>
+      <option>Lesson Notes</option>
+      <option>Notices</option>
+      <option>Tests and Exams</option>
+      <option>Question Bank</option>
+      <option>Teaching Resources</option>
+    </select>
 
-<button onclick="uploadMaterial()">Upload Material</button>
-<p id="uploadMessage"></p>
-</div>
+    <input id="subject" placeholder="Subject">
+    <input id="className" placeholder="Class e.g. FORM TWO">
+    <input id="academicYear" type="number" placeholder="Academic Year">
 
-<div class="card">
-<h3>My Uploaded Materials</h3>
-<div id="materialsList">Loading...</div>
-</div>
-  <div class="card" id="adminDashboard" style="display:none;">
-  <h3>Administrator Dashboard</h3>
+    <label>Select File</label>
+    <input id="file" type="file">
 
-  <h4>Registered Teachers</h4>
-  <div id="teachersList">Loading teachers...</div>
+    <button onclick="uploadMaterial()">Upload Material</button>
+    <p id="uploadMessage"></p>
 
-  <h4>All Teaching Materials</h4>
-  <div id="allMaterialsList">Loading materials...</div>
-</div>
+    <h3>Available Teaching Materials</h3>
+    <div id="materialsListTeacher"></div>
+  </section>
 
 </section>
-</main>
+</div>
 
 <script>
 const SUPABASE_URL = "https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 let currentUser = null;
 let currentTeacher = null;
 
+
+// LOGIN
 async function loginUser() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
@@ -142,19 +150,26 @@ async function loginUser() {
 
   message.textContent = "Logging in...";
 
-  const { data, error } = await db.auth.signInWithPassword({
-    email,
-    password
-  });
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
 
-  if (error) {
-    message.textContent = error.message;
-    return;
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    await showDashboard(data.user);
+
+  } catch (err) {
+    message.textContent = "Login error: " + err.message;
   }
-
-  await showDashboard(data.user);
 }
 
+
+// SHOW DASHBOARD
 async function showDashboard(user) {
   currentUser = user;
 
@@ -167,7 +182,9 @@ async function showDashboard(user) {
   if (error || !profile) {
     document.getElementById("loginMessage").textContent =
       "Profile not found. Contact the school administrator.";
+
     await db.auth.signOut();
+    currentUser = null;
     return;
   }
 
@@ -177,109 +194,122 @@ async function showDashboard(user) {
   document.getElementById("dashboard").classList.remove("hidden");
 
   document.getElementById("userName").textContent =
-    "Name: " + profile.full_name;
+    "Name: " + (profile.full_name || "");
 
   document.getElementById("userRole").textContent =
     "Role: " + profile.role;
+
   if (profile.role === "admin") {
-  document.getElementById("adminDashboard").style.display = "block";
-} else {
-  document.getElementById("adminDashboard").style.display = "none";
-}
+    document.getElementById("adminDashboard").classList.remove("hidden");
+    document.getElementById("teacherDashboard").classList.add("hidden");
+  } else {
+    document.getElementById("teacherDashboard").classList.remove("hidden");
+    document.getElementById("adminDashboard").classList.add("hidden");
+  }
 
   await loadMaterials();
 }
 
-async function uploadMaterial() {
-  
-const message = document.getElementById("uploadMessage");
-  const file = document.getElementById("file").files[0];
 
-  if (!file || !currentTeacher) {
-    message.textContent = "Please select a file.";
-    return;
-  }
+// UPLOAD MATERIAL
+async function uploadMaterial() {
+  const message = document.getElementById("uploadMessage");
+
   const title = document.getElementById("title").value.trim();
   const type = document.getElementById("materialType").value;
   const subject = document.getElementById("subject").value.trim();
-  const className = document.getElementById("className").value;
+  const className = document.getElementById("className").value.trim();
   const year = document.getElementById("academicYear").value;
+  const file = document.getElementById("file").files[0];
 
-  if (!title || !type || !subject || !className || !year) {
-    message.textContent = "Please complete all fields.";
+  if (!currentUser || !currentTeacher) {
+    message.textContent = "Please login again.";
     return;
   }
 
-  if (file.size > 20 * 1024 * 1024) {
-    message.textContent = "File must not exceed 20 MB.";
+  if (!title || !type || !subject || !className || !year || !file) {
+    message.textContent = "Please fill all fields and select a file.";
     return;
   }
-
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const filePath = currentUser.id + "/" +
-    Date.now() + "_" + safeName;
 
   message.textContent = "Uploading...";
 
-  const { error: storageError } = await db.storage
-    .from("teaching-materials")
-    .upload(filePath, file);
+  try {
+    const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = currentUser.id + "/" + Date.now() + "_" + safeFileName;
 
-  if (storageError) {
-    message.textContent = storageError.message;
-    return;
+    const { error: storageError } = await db.storage
+      .from("teaching-materials")
+      .upload(filePath, file);
+
+    if (storageError) {
+      message.textContent = storageError.message;
+      return;
+    }
+
+    const { error: insertError } = await db
+      .from("teaching_materials")
+      .insert({
+        teacher_id: currentUser.id,
+        title: title,
+        material_type: type,
+        subject: subject,
+        class_name: className,
+        academic_year: Number(year),
+        file_path: filePath,
+        review_status: "Pending"
+      });
+
+    if (insertError) {
+      message.textContent = "Database error: " + insertError.message;
+      return;
+    }
+
+    message.textContent = "Upload successful!";
+
+    document.getElementById("title").value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("file").value = "";
+
+    await loadMaterials();
+
+  } catch (err) {
+    message.textContent = "Upload error: " + err.message;
   }
+}
 
-  const { error: insertError } = await db
-    .from("teaching_materials")
-    .insert({
-      teacher_id: currentUser.id,
-      title: title,
-      material_type: type,
-      subject: subject,
-      class_name: className,
-      academic_year: Number(year),
-      file_path: filePath,
-      review_status: "Pending"
-    });
 
-  if (insertError) {
-    message.textContent =
-      "Database error: " + insertError.message;
-    return;
-  }
+// LOAD MATERIALS
+async function loadMaterials() {
+  const adminList = document.getElementById("materialsList");
+  const teacherList = document.getElementById("materialsListTeacher");
 
-  message.textContent = "Upload successful!";
-  document.getElementById("title").value = "";
-  document.getElementById("subject").value = "";
-  document.getElementById("file").value = "";
-
-  await loadMaterials();
-
-  async function loadMaterials() {
-  const list = document.getElementById("materialsList");
-
-  list.innerHTML = "Loading materials...";
+  if (adminList) adminList.innerHTML = "Loading materials...";
+  if (teacherList) teacherList.innerHTML = "Loading materials...";
 
   const { data, error } = await db
     .from("teaching_materials")
-    .select("title, material_type, subject, class_name, review_status, created_at")
+    .select("title, material_type, subject, class_name, review_status, created_at, file_path")
     .order("created_at", { ascending: false });
 
   if (error) {
-    list.innerHTML = "Error: " + error.message;
+    if (adminList) adminList.textContent = "Error: " + error.message;
+    if (teacherList) teacherList.textContent = "Error: " + error.message;
     return;
   }
-
-  list.innerHTML = "";
 
   if (!data || data.length === 0) {
-    list.innerHTML = "No teaching materials found.";
+    if (adminList) adminList.textContent = "No teaching materials found.";
+    if (teacherList) teacherList.textContent = "No teaching materials found.";
     return;
   }
 
+  if (adminList) adminList.innerHTML = "";
+  if (teacherList) teacherList.innerHTML = "";
+
   data.forEach(item => {
-    const entry = document.createElement("p");
+    const entry = document.createElement("div");
+    entry.className = "material";
 
     entry.textContent =
       item.title + " - " +
@@ -288,21 +318,35 @@ const message = document.getElementById("uploadMessage");
       item.class_name + " - " +
       (item.review_status || "Pending");
 
-    list.appendChild(entry);
+    if (adminList) adminList.appendChild(entry.cloneNode(true));
+    if (teacherList) teacherList.appendChild(entry.cloneNode(true));
   });
 }
 
+
+// LOGOUT
 async function logoutUser() {
   await db.auth.signOut();
+
   currentUser = null;
   currentTeacher = null;
 
   document.getElementById("dashboard").classList.add("hidden");
   document.getElementById("login").classList.remove("hidden");
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("loginMessage").textContent = "";
 }
 
+
+// RESTORE SESSION
 async function restoreSession() {
-  const { data } = await db.auth.getSession();
+  const { data, error } = await db.auth.getSession();
+
+  if (error) {
+    console.error(error.message);
+    return;
+  }
 
   if (data.session) {
     await showDashboard(data.session.user);
@@ -310,6 +354,7 @@ async function restoreSession() {
 }
 
 restoreSession();
+
 </script>
 </body>
 </html>
