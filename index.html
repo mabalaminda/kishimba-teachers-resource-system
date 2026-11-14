@@ -358,6 +358,27 @@ async function loadMaterials(){
       (item.subject||"")+" | "+
       (item.class_name||"")+" | "+
       (item.review_status||"Pending");
+    const statusBadge = document.createElement("span");
+statusBadge.textContent = (item.review_status || "Pending").toUpperCase();
+
+statusBadge.style.padding = "5px 12px";
+statusBadge.style.borderRadius = "15px";
+statusBadge.style.fontWeight = "bold";
+
+if(item.review_status === "Approved"){
+  statusBadge.style.backgroundColor = "#d1fae5";
+  statusBadge.style.color = "#047857";
+}
+else if(item.review_status === "Rejected"){
+  statusBadge.style.backgroundColor = "#fee2e2";
+  statusBadge.style.color = "#b91c1c";
+}
+else{
+  statusBadge.style.backgroundColor = "#fef3c7";
+  statusBadge.style.color = "#92400e";
+}
+
+entry.appendChild(statusBadge);
 
 // VIEW BUTTON
 const viewButton=document.createElement("button");
