@@ -446,6 +446,59 @@ async function updateMaterialStatus(materialId,status){
   await loadMaterials();
 }
 
+  async function loadMaterialComments(materialId, container){
+
+  const {data,error}=await db
+    .from("material_comments")
+    .select("*")
+    .eq("material_id",materialId)
+    .order("created_at",{ascending:true});
+
+  if(error){
+    container.textContent="COMMENTS ERROR: "+error.message;
+    return;
+  }
+
+  container.innerHTML="";
+
+  if(!data || data.length===0){
+    container.textContent="No comments yet.";
+    return;
+  }
+
+  data.forEach(comment=>{
+    const p=document.createElement("p");
+    p.textContent=comment.comment;
+    container.appendChild(p);
+  });
+}
+
+  
+async function replyToMaterialComment(materialId){
+
+  const reply = prompt("Andika majibu yako kwa Admin:");
+
+  if(reply === null || !reply.trim()){
+    return;
+  }
+
+  const {error}=await db
+    .from("material_comments")
+    .insert({
+      material_id: materialId,
+      user_id: currentUser.id,
+      comment: reply.trim()
+    });
+
+  if(error){
+    alert("REPLY ERROR: "+error.message);
+    return;
+  }
+
+  alert("Reply sent successfully.");
+  await loadMaterials();
+}
+
 
 
 // DOWNLOAD MATERIAL
