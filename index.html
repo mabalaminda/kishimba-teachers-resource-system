@@ -44,7 +44,6 @@ button {
 }
 button:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
 .logout { background: #b42318; }
 .hidden { display: none !important; }
@@ -94,6 +93,7 @@ h3, h4 { color: #176b45; }
 
 <input id="title" placeholder="Material Title">
 
+<label>Material Type</label>
 <select id="materialType">
 <option value="">Select Material Type</option>
 <option>Scheme of Work</option>
@@ -105,9 +105,47 @@ h3, h4 { color: #176b45; }
 <option>Teaching Resources</option>
 </select>
 
-<input id="subject" placeholder="Subject">
-<input id="className" placeholder="Class / Form">
-<input id="academicYear" placeholder="Academic Year">
+<label>Subject</label>
+<select id="subject">
+<option value="">Select Subject</option>
+<option>Mathematics</option>
+<option>Physics</option>
+<option>Chemistry</option>
+<option>Biology</option>
+<option>Kiswahili</option>
+<option>English</option>
+<option>Geography</option>
+<option>History</option>
+<option>Historia ya Tanzania na Maadili</option>
+<option>Business Studies</option>
+<option>Book Keeping</option>
+<option>Computer Applications</option>
+<option>EDK</option>
+<option>Sports Studies</option>
+<option>Football Performance</option>
+<option>Netball Performance</option>
+</select>
+
+<label>Class / Form</label>
+<select id="className">
+<option value="">Select Class / Form</option>
+<option>Form One</option>
+<option>Form Two</option>
+<option>Form Three</option>
+<option>Form Four</option>
+</select>
+
+<label>Academic Year</label>
+<select id="academicYear">
+<option value="">Select Academic Year</option>
+<option>2026</option>
+<option>2027</option>
+<option>2028</option>
+<option>2029</option>
+<option>2030</option>
+</select>
+
+<label>Select File</label>
 <input id="file" type="file">
 
 <button id="uploadBtn" onclick="uploadMaterial()">
@@ -126,13 +164,13 @@ UPLOAD MATERIAL
 
 <script>
 
-// =================================
 // SUPABASE CONNECTION
-// =================================
 
-const SUPABASE_URL = "https://dvgzvgnazghvowyeeapz.supabase.co";
+const SUPABASE_URL =
+"https://dvgzvgnazghvowyeeapz.supabase.co";
 
-const SUPABASE_KEY = "sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
+const SUPABASE_KEY =
+"sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 
 const BUCKET = "kishimba-teaching-materials";
 
@@ -145,9 +183,7 @@ let currentUser = null;
 let currentTeacher = null;
 
 
-// =================================
 // LOGIN
-// =================================
 
 async function login() {
 
@@ -180,20 +216,14 @@ async function login() {
     await loadDashboard(data.user);
 
   } catch (error) {
-
     message.textContent = error.message;
-
   } finally {
-
     button.disabled = false;
-
   }
 }
 
 
-// =================================
 // LOAD DASHBOARD
-// =================================
 
 async function loadDashboard(user) {
 
@@ -257,17 +287,12 @@ async function loadDashboard(user) {
     await loadMaterials();
 
   } catch (error) {
-
     message.textContent = error.message;
-
   }
-
 }
 
 
-// =================================
 // LOAD TEACHERS
-// =================================
 
 async function loadTeachers() {
 
@@ -303,15 +328,11 @@ async function loadTeachers() {
       " | " + (teacher.role || "teacher");
 
     list.appendChild(item);
-
   });
-
 }
 
 
-// =================================
 // UPLOAD MATERIALS
-// =================================
 
 async function uploadMaterial() {
 
@@ -322,17 +343,17 @@ async function uploadMaterial() {
 
   const title = document.getElementById("title").value.trim();
   const type = document.getElementById("materialType").value;
-  const subject = document.getElementById("subject").value.trim();
-  const className = document.getElementById("className").value.trim();
-  const year = document.getElementById("academicYear").value.trim();
+  const subject = document.getElementById("subject").value;
+  const className = document.getElementById("className").value;
+  const year = document.getElementById("academicYear").value;
   const file = document.getElementById("file").files[0];
 
   const message = document.getElementById("uploadMessage");
   const button = document.getElementById("uploadBtn");
 
-  if (!title || !type || !subject || !file) {
+  if (!title || !type || !subject || !className || !year || !file) {
     message.textContent =
-      "Please fill title, material type, subject and select file.";
+      "Please complete all fields and select a file.";
     return;
   }
 
@@ -359,7 +380,6 @@ async function uploadMaterial() {
     const { error: insertError } = await db
       .from("teaching_materials")
       .insert({
-
         teacher_id: currentUser.id,
         title: title,
         material_type: type,
@@ -368,7 +388,6 @@ async function uploadMaterial() {
         academic_year: year,
         file_path: filePath,
         review_status: "Pending"
-
       });
 
     if (insertError) {
@@ -389,21 +408,14 @@ async function uploadMaterial() {
     await loadMaterials();
 
   } catch (error) {
-
     message.textContent = error.message;
-
   } finally {
-
     button.disabled = false;
-
   }
-
 }
 
 
-// =================================
 // LOAD MATERIALS
-// =================================
 
 async function loadMaterials() {
 
@@ -472,15 +484,11 @@ async function loadMaterials() {
     entry.appendChild(downloadButton);
 
     list.appendChild(entry);
-
   });
-
 }
 
 
-// =================================
 // DOWNLOAD MATERIAL
-// =================================
 
 async function downloadMaterial(path) {
 
@@ -499,13 +507,10 @@ async function downloadMaterial(path) {
   }
 
   window.open(data.signedUrl, "_blank");
-
 }
 
 
-// =================================
 // LOGOUT
-// =================================
 
 async function logout() {
 
@@ -530,13 +535,10 @@ async function logout() {
 
   document.getElementById("loginMessage").textContent =
     "You have logged out successfully.";
-
 }
 
 
-// =================================
 // CHECK EXISTING SESSION
-// =================================
 
 async function checkSession() {
 
@@ -551,7 +553,6 @@ async function checkSession() {
   if (data.session) {
     await loadDashboard(data.session.user);
   }
-
 }
 
 checkSession();
