@@ -310,6 +310,7 @@ async function uploadMaterial(){
 }
 
 // LOAD MATERIALS
+
 async function loadMaterials(){
   const list=document.getElementById("materialsList");
   list.textContent="Loading materials...";
@@ -324,8 +325,9 @@ async function loadMaterials(){
     .order("created_at",{ascending:false});
 
   const role=String(currentTeacher.role||"").trim().toLowerCase();
+  const isAdmin=role==="admin"||role==="administrator";
 
-  if(role!=="admin"&&role!=="administrator"){
+  if(!isAdmin){
     query=query.eq("teacher_id",currentUser.id);
   }
 
@@ -364,9 +366,47 @@ async function loadMaterials(){
     entry.appendChild(heading);
     entry.appendChild(details);
     entry.appendChild(downloadButton);
+
+    if(isAdmin){
+      const approveButton=document.createElement("button");
+      approveButton.textContent="APPROVE";
+      approveButton.onclick=()=>updateMaterialStatus(item.id,"Approved");
+
+      const rejectButton=document.createElement("button");
+      rejectButton.textContent="REJECT";
+      rejectButton.onclick=()=>updateMaterialStatus(item.id,"Rejected");
+
+      if(item.review_status==="Approved"){
+        approveButton.disabled=true;
+      }
+
+      if(item.review_status==="Rejected"){
+        rejectButton.disabled=true;
+      }
+
+      entry.appendChild(approveButton);
+      entry.appendChild(rejectButton);
+    }
+
     list.appendChild(entry);
   });
 }
+
+async function updateMaterialStatus(materialId,status){
+  const {error}=await db
+    .from("teaching_materials")
+    .update({review_status:status})
+    .eq("id",materialId);
+
+  if(error){
+    alert("STATUS UPDATE ERROR: "+error.message);
+    return;
+  }
+
+  alert("Material status updated to "+status);
+  await loadMaterials();
+}
+
 
 // DOWNLOAD MATERIAL
 async function downloadMaterial(path){
