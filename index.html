@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kishimba Teachers Portal</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -42,9 +41,7 @@ button {
   border-radius: 6px;
   cursor: pointer;
 }
-button:disabled {
-  opacity: 0.6;
-}
+button:disabled { opacity: 0.6; }
 .logout { background: #b42318; }
 .hidden { display: none !important; }
 .item {
@@ -66,10 +63,8 @@ h3, h4 { color: #176b45; }
 
 <section id="login" class="card">
 <h3>Teacher / Admin Login</h3>
-
 <input id="email" type="email" placeholder="Email Address">
 <input id="password" type="password" placeholder="Password">
-
 <button id="loginBtn" onclick="login()">LOGIN</button>
 <p id="loginMessage"></p>
 </section>
@@ -151,7 +146,6 @@ h3, h4 { color: #176b45; }
 <button id="uploadBtn" onclick="uploadMaterial()">
 UPLOAD MATERIAL
 </button>
-
 <p id="uploadMessage"></p>
 </div>
 
@@ -170,7 +164,7 @@ const SUPABASE_URL =
 "https://dvgzvgnazghvowyeeapz.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
+""sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u
 
 const BUCKET = "kishimba-teaching-materials";
 
@@ -186,10 +180,8 @@ let currentTeacher = null;
 // LOGIN
 
 async function login() {
-
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-
   const message = document.getElementById("loginMessage");
   const button = document.getElementById("loginBtn");
 
@@ -202,7 +194,6 @@ async function login() {
   message.textContent = "Please wait...";
 
   try {
-
     const { data, error } = await db.auth.signInWithPassword({
       email: email,
       password: password
@@ -226,13 +217,10 @@ async function login() {
 // LOAD DASHBOARD
 
 async function loadDashboard(user) {
-
   const message = document.getElementById("loginMessage");
-
   currentUser = user;
 
   try {
-
     const { data: teacher, error } = await db
       .from("teachers")
       .select("*")
@@ -247,7 +235,6 @@ async function loadDashboard(user) {
     if (!teacher) {
       message.textContent =
         "Teacher profile not found. Contact Administrator.";
-
       await db.auth.signOut();
       currentUser = null;
       return;
@@ -260,9 +247,7 @@ async function loadDashboard(user) {
       .toLowerCase();
 
     document.getElementById("login").classList.add("hidden");
-
-    document.getElementById("dashboard")
-      .classList.remove("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
 
     document.getElementById("welcome").textContent =
       "WELCOME " + (teacher.full_name || user.email);
@@ -271,17 +256,12 @@ async function loadDashboard(user) {
       "Role: " + teacher.role;
 
     if (role === "admin" || role === "administrator") {
-
       document.getElementById("adminSection")
         .classList.remove("hidden");
-
       await loadTeachers();
-
     } else {
-
       document.getElementById("adminSection")
         .classList.add("hidden");
-
     }
 
     await loadMaterials();
@@ -293,20 +273,19 @@ async function loadDashboard(user) {
 
 
 // LOAD TEACHERS
+// SUBJECTS REMOVED BECAUSE THAT COLUMN DOES NOT EXIST
 
 async function loadTeachers() {
-
   const list = document.getElementById("teachersList");
-
   list.textContent = "Loading teachers...";
 
   const { data, error } = await db
     .from("teachers")
-    .select("id, full_name, email, staff_id, subjects, role")
+    .select("id, full_name, email, staff_id, role")
     .order("full_name");
 
   if (error) {
-    list.textContent = error.message;
+    list.textContent = "TEACHERS ERROR: " + error.message;
     return;
   }
 
@@ -318,13 +297,13 @@ async function loadTeachers() {
   }
 
   data.forEach(teacher => {
-
     const item = document.createElement("div");
     item.className = "item";
 
     item.textContent =
       (teacher.full_name || "Teacher") +
       " | " + (teacher.email || "") +
+      " | " + (teacher.staff_id || "") +
       " | " + (teacher.role || "teacher");
 
     list.appendChild(item);
@@ -335,7 +314,6 @@ async function loadTeachers() {
 // UPLOAD MATERIALS
 
 async function uploadMaterial() {
-
   if (!currentUser || !currentTeacher) {
     alert("Please login first.");
     return;
@@ -361,12 +339,12 @@ async function uploadMaterial() {
   message.textContent = "Uploading material...";
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-
   const filePath =
     currentUser.id + "/" + Date.now() + "_" + safeName;
 
-  try {
+  let uploadedPath = null;
 
+  try {
     const { error: storageError } = await db.storage
       .from(BUCKET)
       .upload(filePath, file);
@@ -376,6 +354,8 @@ async function uploadMaterial() {
         "STORAGE ERROR: " + storageError.message;
       return;
     }
+
+    uploadedPath = filePath;
 
     const { error: insertError } = await db
       .from("teaching_materials")
@@ -392,7 +372,8 @@ async function uploadMaterial() {
 
     if (insertError) {
       message.textContent =
-        "DATABASE ERROR: " + insertError.message;
+        "DATABASE ERROR: " + insertError.message +
+        ". The uploaded file remains in Storage.";
       return;
     }
 
@@ -418,9 +399,7 @@ async function uploadMaterial() {
 // LOAD MATERIALS
 
 async function loadMaterials() {
-
   const list = document.getElementById("materialsList");
-
   list.textContent = "Loading materials...";
 
   if (!currentTeacher || !currentUser) {
@@ -444,7 +423,7 @@ async function loadMaterials() {
   const { data, error } = await query;
 
   if (error) {
-    list.textContent = error.message;
+    list.textContent = "MATERIALS ERROR: " + error.message;
     return;
   }
 
@@ -456,7 +435,6 @@ async function loadMaterials() {
   }
 
   data.forEach(item => {
-
     const entry = document.createElement("div");
     entry.className = "item";
 
@@ -464,7 +442,6 @@ async function loadMaterials() {
     heading.textContent = item.title;
 
     const details = document.createElement("p");
-
     details.textContent =
       (item.material_type || "") + " | " +
       (item.subject || "") + " | " +
@@ -472,7 +449,6 @@ async function loadMaterials() {
       (item.review_status || "Pending");
 
     const downloadButton = document.createElement("button");
-
     downloadButton.textContent = "VIEW / DOWNLOAD";
 
     downloadButton.onclick = function() {
@@ -482,7 +458,6 @@ async function loadMaterials() {
     entry.appendChild(heading);
     entry.appendChild(details);
     entry.appendChild(downloadButton);
-
     list.appendChild(entry);
   });
 }
@@ -491,7 +466,6 @@ async function loadMaterials() {
 // DOWNLOAD MATERIAL
 
 async function downloadMaterial(path) {
-
   if (!path) {
     alert("File path not found.");
     return;
@@ -513,7 +487,6 @@ async function downloadMaterial(path) {
 // LOGOUT
 
 async function logout() {
-
   const { error } = await db.auth.signOut();
 
   if (error) {
@@ -524,11 +497,8 @@ async function logout() {
   currentUser = null;
   currentTeacher = null;
 
-  document.getElementById("dashboard")
-    .classList.add("hidden");
-
-  document.getElementById("login")
-    .classList.remove("hidden");
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
 
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
@@ -541,7 +511,6 @@ async function logout() {
 // CHECK EXISTING SESSION
 
 async function checkSession() {
-
   const { data, error } = await db.auth.getSession();
 
   if (error) {
@@ -558,6 +527,5 @@ async function checkSession() {
 checkSession();
 
 </script>
-
 </body>
 </html>
