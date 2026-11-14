@@ -401,20 +401,51 @@ entry.appendChild(downloadButton);
   });
 }
 
+
 async function updateMaterialStatus(materialId,status){
-  const {error}=await db
+
+  const adminComment = prompt(
+    "Andika maoni yako kuhusu teaching material hii:"
+  );
+
+  if(adminComment === null){
+    return;
+  }
+
+  if(!adminComment.trim()){
+    alert("Tafadhali andika maoni kwanza.");
+    return;
+  }
+
+  const {error: statusError} = await db
     .from("teaching_materials")
     .update({review_status:status})
     .eq("id",materialId);
 
-  if(error){
-    alert("STATUS UPDATE ERROR: "+error.message);
+  if(statusError){
+    alert("STATUS ERROR: " + statusError.message);
     return;
   }
 
-  alert("Material status updated to "+status);
+  const {error: commentError} = await db
+    .from("material_comments")
+    .insert({
+      material_id: materialId,
+      user_id: currentUser.id,
+      comment: adminComment.trim()
+    });
+
+  if(commentError){
+    alert("Status updated, but comment failed: " + commentError.message);
+    await loadMaterials();
+    return;
+  }
+
+  alert("Status and admin comment saved successfully.");
+
   await loadMaterials();
 }
+
 
 
 // DOWNLOAD MATERIAL
