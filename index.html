@@ -374,6 +374,17 @@ entry.appendChild(downloadButton);
 
     entry.appendChild(heading);
     entry.appendChild(details);
+    const commentsBox = document.createElement("div");
+commentsBox.className = "comments-box";
+
+const commentsTitle = document.createElement("h4");
+commentsTitle.textContent = "ADMIN COMMENTS & REPLIES";
+
+commentsBox.appendChild(commentsTitle);
+
+entry.appendChild(commentsBox);
+
+loadMaterialComments(item.id, commentsBox);
     entry.appendChild(downloadButton);
 
     if(isAdmin){
