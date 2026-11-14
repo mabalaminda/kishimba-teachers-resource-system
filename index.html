@@ -16,7 +16,7 @@ body {
   padding: 20px;
 }
 .container {
-  max-width: 850px;
+  max-width: 900px;
   margin: auto;
 }
 .card {
@@ -48,8 +48,12 @@ button:hover {
 .hidden {
   display: none !important;
 }
-#loginMessage, #uploadMessage {
-  color: #b42318;
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+.message {
   overflow-wrap: anywhere;
 }
 .material {
@@ -67,17 +71,22 @@ button:hover {
 <h1>Kishimba Secondary School</h1>
 <h2>Teachers Resource Management System</h2>
 
+<!-- LOGIN -->
 <section id="login" class="card">
   <h3>Teacher / Admin Login</h3>
 
+  <label>Email Address</label>
   <input id="email" type="email" placeholder="Email Address">
+
+  <label>Password</label>
   <input id="password" type="password" placeholder="Password">
 
   <button onclick="loginUser()">Login</button>
 
-  <p id="loginMessage"></p>
+  <p id="loginMessage" class="message"></p>
 </section>
 
+<!-- MAIN DASHBOARD -->
 <section id="dashboard" class="hidden">
 
   <div class="card">
@@ -87,112 +96,27 @@ button:hover {
     <button onclick="logoutUser()">Logout</button>
   </div>
 
+  <!-- ADMIN DASHBOARD -->
   <section id="adminDashboard" class="card hidden">
     <h3>Administrator Dashboard</h3>
-    <p>Manage teachers and review teaching materials.</p>
+    <p>Manage and review teaching materials.</p>
+
     <h3>Teaching Materials</h3>
     <div id="materialsList"></div>
   </section>
 
+  <!-- TEACHER DASHBOARD -->
   <section id="teacherDashboard" class="card hidden">
     <h3>Teacher Dashboard</h3>
+    <h3>Upload Teaching Materials</h3>
 
-    
-<section id="teacherDashboard" class="card hidden">
-  <h3>Teacher Dashboard</h3>
+    <label>Material Title</label>
+    <input id="title" type="text"
+      placeholder="Enter Material Title">
 
-  <h3>Upload Teaching Materials</h3>
-
-  <label>Material Title</label>
-  <input id="title" type="text" placeholder="Enter Material Title" required>
-
-  <label>Material Type</label>
-  <select id="materialType" required>
-    <option value="">Choose Material Type</option>
-    <option>Scheme of Work</option>
-    <option>Lesson Plan</option>
-    <option>Lesson Notes</option>
-    <option>Notices</option>
-    <option>Tests and Exams</option>
-    <option>Question Bank</option>
-    <option>Teaching Resources</option>
-  </select>
-
-  <label>Subject</label>
-  <select id="subject" required>
-    <option value="">Choose Subject</option>
-    <option>Biology</option>
-    <option>Physics</option>
-    <option>Chemistry</option>
-    <option>Agriculture</option>
-    <option>Computer Science</option>
-    <option>Geography</option>
-    <option>Historia ya Tanzania na Maadili</option>
-    <option>History</option>
-    <option>Bible Knowledge</option>
-    <option>Elimu ya Dini ya Kiislamu</option>
-    <option>Mathematics</option>
-    <option>Additional Mathematics</option>
-    <option>Kiswahili</option>
-    <option>English Language</option>
-    <option>Chinese</option>
-    <option>Arabic</option>
-    <option>French</option>
-    <option>Literature in English</option>
-    <option>Fasihi ya Kiswahili</option>
-    <option>Business Studies</option>
-    <option>Bookkeeping</option>
-    <option>Textile and Garment Construction</option>
-    <option>Food and Nutrition</option>
-    <option>Music</option>
-    <option>Sports</option>
-    <option>Fine Arts</option>
-    <option>Performing Arts</option>
-  </select>
-
-  <label>Class</label>
-  <select id="className" required>
-    <option value="">Choose Class</option>
-    <option>FORM ONE</option>
-    <option>FORM TWO</option>
-    <option>FORM THREE</option>
-    <option>FORM FOUR</option>
-    <option>FORM FIVE</option>
-    <option>FORM SIX</option>
-  </select>
-
-  <label>Academic Year</label>
-  <select id="academicYear" required>
-    <option value="">Choose Academic Year</option>
-    <option>2025</option>
-    <option>2026</option>
-    <option>2027</option>
-    <option>2028</option>
-    <option>2029</option>
-    <option>2030</option>
-    <option>2031</option>
-    <option>2032</option>
-    <option>2033</option>
-    <option>2034</option>
-    <option>2035</option>
-  </select>
-
-  <label>Select Teaching Material File</label>
-  <input id="file" type="file" required>
-
-  <button onclick="uploadMaterial()">Upload Material</button>
-
-  <p id="uploadMessage"></p>
-
-  <h3>Available Teaching Materials</h3>
-  <div id="materialsListTeacher"></div>
-</section>
-
-
-    <input id="title" placeholder="Material Title">
-
+    <label>Material Type</label>
     <select id="materialType">
-      <option value="">Select Material Type</option>
+      <option value="">Choose Material Type</option>
       <option>Scheme of Work</option>
       <option>Lesson Plan</option>
       <option>Lesson Notes</option>
@@ -202,15 +126,71 @@ button:hover {
       <option>Teaching Resources</option>
     </select>
 
-    <input id="subject" placeholder="Subject">
-    <input id="className" placeholder="Class e.g. FORM TWO">
-    <input id="academicYear" type="number" placeholder="Academic Year">
+    <label>Subject</label>
+    <select id="subject">
+      <option value="">Choose Subject</option>
+      <option>Biology</option>
+      <option>Physics</option>
+      <option>Chemistry</option>
+      <option>Agriculture</option>
+      <option>Computer Science</option>
+      <option>Geography</option>
+      <option>Historia ya Tanzania na Maadili</option>
+      <option>History</option>
+      <option>Bible Knowledge</option>
+      <option>Elimu ya Dini ya Kiislamu</option>
+      <option>Mathematics</option>
+      <option>Additional Mathematics</option>
+      <option>Kiswahili</option>
+      <option>English Language</option>
+      <option>Chinese</option>
+      <option>Arabic</option>
+      <option>French</option>
+      <option>Literature in English</option>
+      <option>Fasihi ya Kiswahili</option>
+      <option>Business Studies</option>
+      <option>Bookkeeping</option>
+      <option>Textile and Garment Construction</option>
+      <option>Food and Nutrition</option>
+      <option>Music</option>
+      <option>Sports</option>
+      <option>Fine Arts</option>
+      <option>Performing Arts</option>
+    </select>
 
-    <label>Select File</label>
+    <label>Class</label>
+    <select id="className">
+      <option value="">Choose Class</option>
+      <option>FORM ONE</option>
+      <option>FORM TWO</option>
+      <option>FORM THREE</option>
+      <option>FORM FOUR</option>
+      <option>FORM FIVE</option>
+      <option>FORM SIX</option>
+    </select>
+
+    <label>Academic Year</label>
+    <select id="academicYear">
+      <option value="">Choose Academic Year</option>
+      <option>2025</option>
+      <option>2026</option>
+      <option>2027</option>
+      <option>2028</option>
+      <option>2029</option>
+      <option>2030</option>
+      <option>2031</option>
+      <option>2032</option>
+      <option>2033</option>
+      <option>2034</option>
+      <option>2035</option>
+    </select>
+
+    <label>Select Teaching Material File</label>
     <input id="file" type="file">
 
     <button onclick="uploadMaterial()">Upload Material</button>
-    <p id="uploadMessage"></p>
+
+    <p id="uploadMessage" class="message"></p>
 
     <h3>Available Teaching Materials</h3>
     <div id="materialsListTeacher"></div>
@@ -220,8 +200,13 @@ button:hover {
 </div>
 
 <script>
-const SUPABASE_URL = "https://dvgzvgnazghvowyeeapz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
+
+// SUPABASE CONNECTION
+const SUPABASE_URL =
+"https://dvgzvgnazghvowyeeapz.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 
 const db = supabase.createClient(
   SUPABASE_URL,
@@ -232,11 +217,16 @@ let currentUser = null;
 let currentTeacher = null;
 
 
-// LOGIN
+// LOGIN FUNCTION
 async function loginUser() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const message = document.getElementById("loginMessage");
+
+  if (!email || !password) {
+    message.textContent = "Enter email and password.";
+    return;
+  }
 
   message.textContent = "Logging in...";
 
@@ -275,6 +265,7 @@ async function showDashboard(user) {
 
     await db.auth.signOut();
     currentUser = null;
+    currentTeacher = null;
     return;
   }
 
@@ -307,8 +298,8 @@ async function uploadMaterial() {
 
   const title = document.getElementById("title").value.trim();
   const type = document.getElementById("materialType").value;
-  const subject = document.getElementById("subject").value.trim();
-  const className = document.getElementById("className").value.trim();
+  const subject = document.getElementById("subject").value;
+  const className = document.getElementById("className").value;
   const year = document.getElementById("academicYear").value;
   const file = document.getElementById("file").files[0];
 
@@ -318,7 +309,7 @@ async function uploadMaterial() {
   }
 
   if (!title || !type || !subject || !className || !year || !file) {
-    message.textContent = "Please fill all fields and select a file.";
+    message.textContent = "Please complete all fields and select a file.";
     return;
   }
 
@@ -326,14 +317,16 @@ async function uploadMaterial() {
 
   try {
     const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filePath = currentUser.id + "/" + Date.now() + "_" + safeFileName;
+
+    const filePath =
+      currentUser.id + "/" + Date.now() + "_" + safeFileName;
 
     const { error: storageError } = await db.storage
       .from("teaching-materials")
       .upload(filePath, file);
 
     if (storageError) {
-      message.textContent = storageError.message;
+      message.textContent = "Storage error: " + storageError.message;
       return;
     }
 
@@ -358,7 +351,10 @@ async function uploadMaterial() {
     message.textContent = "Upload successful!";
 
     document.getElementById("title").value = "";
+    document.getElementById("materialType").value = "";
     document.getElementById("subject").value = "";
+    document.getElementById("className").value = "";
+    document.getElementById("academicYear").value = "";
     document.getElementById("file").value = "";
 
     await loadMaterials();
@@ -379,7 +375,7 @@ async function loadMaterials() {
 
   const { data, error } = await db
     .from("teaching_materials")
-    .select("title, material_type, subject, class_name, review_status, created_at, file_path")
+    .select("title, material_type, subject, class_name, review_status, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -408,8 +404,13 @@ async function loadMaterials() {
       item.class_name + " - " +
       (item.review_status || "Pending");
 
-    if (adminList) adminList.appendChild(entry.cloneNode(true));
-    if (teacherList) teacherList.appendChild(entry.cloneNode(true));
+    if (adminList) {
+      adminList.appendChild(entry.cloneNode(true));
+    }
+
+    if (teacherList) {
+      teacherList.appendChild(entry.cloneNode(true));
+    }
   });
 }
 
@@ -423,6 +424,7 @@ async function logoutUser() {
 
   document.getElementById("dashboard").classList.add("hidden");
   document.getElementById("login").classList.remove("hidden");
+
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
   document.getElementById("loginMessage").textContent = "";
