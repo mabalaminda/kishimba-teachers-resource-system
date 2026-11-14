@@ -322,7 +322,7 @@ async function uploadMaterial() {
       currentUser.id + "/" + Date.now() + "_" + safeFileName;
 
     const { error: storageError } = await db.storage
-      .from("teaching-materials")
+      .from("kishimba-teaching-materials")
       .upload(filePath, file);
 
     if (storageError) {
