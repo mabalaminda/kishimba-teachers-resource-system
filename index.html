@@ -97,7 +97,97 @@ button:hover {
   <section id="teacherDashboard" class="card hidden">
     <h3>Teacher Dashboard</h3>
 
-    <h3>Upload Teaching Materials</h3>
+    
+<section id="teacherDashboard" class="card hidden">
+  <h3>Teacher Dashboard</h3>
+
+  <h3>Upload Teaching Materials</h3>
+
+  <label>Material Title</label>
+  <input id="title" type="text" placeholder="Enter Material Title" required>
+
+  <label>Material Type</label>
+  <select id="materialType" required>
+    <option value="">Choose Material Type</option>
+    <option>Scheme of Work</option>
+    <option>Lesson Plan</option>
+    <option>Lesson Notes</option>
+    <option>Notices</option>
+    <option>Tests and Exams</option>
+    <option>Question Bank</option>
+    <option>Teaching Resources</option>
+  </select>
+
+  <label>Subject</label>
+  <select id="subject" required>
+    <option value="">Choose Subject</option>
+    <option>Biology</option>
+    <option>Physics</option>
+    <option>Chemistry</option>
+    <option>Agriculture</option>
+    <option>Computer Science</option>
+    <option>Geography</option>
+    <option>Historia ya Tanzania na Maadili</option>
+    <option>History</option>
+    <option>Bible Knowledge</option>
+    <option>Elimu ya Dini ya Kiislamu</option>
+    <option>Mathematics</option>
+    <option>Additional Mathematics</option>
+    <option>Kiswahili</option>
+    <option>English Language</option>
+    <option>Chinese</option>
+    <option>Arabic</option>
+    <option>French</option>
+    <option>Literature in English</option>
+    <option>Fasihi ya Kiswahili</option>
+    <option>Business Studies</option>
+    <option>Bookkeeping</option>
+    <option>Textile and Garment Construction</option>
+    <option>Food and Nutrition</option>
+    <option>Music</option>
+    <option>Sports</option>
+    <option>Fine Arts</option>
+    <option>Performing Arts</option>
+  </select>
+
+  <label>Class</label>
+  <select id="className" required>
+    <option value="">Choose Class</option>
+    <option>FORM ONE</option>
+    <option>FORM TWO</option>
+    <option>FORM THREE</option>
+    <option>FORM FOUR</option>
+    <option>FORM FIVE</option>
+    <option>FORM SIX</option>
+  </select>
+
+  <label>Academic Year</label>
+  <select id="academicYear" required>
+    <option value="">Choose Academic Year</option>
+    <option>2025</option>
+    <option>2026</option>
+    <option>2027</option>
+    <option>2028</option>
+    <option>2029</option>
+    <option>2030</option>
+    <option>2031</option>
+    <option>2032</option>
+    <option>2033</option>
+    <option>2034</option>
+    <option>2035</option>
+  </select>
+
+  <label>Select Teaching Material File</label>
+  <input id="file" type="file" required>
+
+  <button onclick="uploadMaterial()">Upload Material</button>
+
+  <p id="uploadMessage"></p>
+
+  <h3>Available Teaching Materials</h3>
+  <div id="materialsListTeacher"></div>
+</section>
+
 
     <input id="title" placeholder="Material Title">
 
