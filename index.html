@@ -478,7 +478,8 @@ async function updateMaterialStatus(materialId,status){
   await loadMaterials();
 }
 
-  async function loadMaterialComments(materialId, container){
+  
+async function loadMaterialComments(materialId, container){
 
   const {data,error}=await db
     .from("material_comments")
@@ -498,10 +499,44 @@ async function updateMaterialStatus(materialId,status){
     return;
   }
 
+  const viewerIsAdmin =
+    ["admin","administrator"].includes(
+      String(currentTeacher.role || "").trim().toLowerCase()
+    );
+
   data.forEach(comment=>{
-    const p=document.createElement("p");
-    p.textContent=comment.comment;
-    container.appendChild(p);
+
+    const isOwnComment =
+      comment.user_id === currentUser.id;
+
+    const isAdminComment =
+      viewerIsAdmin ? isOwnComment : !isOwnComment;
+
+    const box=document.createElement("div");
+
+    box.style.backgroundColor = isAdminComment
+      ? "#EFF6FF"
+      : "#F0FDF4";
+
+    box.style.color="#1E293B";
+    box.style.padding="12px";
+    box.style.margin="8px 0";
+    box.style.borderRadius="10px";
+    box.style.border="1px solid #E2E8F0";
+
+    const heading=document.createElement("strong");
+
+    heading.textContent=isAdminComment
+      ? "ADMIN COMMENTS"
+      : "TEACHER REPLY";
+
+    const message=document.createElement("p");
+    message.textContent=comment.comment;
+
+    box.appendChild(heading);
+    box.appendChild(message);
+
+    container.appendChild(box);
   });
 }
 
