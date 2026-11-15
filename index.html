@@ -21,7 +21,7 @@ button:disabled{opacity:.6}
 h3,h4{color:#176b45}
 .signature-pad{width:100%;height:160px;border:2px dashed #64748b;border-radius:8px;background:#fff;touch-action:none;display:block}
 .signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}
-.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:8px 0}
+.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:8px 5px 8px 0}
 .pending{background:#fef3c7;color:#92400e}
 .checked{background:#dbeafe;color:#1d4ed8}
 .forwarded{background:#d1fae5;color:#047857}
@@ -59,7 +59,7 @@ h3,h4{color:#176b45}
 <h3>ADMIN DASHBOARD</h3>
 <h4>REGISTERED TEACHERS</h4>
 <div id="teachersList"></div>
-<h4>ALL TEACHING MATERIALS</h4>
+<h4>ALL TEACHING MATERIALS AND RECORDS</h4>
 <div id="materialsList"></div>
 </div>
 
@@ -77,6 +77,7 @@ h3,h4{color:#176b45}
 
 <div id="teacherSection" class="card hidden">
 <h3>TEACHER DASHBOARD</h3>
+<p>Approved materials can be viewed here. Download is not provided.</p>
 <div id="teacherMaterials"></div>
 </div>
 
@@ -146,7 +147,6 @@ h3,h4{color:#176b45}
 </section>
 
 <script>
-// SUPABASE CONNECTION
 const SUPABASE_URL="https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY="sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 const BUCKET="kishimba-teaching-materials";
@@ -198,11 +198,8 @@ async function loadDashboard(user){
  currentUser=user;
 
  try{
-  const {data:teacher,error}=await db
-   .from("teachers")
-   .select("*")
-   .eq("id",user.id)
-   .maybeSingle();
+  const {data:teacher,error}=await db.from("teachers")
+   .select("*").eq("id",user.id).maybeSingle();
 
   if(error){
    message.textContent="PROFILE ERROR: "+error.message;
@@ -255,10 +252,8 @@ async function loadTeachers(){
  const list=document.getElementById("teachersList");
  list.textContent="Loading teachers...";
 
- const {data,error}=await db
-  .from("teachers")
-  .select("id,full_name,email,staff_id,role")
-  .order("full_name");
+ const {data,error}=await db.from("teachers")
+  .select("id,full_name,email,staff_id,role").order("full_name");
 
  if(error){
   list.textContent="TEACHERS ERROR: "+error.message;
@@ -359,6 +354,7 @@ async function loadMaterials(){
   .select("*")
   .order("created_at",{ascending:false});
 
+ // Admin sees ALL records, including Approved and Returned.
  if(role==="teacher"){
   query=query.eq("teacher_id",currentUser.id);
  }
@@ -390,7 +386,9 @@ async function loadMaterials(){
   entry.appendChild(heading);
 
   const details=document.createElement("p");
-  details.textContent=[item.material_type,item.subject,item.class_name,item.academic_year].filter(Boolean).join(" | ");
+  details.textContent=[
+   item.material_type,item.subject,item.class_name,item.academic_year
+  ].filter(Boolean).join(" | ");
   entry.appendChild(details);
 
   const review=document.createElement("span");
@@ -402,9 +400,9 @@ async function loadMaterials(){
   );
   entry.appendChild(review);
 
+  const forwarding=item.forwarding_status||"Pending";
   const stage=document.createElement("div");
   stage.className="status";
-  const forwarding=item.forwarding_status||"Pending";
   stage.textContent="OFFICE STATUS: "+forwarding.toUpperCase();
   stage.classList.add(
    forwarding==="Approved"?"approved":
@@ -414,15 +412,26 @@ async function loadMaterials(){
   );
   entry.appendChild(stage);
 
+  // VIEW button for all users
   const viewButton=document.createElement("button");
   viewButton.textContent="VIEW";
   viewButton.onclick=()=>viewMaterial(item.file_path);
   entry.appendChild(viewButton);
 
-  const downloadButton=document.createElement("button");
-  downloadButton.textContent="DOWNLOAD";
-  downloadButton.onclick=()=>downloadMaterial(item.file_path);
-  entry.appendChild(downloadButton);
+  // Only Admin and offices get DOWNLOAD.
+  // Teachers do not get a download button.
+  if(!isAdmin()&&role!=="teacher"){
+   const downloadButton=document.createElement("button");
+   downloadButton.textContent="DOWNLOAD";
+   downloadButton.onclick=()=>downloadMaterial(item.file_path);
+   entry.appendChild(downloadButton);
+  }
+  if(isAdmin()){
+   const downloadButton=document.createElement("button");
+   downloadButton.textContent="DOWNLOAD";
+   downloadButton.onclick=()=>downloadMaterial(item.file_path);
+   entry.appendChild(downloadButton);
+  }
 
   addSignatureDisplay(entry,item);
 
@@ -434,9 +443,10 @@ async function loadMaterials(){
    addSignaturePad(entry,item,"headmaster");
   }
 
+  // ADMIN DECISION BUTTONS
   if(isAdmin()&&forwarding==="Forwarded"){
    const approveButton=document.createElement("button");
-   approveButton.textContent="APPROVE";
+   approveButton.textContent="APPROVE & SEND";
    approveButton.onclick=()=>adminAction(item,"Approved");
    entry.appendChild(approveButton);
 
@@ -447,7 +457,8 @@ async function loadMaterials(){
    entry.appendChild(returnButton);
   }
 
-  if(item.admin_comment){
+  // Show Admin comment to Admin and the relevant teacher.
+  if(item.admin_comment&&(isAdmin()||role==="teacher")){
    const note=document.createElement("p");
    note.textContent="ADMIN COMMENT: "+item.admin_comment;
    entry.appendChild(note);
@@ -455,6 +466,14 @@ async function loadMaterials(){
 
   if(role==="teacher"&&forwarding==="Returned"){
    addResubmitControl(entry,item);
+  }
+
+  if(role==="teacher"&&forwarding==="Approved"){
+   const approvedNote=document.createElement("p");
+   approvedNote.textContent="This material has been approved by the Administrator. You can view it here.";
+   approvedNote.style.color="#166534";
+   approvedNote.style.fontWeight="bold";
+   entry.appendChild(approvedNote);
   }
 
   const commentsBox=document.createElement("div");
@@ -552,7 +571,9 @@ function addSignaturePad(entry,item,office){
  area.className="signature-area";
 
  const title=document.createElement("h4");
- title.textContent=office==="academic"?"ACADEMIC OFFICE - DRAW SIGNATURE":"HEAD OF SCHOOL - DRAW SIGNATURE";
+ title.textContent=office==="academic"?
+  "ACADEMIC OFFICE - DRAW SIGNATURE":
+  "HEAD OF SCHOOL - DRAW SIGNATURE";
  area.appendChild(title);
 
  const canvas=document.createElement("canvas");
@@ -614,7 +635,8 @@ function addSignaturePad(entry,item,office){
  area.appendChild(clearButton);
 
  const saveButton=document.createElement("button");
- saveButton.textContent=office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
+ saveButton.textContent=office==="academic"?
+  "CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
  area.appendChild(saveButton);
 
  saveButton.onclick=async()=>{
@@ -671,13 +693,14 @@ function addSignaturePad(entry,item,office){
    alert("ERROR: "+error.message);
   }finally{
    saveButton.disabled=false;
-   saveButton.textContent=office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
+   saveButton.textContent=office==="academic"?
+    "CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
   }
  };
  entry.appendChild(area);
 }
 
-// ADMIN APPROVE OR RETURN
+// ADMIN APPROVE & SEND OR RETURN
 async function adminAction(item,action){
  if(!isAdmin()){
   alert("Administrator account required.");
@@ -723,23 +746,14 @@ async function adminAction(item,action){
   return;
  }
 
- const {error:commentError}=await db.from("material_comments").insert({
-  material_id:item.id,
-  user_id:currentUser.id,
-  comment:"ADMIN "+action.toUpperCase()+": "+adminComment.trim()
- });
+ alert(action==="Approved"
+  ?"Material APPROVED & SENT to the teacher. It remains in Admin records."
+  :"Material returned to the teacher with Admin comments.");
 
- if(commentError){
-  alert("Action saved, but comment could not be saved: "+commentError.message);
-  await loadMaterials();
-  return;
- }
-
- alert(action==="Approved"?"Material approved successfully.":"Material returned to teacher successfully.");
  await loadMaterials();
 }
 
-// TEACHER RESUBMISSION
+// TEACHER RESUBMISSION AFTER RETURN
 function addResubmitControl(entry,item){
  const area=document.createElement("div");
  area.className="signature-area";
@@ -811,17 +825,13 @@ function addResubmitControl(entry,item){
     return;
    }
 
-   const {error:commentError}=await db.from("material_comments").insert({
+   await db.from("material_comments").insert({
     material_id:item.id,
     user_id:currentUser.id,
     comment:"Teacher has uploaded a corrected version for review."
    });
 
-   if(commentError){
-    alert("Material resubmitted, but history comment failed: "+commentError.message);
-   }else{
-    alert("Corrected material resubmitted successfully.");
-   }
+   alert("Corrected material resubmitted successfully.");
    await loadMaterials();
   }catch(error){
    alert(error.message);
@@ -841,7 +851,7 @@ async function loadMaterialComments(materialId,container){
   .order("created_at",{ascending:true});
 
  if(error){
-  container.textContent="COMMENTS ERROR: "+error.message;
+  container.appendChild(document.createTextNode("Comments could not be loaded: "+error.message));
   return;
  }
  if(!data||data.length===0){
@@ -854,7 +864,8 @@ async function loadMaterialComments(materialId,container){
   box.className="comment-item";
 
   const heading=document.createElement("strong");
-  heading.textContent=comment.user_id===currentUser.id?"YOUR COMMENT":"OFFICE / TEACHER COMMENT";
+  heading.textContent=comment.user_id===currentUser.id?
+   "YOUR COMMENT":"OFFICE / TEACHER COMMENT";
 
   const message=document.createElement("p");
   message.textContent=comment.comment;
@@ -869,7 +880,7 @@ async function loadMaterialComments(materialId,container){
  });
 }
 
-// REPLY TO COMMENTS
+// TEACHER REPLY
 async function replyToMaterialComment(materialId){
  const reply=prompt("Andika majibu yako:");
  if(reply===null||!reply.trim())return;
@@ -889,12 +900,17 @@ async function replyToMaterialComment(materialId){
  await loadMaterials();
 }
 
-// DOWNLOAD MATERIAL
+// DOWNLOAD - ADMIN AND OFFICES ONLY
 async function downloadMaterial(path){
+ if(getRole()==="teacher"){
+  alert("Teachers are not allowed to download materials.");
+  return;
+ }
  if(!path){
   alert("File path not found.");
   return;
  }
+
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
  if(error){
   alert("DOWNLOAD ERROR: "+error.message);
@@ -909,6 +925,7 @@ async function viewMaterial(path){
   alert("File path not found.");
   return;
  }
+
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
  if(error){
   alert("VIEW ERROR: "+error.message);
