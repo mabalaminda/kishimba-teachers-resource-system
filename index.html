@@ -438,6 +438,31 @@ downloadButton.onclick=()=>downloadMaterial(item.file_path);
 
 entry.appendChild(viewButton);
 entry.appendChild(downloadButton);
+    if (
+  currentTeacher &&
+  currentTeacher.role === "teacher" &&
+  item.current_stage === "teacher"
+) {
+  const resubmitButton = document.createElement("button");
+
+  resubmitButton.textContent = "RESUBMIT";
+
+  resubmitButton.onclick = async () => {
+    const { data, error } = await db.rpc("resubmit_material", {
+      p_material_id: item.id
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert(data);
+    await loadMaterials();
+  };
+
+  entry.appendChild(resubmitButton);
+}
 
     entry.appendChild(heading);
     entry.appendChild(details);
