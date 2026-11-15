@@ -45,6 +45,7 @@ h3,h4{color:#176b45}
 .summary-box p{margin:8px 0;font-weight:bold}
 .status-details{background:#f8fafc;padding:10px;border-radius:8px;margin:10px 0}
 .status-details p{margin:6px 0;font-size:13px}
+.office-action{border:2px solid #176b45;background:#f0fdf4;padding:12px;border-radius:8px;margin-top:12px}
 </style>
 </head>
 
@@ -171,7 +172,6 @@ h3,h4{color:#176b45}
 </section>
 
 <script>
-
 const SUPABASE_URL="https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY="sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 const BUCKET="kishimba-teaching-materials";
@@ -182,27 +182,34 @@ let currentUser=null;
 let currentTeacher=null;
 
 function getRole(){
- return String(currentTeacher?.role||"").trim().toLowerCase();
+ const raw=String(currentTeacher?.role||"").trim().toLowerCase();
+
+ if(["admin","administrator"].includes(raw))return "admin";
+ if(["academic","academic office","taaluma","ofisi ya taaluma"].includes(raw))return "academic";
+ if(["headmaster","head of school","mkuu wa shule","head teacher"].includes(raw))return "headmaster";
+ if(["teacher","mwalimu"].includes(raw))return "teacher";
+
+ return raw;
 }
 
 function isAdmin(){
- return ["admin","administrator"].includes(getRole());
+ return getRole()==="admin";
+}
+
+function normalStatus(value){
+ return String(value||"").trim().toLowerCase();
 }
 
 function statusClass(value){
- const s=String(value||"").trim().toLowerCase();
-
+ const s=normalStatus(value);
  if(s.includes("return"))return "returned";
  if(s.includes("approv"))return "approved";
  if(s.includes("forward"))return "forwarded";
  if(s.includes("check"))return "checked";
-
  return "pending";
 }
 
-// LOGIN
 async function login(){
-
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
  const message=document.getElementById("loginMessage");
@@ -218,14 +225,11 @@ async function login(){
 
  try{
   const {data,error}=await db.auth.signInWithPassword({email,password});
-
   if(error){
    message.textContent="LOGIN ERROR: "+error.message;
    return;
   }
-
   await loadDashboard(data.user);
-
  }catch(error){
   message.textContent="LOGIN ERROR: "+error.message;
  }finally{
@@ -233,14 +237,11 @@ async function login(){
  }
 }
 
-// LOAD DASHBOARD
 async function loadDashboard(user){
-
  const message=document.getElementById("loginMessage");
  currentUser=user;
 
  try{
-
   const {data:teacher,error}=await db.from("teachers")
    .select("*").eq("id",user.id).maybeSingle();
 
@@ -261,10 +262,7 @@ async function loadDashboard(user){
 
   document.getElementById("login").classList.add("hidden");
   document.getElementById("dashboard").classList.remove("hidden");
-
-  document.getElementById("welcome").textContent=
-   "WELCOME "+(teacher.full_name||user.email);
-
+  document.getElementById("welcome").textContent="WELCOME "+(teacher.full_name||user.email);
   document.getElementById("roleDisplay").textContent="Role: "+teacher.role;
 
   ["adminSection","academicSection","headmasterSection","teacherSection"]
@@ -275,32 +273,25 @@ async function loadDashboard(user){
   if(isAdmin()){
    document.getElementById("adminSection").classList.remove("hidden");
    await loadTeachers();
-
   }else if(role==="academic"){
    document.getElementById("academicSection").classList.remove("hidden");
-
   }else if(role==="headmaster"){
    document.getElementById("headmasterSection").classList.remove("hidden");
-
   }else if(role==="teacher"){
    document.getElementById("teacherSection").classList.remove("hidden");
    document.getElementById("uploadSection").classList.remove("hidden");
-
   }else{
-   message.textContent="Unknown user role. Contact Administrator.";
+   message.textContent="Unknown user role: "+teacher.role+". Contact Administrator.";
    return;
   }
 
   await loadMaterials();
-
  }catch(error){
   message.textContent="DASHBOARD ERROR: "+error.message;
  }
 }
 
-// LOAD TEACHERS
 async function loadTeachers(){
-
  const list=document.getElementById("teachersList");
  list.textContent="Loading teachers...";
 
@@ -313,7 +304,6 @@ async function loadTeachers(){
  }
 
  list.innerHTML="";
-
  if(!data||data.length===0){
   list.textContent="No teachers found.";
   return;
@@ -322,18 +312,13 @@ async function loadTeachers(){
  data.forEach(teacher=>{
   const item=document.createElement("div");
   item.className="item";
-  item.textContent=
-   (teacher.full_name||"Teacher")+" | "+
-   (teacher.email||"")+" | "+
-   (teacher.staff_id||"")+" | "+
-   (teacher.role||"teacher");
+  item.textContent=(teacher.full_name||"Teacher")+" | "+
+   (teacher.email||"")+" | "+(teacher.staff_id||"")+" | "+(teacher.role||"teacher");
   list.appendChild(item);
  });
 }
 
-// UPLOAD MATERIAL
 async function uploadMaterial(){
-
  if(!currentUser||!currentTeacher||getRole()!=="teacher"){
   alert("Teacher login required.");
   return;
@@ -345,7 +330,6 @@ async function uploadMaterial(){
  const className=document.getElementById("className").value;
  const year=document.getElementById("academicYear").value;
  const file=document.getElementById("file").files[0];
-
  const message=document.getElementById("uploadMessage");
  const button=document.getElementById("uploadBtn");
 
@@ -361,9 +345,7 @@ async function uploadMaterial(){
  const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
 
  try{
-
   const {error:storageError}=await db.storage.from(BUCKET).upload(filePath,file);
-
   if(storageError){
    message.textContent="STORAGE ERROR: "+storageError.message;
    return;
@@ -371,9 +353,9 @@ async function uploadMaterial(){
 
   const {error:insertError}=await db.from("teaching_materials").insert({
    teacher_id:currentUser.id,
-   title:title,
+   title,
    material_type:type,
-   subject:subject,
+   subject,
    class_name:className,
    academic_year:year,
    file_path:filePath,
@@ -387,12 +369,10 @@ async function uploadMaterial(){
   }
 
   message.textContent="Material uploaded successfully!";
-
   ["title","materialType","subject","className","academicYear","file"]
    .forEach(id=>document.getElementById(id).value="");
 
   await loadMaterials();
-
  }catch(error){
   message.textContent=error.message;
  }finally{
@@ -400,13 +380,10 @@ async function uploadMaterial(){
  }
 }
 
-// LOAD MATERIALS
 async function loadMaterials(){
-
  if(!currentTeacher||!currentUser)return;
 
  const role=getRole();
-
  const listId=isAdmin()?"materialsList":
   role==="academic"?"academicMaterials":
   role==="headmaster"?"headmasterMaterials":"teacherMaterials";
@@ -423,11 +400,11 @@ async function loadMaterials(){
  }
 
  if(role==="academic"){
-  query=query.eq("forwarding_status","Pending");
+  query=query.ilike("forwarding_status","Pending");
  }
 
  if(role==="headmaster"){
-  query=query.eq("forwarding_status","Checked");
+  query=query.ilike("forwarding_status","Checked");
  }
 
  const {data,error}=await query;
@@ -445,27 +422,18 @@ async function loadMaterials(){
   return;
  }
 
- if(role==="teacher"){
-  updateTeacherSummary(data);
- }
+ if(role==="teacher")updateTeacherSummary(data);
 
  const peopleNames={};
 
  if(isAdmin()||role==="academic"||role==="headmaster"){
-
-  const ids=[...new Set(
-   data.flatMap(item=>[
-    item.teacher_id,
-    item.academic_signed_by,
-    item.headmaster_signed_by,
-    item.admin_action_by
-   ]).filter(Boolean)
-  )];
+  const ids=[...new Set(data.flatMap(item=>[
+   item.teacher_id,item.academic_signed_by,item.headmaster_signed_by,item.admin_action_by
+  ]).filter(Boolean))];
 
   if(ids.length){
    const {data:people,error:peopleError}=await db.from("teachers")
-    .select("id,full_name,email,role")
-    .in("id",ids);
+    .select("id,full_name,email,role").in("id",ids);
 
    if(!peopleError&&people){
     people.forEach(person=>{
@@ -475,20 +443,10 @@ async function loadMaterials(){
   }
  }
 
- const categories=[
-  "Scheme of Work",
-  "Lesson Plan",
-  "Lesson Notes",
-  "Notices",
-  "Tests and Exams",
-  "Question Bank",
-  "Teaching Resources"
- ];
-
- let groups=[];
+ const categories=["Scheme of Work","Lesson Plan","Lesson Notes","Notices",
+  "Tests and Exams","Question Bank","Teaching Resources"];
 
  if(isAdmin()){
-
   const grouped={};
 
   data.forEach(item=>{
@@ -497,45 +455,26 @@ async function loadMaterials(){
    grouped[id].push(item);
   });
 
-  groups=Object.keys(grouped).sort((a,b)=>
-   (peopleNames[a]||a).localeCompare(peopleNames[b]||b)
-  ).map(id=>({
-   teacherId:id,
-   teacherName:peopleNames[id]||"Teacher account",
-   materials:grouped[id]
-  }));
+  const groups=Object.keys(grouped).sort((a,b)=>
+   (peopleNames[a]||a).localeCompare(peopleNames[b]||b));
 
- }else{
-  groups=[{
-   teacherId:currentUser.id,
-   teacherName:currentTeacher.full_name||"Teacher",
-   materials:data
-  }];
- }
-
- for(const group of groups){
-
-  if(isAdmin()){
-
+  for(const id of groups){
    const teacherHeading=document.createElement("div");
    teacherHeading.className="teacher-heading";
 
    const name=document.createElement("h3");
-   name.textContent="TEACHER: "+group.teacherName;
+   name.textContent="TEACHER: "+(peopleNames[id]||"Teacher account");
 
    const count=document.createElement("p");
-   count.textContent="TOTAL MATERIALS: "+group.materials.length;
+   count.textContent="TOTAL MATERIALS: "+grouped[id].length;
 
    teacherHeading.appendChild(name);
    teacherHeading.appendChild(count);
    list.appendChild(teacherHeading);
 
    for(const category of categories){
-
-    const matching=group.materials.filter(item=>
-     String(item.material_type||"").trim().toLowerCase()
-      ===category.toLowerCase()
-    );
+    const matching=grouped[id].filter(item=>
+     normalStatus(item.material_type)===normalStatus(category));
 
     const categoryBox=document.createElement("div");
     categoryBox.className="material-category";
@@ -568,7 +507,6 @@ async function loadMaterials(){
     categoryHeader.appendChild(categoryName);
     categoryHeader.appendChild(badge);
     categoryHeader.appendChild(openButton);
-
     categoryBox.appendChild(categoryHeader);
     categoryBox.appendChild(content);
     list.appendChild(categoryBox);
@@ -577,32 +515,19 @@ async function loadMaterials(){
      await renderMaterialEntry(item,content,role,peopleNames);
     }
    }
-
-  }else{
-
-   for(const item of group.materials){
-    await renderMaterialEntry(item,list,role,peopleNames);
-   }
+  }
+ }else{
+  for(const item of data){
+   await renderMaterialEntry(item,list,role,peopleNames);
   }
  }
 }
 
-// TEACHER SUMMARY
 function updateTeacherSummary(data){
-
  const total=data.length;
-
- const approved=data.filter(item=>
-  String(item.review_status||"").trim().toLowerCase()==="approved"
- ).length;
-
- const returned=data.filter(item=>
-  String(item.forwarding_status||"").trim().toLowerCase()==="returned"
- ).length;
-
- const forwarded=data.filter(item=>
-  String(item.forwarding_status||"").trim().toLowerCase()==="forwarded to teacher"
- ).length;
+ const approved=data.filter(item=>normalStatus(item.review_status)==="approved").length;
+ const returned=data.filter(item=>normalStatus(item.forwarding_status)==="returned").length;
+ const forwarded=data.filter(item=>normalStatus(item.forwarding_status)==="forwarded to teacher").length;
 
  document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+total;
  document.getElementById("teacherApprovedCount").textContent="APPROVED: "+approved;
@@ -610,14 +535,12 @@ function updateTeacherSummary(data){
  document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+forwarded;
 }
 
-// DISPLAY ONE MATERIAL
 async function renderMaterialEntry(item,list,role,peopleNames){
-
  const entry=document.createElement("div");
  entry.className="item";
 
  const heading=document.createElement("h4");
- heading.textContent=item.title;
+ heading.textContent=item.title||"Untitled material";
  entry.appendChild(heading);
 
  const teacherName=peopleNames[item.teacher_id]||"Teacher";
@@ -629,12 +552,8 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  }
 
  const details=document.createElement("p");
- details.textContent=[
-  item.material_type,
-  item.subject,
-  item.class_name,
-  item.academic_year
- ].filter(Boolean).join(" | ");
+ details.textContent=[item.material_type,item.subject,item.class_name,item.academic_year]
+  .filter(Boolean).join(" | ");
  entry.appendChild(details);
 
  const review=document.createElement("span");
@@ -643,15 +562,14 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  entry.appendChild(review);
 
  const forwarding=String(item.forwarding_status||"Pending").trim();
- const forwardingLower=forwarding.toLowerCase();
- const reviewLower=String(item.review_status||"").trim().toLowerCase();
+ const forwardingLower=normalStatus(forwarding);
+ const reviewLower=normalStatus(item.review_status);
 
  const stage=document.createElement("div");
  stage.className="status "+statusClass(forwarding);
  stage.textContent="STATUS: "+forwarding.toUpperCase();
  entry.appendChild(stage);
 
- // TRACKING
  const tracking=document.createElement("div");
  tracking.className="status-details";
 
@@ -670,95 +588,84 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  tracking.appendChild(headLine);
 
  const adminLine=document.createElement("p");
- adminLine.textContent="ADMIN: "+
-  (item.admin_action_at?adminName+" - "+(item.review_status||"Reviewed"):"Awaiting Admin");
+ adminLine.textContent="ADMIN: "+(item.admin_action_at?
+  adminName+" - "+(item.review_status||"Reviewed"):"Awaiting Admin");
  tracking.appendChild(adminLine);
 
  if(forwardingLower==="forwarded to teacher"){
-  const receivedLine=document.createElement("p");
-  receivedLine.textContent="DESTINATION: "+teacherName+" - FORWARDED TO TEACHER";
-  tracking.appendChild(receivedLine);
+  const p=document.createElement("p");
+  p.textContent="DESTINATION: "+teacherName+" - FORWARDED TO TEACHER";
+  tracking.appendChild(p);
  }
 
  if(forwardingLower==="returned"){
-  const returnedLine=document.createElement("p");
-  returnedLine.textContent="DESTINATION: "+teacherName+" - RETURNED FOR CORRECTIONS";
-  tracking.appendChild(returnedLine);
+  const p=document.createElement("p");
+  p.textContent="DESTINATION: "+teacherName+" - RETURNED FOR CORRECTIONS";
+  tracking.appendChild(p);
  }
 
  entry.appendChild(tracking);
 
- // VIEW
  const viewButton=document.createElement("button");
- viewButton.textContent="VIEW";
+ viewButton.textContent="VIEW / OPEN MATERIAL";
  viewButton.onclick=()=>viewMaterial(item.file_path);
  entry.appendChild(viewButton);
 
- // DOWNLOAD
  if(role!=="teacher"){
   const downloadButton=document.createElement("button");
-  downloadButton.textContent="DOWNLOAD";
+  downloadButton.textContent="DOWNLOAD MATERIAL";
   downloadButton.onclick=()=>downloadMaterial(item.file_path);
   entry.appendChild(downloadButton);
  }
 
- // SIGNATURES
  addSignatureDisplay(entry,item);
 
- // ACADEMIC OFFICE
- if(role==="academic"&&forwardingLower==="pending"){
+ // ACADEMIC OFFICE SIGNATURE AND COMMENT
+ if(role==="academic"&&!item.academic_signature&&
+    forwardingLower==="pending"){
   addSignaturePad(entry,item,"academic");
  }
 
- // HEAD OF SCHOOL
- if(role==="headmaster"&&forwardingLower==="checked"){
+ // HEAD OF SCHOOL SIGNATURE AND COMMENT
+ if(role==="headmaster"&&!item.headmaster_signature&&
+    forwardingLower==="checked"){
   addSignaturePad(entry,item,"headmaster");
  }
 
- // ADMIN ACTIONS - IMPROVED
+ // ADMIN ACTIONS
  const isAlreadySent=forwardingLower==="forwarded to teacher";
 
- const isReadyForAdmin=
-  Boolean(item.headmaster_signature)||
+ const isReadyForAdmin=Boolean(item.headmaster_signature)||
   ["forwarded","approved"].includes(forwardingLower)||
   reviewLower==="approved";
 
  if(isAdmin()){
-
   if(isAlreadySent){
-
-   const sentLabel=document.createElement("p");
-   sentLabel.className="status forwarded";
-   sentLabel.textContent="SENT TO TEACHER SUCCESSFULLY";
-   entry.appendChild(sentLabel);
-
+   const label=document.createElement("p");
+   label.className="status forwarded";
+   label.textContent="SENT TO TEACHER SUCCESSFULLY";
+   entry.appendChild(label);
   }else if(forwardingLower==="returned"){
-
-   const returnedLabel=document.createElement("p");
-   returnedLabel.className="status returned";
-   returnedLabel.textContent="RETURNED TO TEACHER";
-   entry.appendChild(returnedLabel);
-
+   const label=document.createElement("p");
+   label.className="status returned";
+   label.textContent="RETURNED TO TEACHER";
+   entry.appendChild(label);
   }else if(isReadyForAdmin){
-
    const adminHeading=document.createElement("h4");
    adminHeading.textContent="ADMINISTRATOR ACTIONS";
    entry.appendChild(adminHeading);
 
    if(reviewLower!=="approved"){
-
     const approveButton=document.createElement("button");
     approveButton.className="approve-button";
     approveButton.textContent="APPROVE";
     approveButton.onclick=()=>adminAction(item,"Approved");
     entry.appendChild(approveButton);
-
    }else{
-
-    const approvedLabel=document.createElement("p");
-    approvedLabel.className="status approved";
-    approvedLabel.textContent="APPROVED BY ADMIN";
-    entry.appendChild(approvedLabel);
+    const label=document.createElement("p");
+    label.className="status approved";
+    label.textContent="APPROVED BY ADMIN";
+    entry.appendChild(label);
 
     const sendButton=document.createElement("button");
     sendButton.className="send-button";
@@ -772,9 +679,7 @@ async function renderMaterialEntry(item,list,role,peopleNames){
    returnButton.textContent="RETURN TO TEACHER";
    returnButton.onclick=()=>adminAction(item,"Returned");
    entry.appendChild(returnButton);
-
   }else{
-
    const waiting=document.createElement("p");
    waiting.className="small";
    waiting.textContent="WAITING FOR HEAD OF SCHOOL SIGNATURE";
@@ -782,28 +687,24 @@ async function renderMaterialEntry(item,list,role,peopleNames){
   }
  }
 
- // ADMIN COMMENT
  if(item.admin_comment&&(isAdmin()||role==="teacher")){
   const note=document.createElement("p");
   note.textContent="ADMIN COMMENT: "+item.admin_comment;
   entry.appendChild(note);
  }
 
- // TEACHER RESUBMISSION
  if(role==="teacher"&&forwardingLower==="returned"){
   addResubmitControl(entry,item);
  }
 
- // TEACHER APPROVAL MESSAGE
  if(role==="teacher"&&forwardingLower==="forwarded to teacher"){
-  const approvedNote=document.createElement("p");
-  approvedNote.textContent="This material has been approved by the Administrator and forwarded to you.";
-  approvedNote.style.color="#166534";
-  approvedNote.style.fontWeight="bold";
-  entry.appendChild(approvedNote);
+  const note=document.createElement("p");
+  note.textContent="This material has been approved by the Administrator and forwarded to you.";
+  note.style.color="#166534";
+  note.style.fontWeight="bold";
+  entry.appendChild(note);
  }
 
- // COMMENTS
  const commentsBox=document.createElement("div");
  commentsBox.className="comments-box";
 
@@ -823,9 +724,7 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  await loadMaterialComments(item.id,commentsBox);
 }
 
-// DISPLAY SIGNATURES
 function addSignatureDisplay(entry,item){
-
  const area=document.createElement("div");
  area.className="signature-area";
 
@@ -834,7 +733,6 @@ function addSignatureDisplay(entry,item){
  area.appendChild(title);
 
  const academic=document.createElement("div");
-
  const academicTitle=document.createElement("strong");
  academicTitle.textContent="ACADEMIC OFFICE SIGNATURE";
  academic.appendChild(academicTitle);
@@ -859,7 +757,6 @@ function addSignatureDisplay(entry,item){
   comment.textContent="Academic Comment: "+item.academic_comment;
   academic.appendChild(comment);
  }
-
  area.appendChild(academic);
 
  const head=document.createElement("div");
@@ -889,7 +786,6 @@ function addSignatureDisplay(entry,item){
   comment.textContent="Head of School Comment: "+item.headmaster_comment;
   head.appendChild(comment);
  }
-
  area.appendChild(head);
  entry.appendChild(area);
 }
@@ -898,17 +794,22 @@ function formatDate(value){
  return value?new Date(value).toLocaleString():"Date unavailable";
 }
 
-// SIGNATURE PAD
+// SIGNATURE PAD FOR BOTH OFFICES
 function addSignaturePad(entry,item,office){
-
  const area=document.createElement("div");
- area.className="signature-area";
+ area.className="signature-area office-action";
 
  const title=document.createElement("h4");
  title.textContent=office==="academic"?
-  "ACADEMIC OFFICE - DRAW SIGNATURE":
-  "HEAD OF SCHOOL - DRAW SIGNATURE";
+  "ACADEMIC OFFICE - REVIEW, COMMENT AND SIGN":
+  "HEAD OF SCHOOL - REVIEW, COMMENT AND SIGN";
  area.appendChild(title);
+
+ const instruction=document.createElement("p");
+ instruction.textContent=office==="academic"?
+  "Review this material, write your comments and sign below. Press CHECKED to send it to the Head of School.":
+  "Review the checked material, write your comments and sign below. Press FORWARDED to send it to the Administrator.";
+ area.appendChild(instruction);
 
  const canvas=document.createElement("canvas");
  canvas.className="signature-pad";
@@ -958,45 +859,44 @@ function addSignaturePad(entry,item,office){
  canvas.addEventListener("pointercancel",stopDrawing);
 
  const comment=document.createElement("textarea");
- comment.placeholder="Enter your office comments...";
+ comment.placeholder=office==="academic"?
+  "Academic Office: Write your review comments here...":
+  "Head of School: Write your review comments here...";
  area.appendChild(comment);
 
  const clearButton=document.createElement("button");
  clearButton.textContent="CLEAR SIGNATURE";
-
  clearButton.onclick=()=>{
   ctx.clearRect(0,0,canvas.width,canvas.height);
   hasSignature=false;
  };
-
  area.appendChild(clearButton);
 
  const saveButton=document.createElement("button");
+ saveButton.className="approve-button";
  saveButton.textContent=office==="academic"?
-  "CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
+  "CHECKED - SAVE SIGNATURE":
+  "FORWARDED - SAVE SIGNATURE";
  area.appendChild(saveButton);
 
  saveButton.onclick=async()=>{
-
   if(!hasSignature){
    alert("Please draw your signature first.");
    return;
   }
 
   const officeComment=comment.value.trim();
-
   if(!officeComment){
    alert("Please enter your office comment.");
    return;
   }
 
-  if(!confirm("Confirm signature and submit this office action?"))return;
+  if(!confirm("Confirm your comment and signature?"))return;
 
   saveButton.disabled=true;
   saveButton.textContent="SAVING...";
 
   try{
-
    const signature=canvas.toDataURL("image/png");
 
    const updates=office==="academic"?{
@@ -1029,22 +929,21 @@ function addSignaturePad(entry,item,office){
     return;
    }
 
-   alert("Signature saved successfully. Status: "+data.forwarding_status);
+   alert("Signature and comment saved. Status: "+data.forwarding_status);
    await loadMaterials();
-
   }catch(error){
    alert("ERROR: "+error.message);
   }finally{
    saveButton.disabled=false;
    saveButton.textContent=office==="academic"?
-    "CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
+    "CHECKED - SAVE SIGNATURE":
+    "FORWARDED - SAVE SIGNATURE";
   }
  };
+ entry.appendChild(area);
 }
 
-// ADMIN APPROVE OR RETURN
 async function adminAction(item,action){
-
  if(!isAdmin()){
   alert("Administrator account required.");
   return;
@@ -1055,7 +954,6 @@ async function adminAction(item,action){
   "Enter the reason for returning this material to the teacher:";
 
  const adminComment=prompt(promptText);
-
  if(adminComment===null)return;
 
  if(!adminComment.trim()){
@@ -1077,10 +975,8 @@ async function adminAction(item,action){
  }
 
  const {data,error}=await db.from("teaching_materials")
-  .update(updates)
-  .eq("id",item.id)
-  .select("id,forwarding_status")
-  .maybeSingle();
+  .update(updates).eq("id",item.id)
+  .select("id,forwarding_status").maybeSingle();
 
  if(error){
   alert("ADMIN ACTION ERROR: "+error.message);
@@ -1099,16 +995,14 @@ async function adminAction(item,action){
  await loadMaterials();
 }
 
-// SEND APPROVED MATERIAL TO TEACHER
 async function adminSendToTeacher(item,button){
-
  if(!isAdmin()){
   alert("Administrator account required.");
   return;
  }
 
- const review=String(item.review_status||"").trim().toLowerCase();
- const forwarding=String(item.forwarding_status||"").trim().toLowerCase();
+ const review=normalStatus(item.review_status);
+ const forwarding=normalStatus(item.forwarding_status);
 
  if(review!=="approved"){
   alert("Please approve this material first.");
@@ -1120,18 +1014,13 @@ async function adminSendToTeacher(item,button){
   return;
  }
 
- if(!confirm(
-  "Send this approved material to the teacher's dashboard? The material will remain in Admin records."
- ))return;
+ if(!confirm("Send this approved material to the teacher's dashboard? The material will remain in Admin records."))return;
 
  if(button)button.disabled=true;
 
  try{
-
   const {data,error}=await db.from("teaching_materials")
-   .update({
-    forwarding_status:"Forwarded to Teacher"
-   })
+   .update({forwarding_status:"Forwarded to Teacher"})
    .eq("id",item.id)
    .eq("review_status","Approved")
    .eq("forwarding_status","Approved")
@@ -1150,7 +1039,6 @@ async function adminSendToTeacher(item,button){
 
   alert("Material forwarded to the teacher successfully. It remains in Admin records.");
   await loadMaterials();
-
  }catch(error){
   alert("SEND ERROR: "+error.message);
  }finally{
@@ -1158,9 +1046,7 @@ async function adminSendToTeacher(item,button){
  }
 }
 
-// TEACHER RESUBMISSION
 function addResubmitControl(entry,item){
-
  const area=document.createElement("div");
  area.className="signature-area";
 
@@ -1181,9 +1067,7 @@ function addResubmitControl(entry,item){
  area.appendChild(button);
 
  button.onclick=async()=>{
-
   const file=fileInput.files[0];
-
   if(!file){
    alert("Please select the corrected file.");
    return;
@@ -1198,9 +1082,7 @@ function addResubmitControl(entry,item){
   const newPath=currentUser.id+"/"+Date.now()+"_"+safeName;
 
   try{
-
    const {error:storageError}=await db.storage.from(BUCKET).upload(newPath,file);
-
    if(storageError){
     alert("STORAGE ERROR: "+storageError.message);
     return;
@@ -1221,11 +1103,9 @@ function addResubmitControl(entry,item){
    };
 
    const {data,error}=await db.from("teaching_materials")
-    .update(updates)
-    .eq("id",item.id)
+    .update(updates).eq("id",item.id)
     .eq("forwarding_status","Returned")
-    .select("id,forwarding_status")
-    .maybeSingle();
+    .select("id,forwarding_status").maybeSingle();
 
    if(error){
     alert("RESUBMIT ERROR: "+error.message);
@@ -1245,7 +1125,6 @@ function addResubmitControl(entry,item){
 
    alert("Corrected material resubmitted successfully.");
    await loadMaterials();
-
   }catch(error){
    alert(error.message);
   }finally{
@@ -1255,18 +1134,13 @@ function addResubmitControl(entry,item){
  };
 }
 
-// LOAD COMMENTS
 async function loadMaterialComments(materialId,container){
-
  const {data,error}=await db.from("material_comments")
-  .select("*")
-  .eq("material_id",materialId)
+  .select("*").eq("material_id",materialId)
   .order("created_at",{ascending:true});
 
  if(error){
-  container.appendChild(document.createTextNode(
-   "Comments could not be loaded: "+error.message
-  ));
+  container.appendChild(document.createTextNode("Comments could not be loaded: "+error.message));
   return;
  }
 
@@ -1276,7 +1150,6 @@ async function loadMaterialComments(materialId,container){
  }
 
  data.forEach(comment=>{
-
   const box=document.createElement("div");
   box.className="comment-item";
 
@@ -1297,11 +1170,8 @@ async function loadMaterialComments(materialId,container){
  });
 }
 
-// TEACHER REPLY
 async function replyToMaterialComment(materialId){
-
  const reply=prompt("Andika majibu yako:");
-
  if(reply===null||!reply.trim())return;
 
  const {error}=await db.from("material_comments").insert({
@@ -1319,9 +1189,7 @@ async function replyToMaterialComment(materialId){
  await loadMaterials();
 }
 
-// DOWNLOAD
 async function downloadMaterial(path){
-
  if(getRole()==="teacher"){
   alert("Teachers are not allowed to download materials.");
   return;
@@ -1333,7 +1201,6 @@ async function downloadMaterial(path){
  }
 
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
-
  if(error){
   alert("DOWNLOAD ERROR: "+error.message);
   return;
@@ -1342,16 +1209,13 @@ async function downloadMaterial(path){
  window.open(data.signedUrl,"_blank");
 }
 
-// VIEW MATERIAL
 async function viewMaterial(path){
-
  if(!path){
   alert("File path not found.");
   return;
  }
 
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
-
  if(error){
   alert("VIEW ERROR: "+error.message);
   return;
@@ -1360,9 +1224,7 @@ async function viewMaterial(path){
  window.open(data.signedUrl,"_blank");
 }
 
-// LOGOUT
 async function logout(){
-
  const {error}=await db.auth.signOut();
 
  if(error){
@@ -1375,17 +1237,12 @@ async function logout(){
 
  document.getElementById("dashboard").classList.add("hidden");
  document.getElementById("login").classList.remove("hidden");
-
  document.getElementById("email").value="";
  document.getElementById("password").value="";
-
- document.getElementById("loginMessage").textContent=
-  "You have logged out successfully.";
+ document.getElementById("loginMessage").textContent="You have logged out successfully.";
 }
 
-// CHECK SESSION
 async function checkSession(){
-
  const {data,error}=await db.auth.getSession();
 
  if(error){
@@ -1399,7 +1256,6 @@ async function checkSession(){
 }
 
 checkSession();
-
 </script>
 </body>
 </html>
