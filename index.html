@@ -16,9 +16,10 @@ input,select,textarea,button{width:100%;padding:12px;margin:7px 0;box-sizing:bor
 textarea{min-height:75px}
 button{background:#176b45;color:white;border:0;border-radius:6px;cursor:pointer}
 button:disabled{opacity:.6;cursor:not-allowed}
-.logout,.danger{background:#b42318}
+.logout,.danger,.delete-button{background:#b42318}
 .send-button{background:#075985}
 .approve-button{background:#166534}
+.submit-button{background:#075985}
 .hidden{display:none!important}
 .item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px}
 h3,h4{color:#176b45}
@@ -30,6 +31,7 @@ h3,h4{color:#176b45}
 .forwarded{background:#d1fae5;color:#047857}
 .approved{background:#dcfce7;color:#166534}
 .returned{background:#ffedd5;color:#9a3412}
+.draft{background:#e0e7ff;color:#3730a3}
 .signature-area{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}
 .small{font-size:13px;color:#475569}
 .comments-box{background:#f8fafc;padding:10px;border-radius:8px;margin-top:12px}
@@ -97,6 +99,7 @@ h3,h4{color:#176b45}
 <div class="summary-box">
 <h4>MY MATERIALS SUMMARY</h4>
 <p id="teacherMaterialCount">TOTAL MATERIALS: 0</p>
+<p id="teacherDraftCount">DRAFT: 0</p>
 <p id="teacherApprovedCount">APPROVED: 0</p>
 <p id="teacherReturnedCount">RETURNED: 0</p>
 <p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p>
@@ -202,6 +205,7 @@ function normalStatus(value){
 
 function statusClass(value){
  const s=normalStatus(value);
+ if(s==="draft")return "draft";
  if(s.includes("return"))return "returned";
  if(s.includes("approv"))return "approved";
  if(s.includes("forward"))return "forwarded";
@@ -318,6 +322,7 @@ async function loadTeachers(){
  });
 }
 
+// UPLOAD AS DRAFT
 async function uploadMaterial(){
  if(!currentUser||!currentTeacher||getRole()!=="teacher"){
   alert("Teacher login required.");
@@ -346,6 +351,7 @@ async function uploadMaterial(){
 
  try{
   const {error:storageError}=await db.storage.from(BUCKET).upload(filePath,file);
+
   if(storageError){
    message.textContent="STORAGE ERROR: "+storageError.message;
    return;
@@ -359,24 +365,149 @@ async function uploadMaterial(){
    class_name:className,
    academic_year:year,
    file_path:filePath,
-   review_status:"Pending",
-   forwarding_status:"Pending"
+   review_status:"Draft",
+   forwarding_status:"Draft"
   });
 
   if(insertError){
+   await db.storage.from(BUCKET).remove([filePath]);
    message.textContent="DATABASE ERROR: "+insertError.message;
    return;
   }
 
-  message.textContent="Material uploaded successfully!";
+  message.textContent="Material uploaded successfully as DRAFT. Press SUBMIT when ready.";
   ["title","materialType","subject","className","academicYear","file"]
    .forEach(id=>document.getElementById(id).value="");
 
   await loadMaterials();
  }catch(error){
-  message.textContent=error.message;
+  message.textContent="UPLOAD ERROR: "+error.message;
  }finally{
   button.disabled=false;
+ }
+}
+
+// TEACHER SUBMITS DRAFT TO ACADEMIC OFFICE
+async function submitMaterial(item,button){
+ if(getRole()!=="teacher"||!currentUser){
+  alert("Teacher login required.");
+  return;
+ }
+
+ if(item.teacher_id!==currentUser.id){
+  alert("You can only submit your own material.");
+  return;
+ }
+
+ if(normalStatus(item.review_status)!=="draft"||
+    normalStatus(item.forwarding_status)!=="draft"){
+  alert("This material is no longer a draft and cannot be submitted using this button.");
+  return;
+ }
+
+ if(!confirm("Submit this material to the Academic Office for review? You will not be able to delete it after submission.")){
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="SUBMITTING...";
+
+ try{
+  const {data,error}=await db.from("teaching_materials")
+   .update({
+    review_status:"Pending",
+    forwarding_status:"Pending"
+   })
+   .eq("id",item.id)
+   .eq("teacher_id",currentUser.id)
+   .eq("review_status","Draft")
+   .eq("forwarding_status","Draft")
+   .select("id,forwarding_status")
+   .maybeSingle();
+
+  if(error){
+   alert("SUBMIT ERROR: "+error.message);
+   return;
+  }
+
+  if(!data){
+   alert("Material was not submitted. It may have already been submitted or database permissions may prevent this action.");
+   return;
+  }
+
+  alert("Material submitted successfully to the Academic Office.");
+  await loadMaterials();
+ }catch(error){
+  alert("SUBMIT ERROR: "+error.message);
+ }finally{
+  button.disabled=false;
+  button.textContent="SUBMIT";
+ }
+}
+
+// TEACHER DELETES OWN DRAFT
+async function deleteMaterial(item,button){
+ if(getRole()!=="teacher"||!currentUser){
+  alert("Teacher login required.");
+  return;
+ }
+
+ if(item.teacher_id!==currentUser.id){
+  alert("You can only delete your own material.");
+  return;
+ }
+
+ if(normalStatus(item.review_status)!=="draft"||
+    normalStatus(item.forwarding_status)!=="draft"||
+    item.academic_signature||item.headmaster_signature||
+    item.academic_signed_at||item.headmaster_signed_at){
+  alert("Only an unsigned DRAFT can be deleted.");
+  return;
+ }
+
+ if(!confirm("Are you sure you want to permanently delete this draft and its uploaded file?")){
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="DELETING...";
+
+ try{
+  // Delete the database record first. If this fails, the file is preserved.
+  const {data,error}=await db.from("teaching_materials")
+   .delete()
+   .eq("id",item.id)
+   .eq("teacher_id",currentUser.id)
+   .eq("review_status","Draft")
+   .eq("forwarding_status","Draft")
+   .select("id")
+   .maybeSingle();
+
+  if(error){
+   alert("DELETE ERROR: "+error.message);
+   return;
+  }
+
+  if(!data){
+   alert("The draft was not deleted. Check database permissions or its current status.");
+   return;
+  }
+
+  // Remove the Storage file after successful row deletion.
+  const {error:storageError}=await db.storage.from(BUCKET).remove([item.file_path]);
+
+  if(storageError){
+   alert("The draft record was deleted, but its Storage file could not be removed: "+storageError.message);
+  }else{
+   alert("Draft and uploaded file deleted successfully.");
+  }
+
+  await loadMaterials();
+ }catch(error){
+  alert("DELETE ERROR: "+error.message);
+ }finally{
+  button.disabled=false;
+  button.textContent="DELETE";
  }
 }
 
@@ -525,11 +656,15 @@ async function loadMaterials(){
 
 function updateTeacherSummary(data){
  const total=data.length;
+ const draft=data.filter(item=>
+  normalStatus(item.review_status)==="draft"&&
+  normalStatus(item.forwarding_status)==="draft").length;
  const approved=data.filter(item=>normalStatus(item.review_status)==="approved").length;
  const returned=data.filter(item=>normalStatus(item.forwarding_status)==="returned").length;
  const forwarded=data.filter(item=>normalStatus(item.forwarding_status)==="forwarded to teacher").length;
 
  document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+total;
+ document.getElementById("teacherDraftCount").textContent="DRAFT: "+draft;
  document.getElementById("teacherApprovedCount").textContent="APPROVED: "+approved;
  document.getElementById("teacherReturnedCount").textContent="RETURNED: "+returned;
  document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+forwarded;
@@ -619,6 +754,32 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  }
 
  addSignatureDisplay(entry,item);
+
+ // TEACHER DRAFT ACTIONS
+ if(role==="teacher"&&
+    item.teacher_id===currentUser.id&&
+    reviewLower==="draft"&&
+    forwardingLower==="draft"&&
+    !item.academic_signature&&
+    !item.headmaster_signature){
+
+  const draftLabel=document.createElement("p");
+  draftLabel.className="status draft";
+  draftLabel.textContent="DRAFT - NOT YET SUBMITTED";
+  entry.appendChild(draftLabel);
+
+  const submitButton=document.createElement("button");
+  submitButton.className="submit-button";
+  submitButton.textContent="SUBMIT";
+  submitButton.onclick=()=>submitMaterial(item,submitButton);
+  entry.appendChild(submitButton);
+
+  const deleteButton=document.createElement("button");
+  deleteButton.className="delete-button";
+  deleteButton.textContent="DELETE";
+  deleteButton.onclick=()=>deleteMaterial(item,deleteButton);
+  entry.appendChild(deleteButton);
+ }
 
  // ACADEMIC OFFICE SIGNATURE AND COMMENT
  if(role==="academic"&&!item.academic_signature&&
@@ -1046,6 +1207,7 @@ async function adminSendToTeacher(item,button){
  }
 }
 
+// TEACHER RE-UPLOADS A CORRECTED VERSION AS DRAFT
 function addResubmitControl(entry,item){
  const area=document.createElement("div");
  area.className="signature-area";
@@ -1055,7 +1217,7 @@ function addResubmitControl(entry,item){
  area.appendChild(heading);
 
  const note=document.createElement("p");
- note.textContent="Read the Admin comments, correct your document and upload the revised file.";
+ note.textContent="Read the Admin comments, correct your document and upload the revised file. It will be saved as DRAFT until you press SUBMIT.";
  area.appendChild(note);
 
  const fileInput=document.createElement("input");
@@ -1073,7 +1235,7 @@ function addResubmitControl(entry,item){
    return;
   }
 
-  if(!confirm("Submit the corrected material again?"))return;
+  if(!confirm("Upload the corrected material as a draft? You will need to press SUBMIT afterwards."))return;
 
   button.disabled=true;
   button.textContent="UPLOADING...";
@@ -1090,8 +1252,8 @@ function addResubmitControl(entry,item){
 
    const updates={
     file_path:newPath,
-    forwarding_status:"Pending",
-    review_status:"Pending",
+    forwarding_status:"Draft",
+    review_status:"Draft",
     academic_signature:null,
     academic_signed_by:null,
     academic_signed_at:null,
@@ -1103,30 +1265,43 @@ function addResubmitControl(entry,item){
    };
 
    const {data,error}=await db.from("teaching_materials")
-    .update(updates).eq("id",item.id)
+    .update(updates)
+    .eq("id",item.id)
+    .eq("teacher_id",currentUser.id)
     .eq("forwarding_status","Returned")
-    .select("id,forwarding_status").maybeSingle();
+    .select("id,forwarding_status")
+    .maybeSingle();
 
    if(error){
+    await db.storage.from(BUCKET).remove([newPath]);
     alert("RESUBMIT ERROR: "+error.message);
     return;
    }
 
    if(!data){
+    await db.storage.from(BUCKET).remove([newPath]);
     alert("Material was not resubmitted. Check its status and permissions.");
     return;
+   }
+
+   // Remove the previous version after the database points to the new file.
+   if(item.file_path){
+    const {error:oldFileError}=await db.storage.from(BUCKET).remove([item.file_path]);
+    if(oldFileError){
+     alert("New draft saved, but the old file could not be removed: "+oldFileError.message);
+    }
    }
 
    await db.from("material_comments").insert({
     material_id:item.id,
     user_id:currentUser.id,
-    comment:"Teacher has uploaded a corrected version for review."
+    comment:"Teacher has uploaded a corrected version as DRAFT. Awaiting teacher submission."
    });
 
-   alert("Corrected material resubmitted successfully.");
+   alert("Corrected material uploaded as DRAFT. Press SUBMIT when you are ready to send it to the Academic Office.");
    await loadMaterials();
   }catch(error){
-   alert(error.message);
+   alert("RESUBMIT ERROR: "+error.message);
   }finally{
    button.disabled=false;
    button.textContent="UPLOAD CORRECTED MATERIAL";
