@@ -229,11 +229,14 @@ async function login(){
 
  try{
   const {data,error}=await db.auth.signInWithPassword({email,password});
+
   if(error){
    message.textContent="LOGIN ERROR: "+error.message;
    return;
   }
+
   await loadDashboard(data.user);
+
  }catch(error){
   message.textContent="LOGIN ERROR: "+error.message;
  }finally{
@@ -290,6 +293,7 @@ async function loadDashboard(user){
   }
 
   await loadMaterials();
+
  }catch(error){
   message.textContent="DASHBOARD ERROR: "+error.message;
  }
@@ -308,6 +312,7 @@ async function loadTeachers(){
  }
 
  list.innerHTML="";
+
  if(!data||data.length===0){
   list.textContent="No teachers found.";
   return;
@@ -376,10 +381,12 @@ async function uploadMaterial(){
   }
 
   message.textContent="Material uploaded successfully as DRAFT. Press SUBMIT when ready.";
+
   ["title","materialType","subject","className","academicYear","file"]
    .forEach(id=>document.getElementById(id).value="");
 
   await loadMaterials();
+
  }catch(error){
   message.textContent="UPLOAD ERROR: "+error.message;
  }finally{
@@ -401,7 +408,7 @@ async function submitMaterial(item,button){
 
  if(normalStatus(item.review_status)!=="draft"||
     normalStatus(item.forwarding_status)!=="draft"){
-  alert("This material is no longer a draft and cannot be submitted using this button.");
+  alert("This material is no longer a draft and cannot be submitted.");
   return;
  }
 
@@ -431,12 +438,13 @@ async function submitMaterial(item,button){
   }
 
   if(!data){
-   alert("Material was not submitted. It may have already been submitted or database permissions may prevent this action.");
+   alert("Material was not submitted. It may already have been submitted or database permissions may prevent this action.");
    return;
   }
 
   alert("Material submitted successfully to the Academic Office.");
   await loadMaterials();
+
  }catch(error){
   alert("SUBMIT ERROR: "+error.message);
  }finally{
@@ -445,7 +453,7 @@ async function submitMaterial(item,button){
  }
 }
 
-// TEACHER DELETES OWN DRAFT
+// TEACHER DELETES OWN UNSIGNED DRAFT
 async function deleteMaterial(item,button){
  if(getRole()!=="teacher"||!currentUser){
   alert("Teacher login required.");
@@ -459,8 +467,10 @@ async function deleteMaterial(item,button){
 
  if(normalStatus(item.review_status)!=="draft"||
     normalStatus(item.forwarding_status)!=="draft"||
-    item.academic_signature||item.headmaster_signature||
-    item.academic_signed_at||item.headmaster_signed_at){
+    item.academic_signature||
+    item.headmaster_signature||
+    item.academic_signed_at||
+    item.headmaster_signed_at){
   alert("Only an unsigned DRAFT can be deleted.");
   return;
  }
@@ -473,7 +483,6 @@ async function deleteMaterial(item,button){
  button.textContent="DELETING...";
 
  try{
-  // Delete the database record first. If this fails, the file is preserved.
   const {data,error}=await db.from("teaching_materials")
    .delete()
    .eq("id",item.id)
@@ -493,7 +502,6 @@ async function deleteMaterial(item,button){
    return;
   }
 
-  // Remove the Storage file after successful row deletion.
   const {error:storageError}=await db.storage.from(BUCKET).remove([item.file_path]);
 
   if(storageError){
@@ -503,6 +511,7 @@ async function deleteMaterial(item,button){
   }
 
   await loadMaterials();
+
  }catch(error){
   alert("DELETE ERROR: "+error.message);
  }finally{
@@ -515,6 +524,7 @@ async function loadMaterials(){
  if(!currentTeacher||!currentUser)return;
 
  const role=getRole();
+
  const listId=isAdmin()?"materialsList":
   role==="academic"?"academicMaterials":
   role==="headmaster"?"headmasterMaterials":"teacherMaterials";
@@ -553,13 +563,18 @@ async function loadMaterials(){
   return;
  }
 
- if(role==="teacher")updateTeacherSummary(data);
+ if(role==="teacher"){
+  updateTeacherSummary(data);
+ }
 
  const peopleNames={};
 
  if(isAdmin()||role==="academic"||role==="headmaster"){
   const ids=[...new Set(data.flatMap(item=>[
-   item.teacher_id,item.academic_signed_by,item.headmaster_signed_by,item.admin_action_by
+   item.teacher_id,
+   item.academic_signed_by,
+   item.headmaster_signed_by,
+   item.admin_action_by
   ]).filter(Boolean))];
 
   if(ids.length){
@@ -574,8 +589,15 @@ async function loadMaterials(){
   }
  }
 
- const categories=["Scheme of Work","Lesson Plan","Lesson Notes","Notices",
-  "Tests and Exams","Question Bank","Teaching Resources"];
+ const categories=[
+  "Scheme of Work",
+  "Lesson Plan",
+  "Lesson Notes",
+  "Notices",
+  "Tests and Exams",
+  "Question Bank",
+  "Teaching Resources"
+ ];
 
  if(isAdmin()){
   const grouped={};
@@ -604,8 +626,12 @@ async function loadMaterials(){
    list.appendChild(teacherHeading);
 
    for(const category of categories){
-    const matching=grouped[id].filter(item=>
-     normalStatus(item.material_type)===normalStatus(category));
+    const matching=grouped[id].filter(item=>{
+     const type=normalStatus(item.material_type);
+     const wanted=normalStatus(category);
+     return type===wanted||
+      (type==="notice"&&wanted==="notices");
+    });
 
     const categoryBox=document.createElement("div");
     categoryBox.className="material-category";
@@ -647,6 +673,7 @@ async function loadMaterials(){
     }
    }
   }
+
  }else{
   for(const item of data){
    await renderMaterialEntry(item,list,role,peopleNames);
@@ -656,12 +683,19 @@ async function loadMaterials(){
 
 function updateTeacherSummary(data){
  const total=data.length;
+
  const draft=data.filter(item=>
   normalStatus(item.review_status)==="draft"&&
   normalStatus(item.forwarding_status)==="draft").length;
- const approved=data.filter(item=>normalStatus(item.review_status)==="approved").length;
- const returned=data.filter(item=>normalStatus(item.forwarding_status)==="returned").length;
- const forwarded=data.filter(item=>normalStatus(item.forwarding_status)==="forwarded to teacher").length;
+
+ const approved=data.filter(item=>
+  normalStatus(item.review_status)==="approved").length;
+
+ const returned=data.filter(item=>
+  normalStatus(item.forwarding_status)==="returned").length;
+
+ const forwarded=data.filter(item=>
+  normalStatus(item.forwarding_status)==="forwarded to teacher").length;
 
  document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+total;
  document.getElementById("teacherDraftCount").textContent="DRAFT: "+draft;
@@ -670,6 +704,7 @@ function updateTeacherSummary(data){
  document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+forwarded;
 }
 
+// DISPLAY EACH MATERIAL
 async function renderMaterialEntry(item,list,role,peopleNames){
  const entry=document.createElement("div");
  entry.className="item";
@@ -687,8 +722,13 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  }
 
  const details=document.createElement("p");
- details.textContent=[item.material_type,item.subject,item.class_name,item.academic_year]
-  .filter(Boolean).join(" | ");
+ details.textContent=[
+  item.material_type,
+  item.subject,
+  item.class_name,
+  item.academic_year
+ ].filter(Boolean).join(" | ");
+
  entry.appendChild(details);
 
  const review=document.createElement("span");
@@ -756,13 +796,14 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  addSignatureDisplay(entry,item);
 
  // TEACHER DRAFT ACTIONS
- if(role==="teacher"&&
-    item.teacher_id===currentUser.id&&
-    reviewLower==="draft"&&
-    forwardingLower==="draft"&&
-    !item.academic_signature&&
-    !item.headmaster_signature){
+ // Teacher materials are already filtered by teacher_id in loadMaterials().
+ // Ownership is checked again inside submitMaterial() and deleteMaterial().
+ const isTeacherDraft=
+  role==="teacher"&&
+  reviewLower==="draft"&&
+  forwardingLower==="draft";
 
+ if(isTeacherDraft){
   const draftLabel=document.createElement("p");
   draftLabel.className="status draft";
   draftLabel.textContent="DRAFT - NOT YET SUBMITTED";
@@ -774,20 +815,28 @@ async function renderMaterialEntry(item,list,role,peopleNames){
   submitButton.onclick=()=>submitMaterial(item,submitButton);
   entry.appendChild(submitButton);
 
-  const deleteButton=document.createElement("button");
-  deleteButton.className="delete-button";
-  deleteButton.textContent="DELETE";
-  deleteButton.onclick=()=>deleteMaterial(item,deleteButton);
-  entry.appendChild(deleteButton);
+  const isUnsigned=
+   !item.academic_signature&&
+   !item.headmaster_signature&&
+   !item.academic_signed_at&&
+   !item.headmaster_signed_at;
+
+  if(isUnsigned){
+   const deleteButton=document.createElement("button");
+   deleteButton.className="delete-button";
+   deleteButton.textContent="DELETE";
+   deleteButton.onclick=()=>deleteMaterial(item,deleteButton);
+   entry.appendChild(deleteButton);
+  }
  }
 
- // ACADEMIC OFFICE SIGNATURE AND COMMENT
+ // ACADEMIC OFFICE
  if(role==="academic"&&!item.academic_signature&&
     forwardingLower==="pending"){
   addSignaturePad(entry,item,"academic");
  }
 
- // HEAD OF SCHOOL SIGNATURE AND COMMENT
+ // HEAD OF SCHOOL
  if(role==="headmaster"&&!item.headmaster_signature&&
     forwardingLower==="checked"){
   addSignaturePad(entry,item,"headmaster");
@@ -806,11 +855,13 @@ async function renderMaterialEntry(item,list,role,peopleNames){
    label.className="status forwarded";
    label.textContent="SENT TO TEACHER SUCCESSFULLY";
    entry.appendChild(label);
+
   }else if(forwardingLower==="returned"){
    const label=document.createElement("p");
    label.className="status returned";
    label.textContent="RETURNED TO TEACHER";
    entry.appendChild(label);
+
   }else if(isReadyForAdmin){
    const adminHeading=document.createElement("h4");
    adminHeading.textContent="ADMINISTRATOR ACTIONS";
@@ -822,6 +873,7 @@ async function renderMaterialEntry(item,list,role,peopleNames){
     approveButton.textContent="APPROVE";
     approveButton.onclick=()=>adminAction(item,"Approved");
     entry.appendChild(approveButton);
+
    }else{
     const label=document.createElement("p");
     label.className="status approved";
@@ -840,6 +892,7 @@ async function renderMaterialEntry(item,list,role,peopleNames){
    returnButton.textContent="RETURN TO TEACHER";
    returnButton.onclick=()=>adminAction(item,"Returned");
    entry.appendChild(returnButton);
+
   }else{
    const waiting=document.createElement("p");
    waiting.className="small";
@@ -918,6 +971,7 @@ function addSignatureDisplay(entry,item){
   comment.textContent="Academic Comment: "+item.academic_comment;
   academic.appendChild(comment);
  }
+
  area.appendChild(academic);
 
  const head=document.createElement("div");
@@ -947,6 +1001,7 @@ function addSignatureDisplay(entry,item){
   comment.textContent="Head of School Comment: "+item.headmaster_comment;
   head.appendChild(comment);
  }
+
  area.appendChild(head);
  entry.appendChild(area);
 }
@@ -1047,6 +1102,7 @@ function addSignaturePad(entry,item,office){
   }
 
   const officeComment=comment.value.trim();
+
   if(!officeComment){
    alert("Please enter your office comment.");
    return;
@@ -1092,6 +1148,7 @@ function addSignaturePad(entry,item,office){
 
    alert("Signature and comment saved. Status: "+data.forwarding_status);
    await loadMaterials();
+
   }catch(error){
    alert("ERROR: "+error.message);
   }finally{
@@ -1101,6 +1158,7 @@ function addSignaturePad(entry,item,office){
     "FORWARDED - SAVE SIGNATURE";
   }
  };
+
  entry.appendChild(area);
 }
 
@@ -1136,8 +1194,10 @@ async function adminAction(item,action){
  }
 
  const {data,error}=await db.from("teaching_materials")
-  .update(updates).eq("id",item.id)
-  .select("id,forwarding_status").maybeSingle();
+  .update(updates)
+  .eq("id",item.id)
+  .select("id,forwarding_status")
+  .maybeSingle();
 
  if(error){
   alert("ADMIN ACTION ERROR: "+error.message);
@@ -1175,7 +1235,9 @@ async function adminSendToTeacher(item,button){
   return;
  }
 
- if(!confirm("Send this approved material to the teacher's dashboard? The material will remain in Admin records."))return;
+ if(!confirm("Send this approved material to the teacher's dashboard? The material will remain in Admin records.")){
+  return;
+ }
 
  if(button)button.disabled=true;
 
@@ -1200,6 +1262,7 @@ async function adminSendToTeacher(item,button){
 
   alert("Material forwarded to the teacher successfully. It remains in Admin records.");
   await loadMaterials();
+
  }catch(error){
   alert("SEND ERROR: "+error.message);
  }finally{
@@ -1230,12 +1293,15 @@ function addResubmitControl(entry,item){
 
  button.onclick=async()=>{
   const file=fileInput.files[0];
+
   if(!file){
    alert("Please select the corrected file.");
    return;
   }
 
-  if(!confirm("Upload the corrected material as a draft? You will need to press SUBMIT afterwards."))return;
+  if(!confirm("Upload the corrected material as a draft? You will need to press SUBMIT afterwards.")){
+   return;
+  }
 
   button.disabled=true;
   button.textContent="UPLOADING...";
@@ -1245,6 +1311,7 @@ function addResubmitControl(entry,item){
 
   try{
    const {error:storageError}=await db.storage.from(BUCKET).upload(newPath,file);
+
    if(storageError){
     alert("STORAGE ERROR: "+storageError.message);
     return;
@@ -1284,22 +1351,27 @@ function addResubmitControl(entry,item){
     return;
    }
 
-   // Remove the previous version after the database points to the new file.
    if(item.file_path){
     const {error:oldFileError}=await db.storage.from(BUCKET).remove([item.file_path]);
+
     if(oldFileError){
      alert("New draft saved, but the old file could not be removed: "+oldFileError.message);
     }
    }
 
-   await db.from("material_comments").insert({
+   const {error:commentError}=await db.from("material_comments").insert({
     material_id:item.id,
     user_id:currentUser.id,
     comment:"Teacher has uploaded a corrected version as DRAFT. Awaiting teacher submission."
    });
 
+   if(commentError){
+    console.error("COMMENT ERROR:",commentError.message);
+   }
+
    alert("Corrected material uploaded as DRAFT. Press SUBMIT when you are ready to send it to the Academic Office.");
    await loadMaterials();
+
   }catch(error){
    alert("RESUBMIT ERROR: "+error.message);
   }finally{
@@ -1311,7 +1383,8 @@ function addResubmitControl(entry,item){
 
 async function loadMaterialComments(materialId,container){
  const {data,error}=await db.from("material_comments")
-  .select("*").eq("material_id",materialId)
+  .select("*")
+  .eq("material_id",materialId)
   .order("created_at",{ascending:true});
 
  if(error){
@@ -1347,6 +1420,7 @@ async function loadMaterialComments(materialId,container){
 
 async function replyToMaterialComment(materialId){
  const reply=prompt("Andika majibu yako:");
+
  if(reply===null||!reply.trim())return;
 
  const {error}=await db.from("material_comments").insert({
@@ -1376,6 +1450,7 @@ async function downloadMaterial(path){
  }
 
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
+
  if(error){
   alert("DOWNLOAD ERROR: "+error.message);
   return;
@@ -1391,6 +1466,7 @@ async function viewMaterial(path){
  }
 
  const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
+
  if(error){
   alert("VIEW ERROR: "+error.message);
   return;
