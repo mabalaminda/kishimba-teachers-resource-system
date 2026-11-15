@@ -15,7 +15,7 @@ header h2{color:white}
 input,select,textarea,button{width:100%;padding:12px;margin:7px 0;box-sizing:border-box}
 textarea{min-height:75px}
 button{background:#176b45;color:white;border:0;border-radius:6px;cursor:pointer}
-button:disabled{opacity:.6}
+button:disabled{opacity:.6;cursor:not-allowed}
 .logout,.danger{background:#b42318}
 .hidden{display:none!important}
 .item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px}
@@ -33,6 +33,55 @@ h3,h4{color:#176b45}
 .comments-box{background:#f8fafc;padding:10px;border-radius:8px;margin-top:12px}
 .comment-item{background:#eff6ff;color:#1e293b;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}
 .teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
+
+/* ADMIN MATERIAL CATEGORY DESIGN */
+.material-category{
+ background:#f8fafc;
+ border:1px solid #dbe3ea;
+ border-radius:8px;
+ padding:12px;
+ margin:10px 0;
+}
+
+.category-header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+ flex-wrap:wrap;
+}
+
+.category-name{
+ flex:1;
+ min-width:130px;
+ color:#176b45;
+ font-weight:bold;
+}
+
+.count-badge{
+ background:#dbeafe;
+ color:#1e40af;
+ width:38px;
+ height:38px;
+ min-width:38px;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-weight:bold;
+ font-size:16px;
+}
+
+.category-toggle{
+ width:auto;
+ min-width:105px;
+ padding:10px 14px;
+ margin:0;
+}
+
+.category-content{
+ margin-top:12px;
+}
 </style>
 </head>
 
@@ -372,7 +421,7 @@ async function uploadMaterial(){
  }
 }
 
-// LOAD MATERIALS - ORGANIZED BY TEACHER
+// LOAD MATERIALS - ORGANIZED BY TEACHER AND CATEGORY
 async function loadMaterials(){
 
  if(!currentTeacher||!currentUser)return;
@@ -416,7 +465,7 @@ async function loadMaterials(){
   return;
  }
 
- // FIND TEACHER NAMES
+ // GET TEACHER NAMES
  const teacherNames={};
 
  if(isAdmin()||role==="academic"||role==="headmaster"){
@@ -438,6 +487,17 @@ async function loadMaterials(){
    }
   }
  }
+
+ // ALL MATERIAL CATEGORIES
+ const categories=[
+  "Scheme of Work",
+  "Lesson Plan",
+  "Lesson Notes",
+  "Notices",
+  "Tests and Exams",
+  "Question Bank",
+  "Teaching Resources"
+ ];
 
  // GROUP MATERIALS BY TEACHER
  let groups=[];
@@ -472,7 +532,7 @@ async function loadMaterials(){
 
  }
 
- // DISPLAY GROUPS
+ // DISPLAY EACH TEACHER
  for(const group of groups){
 
   if(isAdmin()){
@@ -489,147 +549,210 @@ async function loadMaterials(){
    teacherHeading.appendChild(name);
    teacherHeading.appendChild(count);
    list.appendChild(teacherHeading);
-  }
 
-  for(const item of group.materials){
+   // DISPLAY EACH MATERIAL CATEGORY
+   for(const category of categories){
 
-   const entry=document.createElement("div");
-   entry.className="item";
+    const matching=group.materials.filter(item=>
+     String(item.material_type||"").trim().toLowerCase()
+      ===category.toLowerCase()
+    );
 
-   const heading=document.createElement("h4");
-   heading.textContent=item.title;
-   entry.appendChild(heading);
+    const categoryBox=document.createElement("div");
+    categoryBox.className="material-category";
 
-   if(isAdmin()){
-    const teacher=document.createElement("p");
-    teacher.textContent="UPLOADED BY: "+
-     (teacherNames[item.teacher_id]||"Teacher");
-    entry.appendChild(teacher);
+    const categoryHeader=document.createElement("div");
+    categoryHeader.className="category-header";
+
+    const categoryName=document.createElement("div");
+    categoryName.className="category-name";
+    categoryName.textContent=category;
+
+    const badge=document.createElement("span");
+    badge.className="count-badge";
+    badge.textContent=matching.length;
+
+    const openButton=document.createElement("button");
+    openButton.className="category-toggle";
+    openButton.textContent="OPEN / VIEW";
+    openButton.disabled=matching.length===0;
+
+    const content=document.createElement("div");
+    content.className="category-content hidden";
+
+    openButton.onclick=()=>{
+     const isHidden=content.classList.contains("hidden");
+     content.classList.toggle("hidden");
+     openButton.textContent=isHidden?"CLOSE":"OPEN / VIEW";
+    };
+
+    categoryHeader.appendChild(categoryName);
+    categoryHeader.appendChild(badge);
+    categoryHeader.appendChild(openButton);
+
+    categoryBox.appendChild(categoryHeader);
+    categoryBox.appendChild(content);
+
+    list.appendChild(categoryBox);
+
+    // MATERIALS INSIDE THIS CATEGORY
+    for(const item of matching){
+     await renderMaterialEntry(item,content,role,teacherNames);
+    }
    }
 
-   const details=document.createElement("p");
-   details.textContent=[
-    item.material_type,
-    item.subject,
-    item.class_name,
-    item.academic_year
-   ].filter(Boolean).join(" | ");
+  }else{
 
-   entry.appendChild(details);
-
-   // REVIEW STATUS
-   const review=document.createElement("span");
-   review.className="status";
-   review.textContent=(item.review_status||"Pending").toUpperCase();
-
-   review.classList.add(
-    item.review_status==="Approved"?"approved":
-    item.review_status==="Returned"?"returned":"pending"
-   );
-
-   entry.appendChild(review);
-
-   // OFFICE STATUS
-   const forwarding=item.forwarding_status||"Pending";
-
-   const stage=document.createElement("div");
-   stage.className="status";
-   stage.textContent="OFFICE STATUS: "+forwarding.toUpperCase();
-
-   stage.classList.add(
-    forwarding==="Approved"?"approved":
-    forwarding==="Forwarded"?"forwarded":
-    forwarding==="Checked"?"checked":
-    forwarding==="Returned"?"returned":"pending"
-   );
-
-   entry.appendChild(stage);
-
-   // VIEW
-   const viewButton=document.createElement("button");
-   viewButton.textContent="VIEW";
-   viewButton.onclick=()=>viewMaterial(item.file_path);
-   entry.appendChild(viewButton);
-
-   // DOWNLOAD - ADMIN AND OFFICES
-   if(role!=="teacher"){
-    const downloadButton=document.createElement("button");
-    downloadButton.textContent="DOWNLOAD";
-    downloadButton.onclick=()=>downloadMaterial(item.file_path);
-    entry.appendChild(downloadButton);
+   // OFFICE AND TEACHER MATERIALS
+   for(const item of group.materials){
+    await renderMaterialEntry(item,list,role,teacherNames);
    }
-
-   // SIGNATURES
-   addSignatureDisplay(entry,item);
-
-   if(role==="academic"&&forwarding==="Pending"){
-    addSignaturePad(entry,item,"academic");
-   }
-
-   if(role==="headmaster"&&forwarding==="Checked"){
-    addSignaturePad(entry,item,"headmaster");
-   }
-
-   // ADMIN APPROVAL
-   if(isAdmin()&&forwarding==="Forwarded"){
-
-    const approveButton=document.createElement("button");
-    approveButton.textContent="APPROVE & SEND";
-    approveButton.onclick=()=>adminAction(item,"Approved");
-    entry.appendChild(approveButton);
-
-    const returnButton=document.createElement("button");
-    returnButton.textContent="RETURN TO TEACHER";
-    returnButton.className="danger";
-    returnButton.onclick=()=>adminAction(item,"Returned");
-    entry.appendChild(returnButton);
-   }
-
-   // ADMIN COMMENTS
-   if(item.admin_comment&&(isAdmin()||role==="teacher")){
-    const note=document.createElement("p");
-    note.textContent="ADMIN COMMENT: "+item.admin_comment;
-    entry.appendChild(note);
-   }
-
-   // TEACHER RESUBMISSION
-   if(role==="teacher"&&forwarding==="Returned"){
-    addResubmitControl(entry,item);
-   }
-
-   // APPROVED MESSAGE
-   if(role==="teacher"&&forwarding==="Approved"){
-    const approvedNote=document.createElement("p");
-    approvedNote.textContent=
-     "This material has been approved by the Administrator. You can view it here.";
-    approvedNote.style.color="#166534";
-    approvedNote.style.fontWeight="bold";
-    entry.appendChild(approvedNote);
-   }
-
-   // COMMENTS
-   const commentsBox=document.createElement("div");
-   commentsBox.className="comments-box";
-
-   const commentsTitle=document.createElement("h4");
-   commentsTitle.textContent="COMMENTS & REPLIES";
-
-   commentsBox.appendChild(commentsTitle);
-   entry.appendChild(commentsBox);
-
-   if(role==="teacher"){
-    const replyButton=document.createElement("button");
-    replyButton.textContent="REPLY TO COMMENT";
-    replyButton.onclick=()=>replyToMaterialComment(item.id);
-    entry.appendChild(replyButton);
-   }
-
-   list.appendChild(entry);
-
-   await loadMaterialComments(item.id,commentsBox);
   }
  }
 }
+
+
+// DISPLAY ONE MATERIAL
+async function renderMaterialEntry(item,list,role,teacherNames){
+
+ const entry=document.createElement("div");
+ entry.className="item";
+
+ const heading=document.createElement("h4");
+ heading.textContent=item.title;
+ entry.appendChild(heading);
+
+ if(isAdmin()){
+  const teacher=document.createElement("p");
+  teacher.textContent="UPLOADED BY: "+
+   (teacherNames[item.teacher_id]||"Teacher");
+  entry.appendChild(teacher);
+ }
+
+ const details=document.createElement("p");
+ details.textContent=[
+  item.material_type,
+  item.subject,
+  item.class_name,
+  item.academic_year
+ ].filter(Boolean).join(" | ");
+
+ entry.appendChild(details);
+
+ // REVIEW STATUS
+ const review=document.createElement("span");
+ review.className="status";
+ review.textContent=(item.review_status||"Pending").toUpperCase();
+
+ review.classList.add(
+  item.review_status==="Approved"?"approved":
+  item.review_status==="Returned"?"returned":"pending"
+ );
+
+ entry.appendChild(review);
+
+ // OFFICE STATUS
+ const forwarding=item.forwarding_status||"Pending";
+
+ const stage=document.createElement("div");
+ stage.className="status";
+ stage.textContent="OFFICE STATUS: "+forwarding.toUpperCase();
+
+ stage.classList.add(
+  forwarding==="Approved"?"approved":
+  forwarding==="Forwarded"?"forwarded":
+  forwarding==="Checked"?"checked":
+  forwarding==="Returned"?"returned":"pending"
+ );
+
+ entry.appendChild(stage);
+
+ // VIEW
+ const viewButton=document.createElement("button");
+ viewButton.textContent="VIEW";
+ viewButton.onclick=()=>viewMaterial(item.file_path);
+ entry.appendChild(viewButton);
+
+ // DOWNLOAD FOR ADMIN AND OFFICES
+ if(role!=="teacher"){
+  const downloadButton=document.createElement("button");
+  downloadButton.textContent="DOWNLOAD";
+  downloadButton.onclick=()=>downloadMaterial(item.file_path);
+  entry.appendChild(downloadButton);
+ }
+
+ // SIGNATURES
+ addSignatureDisplay(entry,item);
+
+ // ACADEMIC OFFICE
+ if(role==="academic"&&forwarding==="Pending"){
+  addSignaturePad(entry,item,"academic");
+ }
+
+ // HEAD OF SCHOOL
+ if(role==="headmaster"&&forwarding==="Checked"){
+  addSignaturePad(entry,item,"headmaster");
+ }
+
+ // ADMIN APPROVAL
+ if(isAdmin()&&forwarding==="Forwarded"){
+
+  const approveButton=document.createElement("button");
+  approveButton.textContent="APPROVE & SEND";
+  approveButton.onclick=()=>adminAction(item,"Approved");
+  entry.appendChild(approveButton);
+
+  const returnButton=document.createElement("button");
+  returnButton.textContent="RETURN TO TEACHER";
+  returnButton.className="danger";
+  returnButton.onclick=()=>adminAction(item,"Returned");
+  entry.appendChild(returnButton);
+ }
+
+ // ADMIN COMMENTS
+ if(item.admin_comment&&(isAdmin()||role==="teacher")){
+  const note=document.createElement("p");
+  note.textContent="ADMIN COMMENT: "+item.admin_comment;
+  entry.appendChild(note);
+ }
+
+ // TEACHER RESUBMISSION
+ if(role==="teacher"&&forwarding==="Returned"){
+  addResubmitControl(entry,item);
+ }
+
+ // APPROVED MESSAGE
+ if(role==="teacher"&&forwarding==="Approved"){
+  const approvedNote=document.createElement("p");
+  approvedNote.textContent=
+   "This material has been approved by the Administrator. You can view it here.";
+  approvedNote.style.color="#166534";
+  approvedNote.style.fontWeight="bold";
+  entry.appendChild(approvedNote);
+ }
+
+ // COMMENTS
+ const commentsBox=document.createElement("div");
+ commentsBox.className="comments-box";
+
+ const commentsTitle=document.createElement("h4");
+ commentsTitle.textContent="COMMENTS & REPLIES";
+
+ commentsBox.appendChild(commentsTitle);
+ entry.appendChild(commentsBox);
+
+ if(role==="teacher"){
+  const replyButton=document.createElement("button");
+  replyButton.textContent="REPLY TO COMMENT";
+  replyButton.onclick=()=>replyToMaterialComment(item.id);
+  entry.appendChild(replyButton);
+ }
+
+ list.appendChild(entry);
+
+ await loadMaterialComments(item.id,commentsBox);
+}
+
 
 // DISPLAY SIGNATURES
 function addSignatureDisplay(entry,item){
@@ -709,6 +832,7 @@ function addSignatureDisplay(entry,item){
 function formatDate(value){
  return value?new Date(value).toLocaleString():"Date unavailable";
 }
+
 
 // SIGNATURE PAD
 function addSignaturePad(entry,item,office){
@@ -856,6 +980,7 @@ function addSignaturePad(entry,item,office){
  };
 }
 
+
 // ADMIN APPROVE OR RETURN
 async function adminAction(item,action){
 
@@ -912,6 +1037,7 @@ async function adminAction(item,action){
 
  await loadMaterials();
 }
+
 
 // TEACHER RESUBMISSION
 function addResubmitControl(entry,item){
@@ -1010,6 +1136,7 @@ function addResubmitControl(entry,item){
  };
 }
 
+
 // LOAD COMMENTS
 async function loadMaterialComments(materialId,container){
 
@@ -1053,6 +1180,7 @@ async function loadMaterialComments(materialId,container){
  });
 }
 
+
 // TEACHER REPLY
 async function replyToMaterialComment(materialId){
 
@@ -1074,6 +1202,7 @@ async function replyToMaterialComment(materialId){
  alert("Reply sent successfully.");
  await loadMaterials();
 }
+
 
 // DOWNLOAD
 async function downloadMaterial(path){
@@ -1098,6 +1227,7 @@ async function downloadMaterial(path){
  window.open(data.signedUrl,"_blank");
 }
 
+
 // VIEW MATERIAL
 async function viewMaterial(path){
 
@@ -1115,6 +1245,7 @@ async function viewMaterial(path){
 
  window.open(data.signedUrl,"_blank");
 }
+
 
 // LOGOUT
 async function logout(){
@@ -1138,6 +1269,7 @@ async function logout(){
  document.getElementById("loginMessage").textContent=
   "You have logged out successfully.";
 }
+
 
 // CHECK SESSION
 async function checkSession(){
