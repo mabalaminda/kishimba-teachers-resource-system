@@ -326,10 +326,13 @@ async function loadMaterials(){
 
   const role=String(currentTeacher.role||"").trim().toLowerCase();
   const isAdmin=role==="admin"||role==="administrator";
+  const isAcademic=role==="academic";
+const isHeadmaster=role==="headmaster";
+const isTeacher=role==="teacher";
 
-  if(!isAdmin){
-    query=query.eq("teacher_id",currentUser.id);
-  }
+  if(isTeacher){
+  query=query.eq("teacher_id",currentUser.id);
+}
 
   const {data,error}=await query;
 
