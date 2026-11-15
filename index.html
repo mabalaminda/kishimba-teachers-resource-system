@@ -93,7 +93,6 @@ h3,h4{color:#176b45}
 
 <div id="teacherSection" class="card hidden">
 <h3>TEACHER DASHBOARD</h3>
-
 <div class="summary-box">
 <h4>MY MATERIALS SUMMARY</h4>
 <p id="teacherMaterialCount">TOTAL MATERIALS: 0</p>
@@ -101,7 +100,6 @@ h3,h4{color:#176b45}
 <p id="teacherReturnedCount">RETURNED: 0</p>
 <p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p>
 </div>
-
 <p>Your uploaded materials and their review progress appear below.</p>
 <div id="teacherMaterials"></div>
 </div>
@@ -192,7 +190,7 @@ function isAdmin(){
 }
 
 function statusClass(value){
- const s=String(value||"").toLowerCase();
+ const s=String(value||"").trim().toLowerCase();
 
  if(s.includes("return"))return "returned";
  if(s.includes("approv"))return "approved";
@@ -322,16 +320,13 @@ async function loadTeachers(){
  }
 
  data.forEach(teacher=>{
-
   const item=document.createElement("div");
   item.className="item";
-
   item.textContent=
    (teacher.full_name||"Teacher")+" | "+
    (teacher.email||"")+" | "+
    (teacher.staff_id||"")+" | "+
    (teacher.role||"teacher");
-
   list.appendChild(item);
  });
 }
@@ -450,12 +445,10 @@ async function loadMaterials(){
   return;
  }
 
- // TEACHER SUMMARY
  if(role==="teacher"){
   updateTeacherSummary(data);
  }
 
- // LOAD NAMES OF TEACHERS AND OFFICIALS
  const peopleNames={};
 
  if(isAdmin()||role==="academic"||role==="headmaster"){
@@ -470,7 +463,6 @@ async function loadMaterials(){
   )];
 
   if(ids.length){
-
    const {data:people,error:peopleError}=await db.from("teachers")
     .select("id,full_name,email,role")
     .in("id",ids);
@@ -483,7 +475,6 @@ async function loadMaterials(){
   }
  }
 
- // CATEGORIES
  const categories=[
   "Scheme of Work",
   "Lesson Plan",
@@ -494,7 +485,6 @@ async function loadMaterials(){
   "Teaching Resources"
  ];
 
- // GROUP MATERIALS BY TEACHER FOR ADMIN
  let groups=[];
 
  if(isAdmin()){
@@ -516,7 +506,6 @@ async function loadMaterials(){
   }));
 
  }else{
-
   groups=[{
    teacherId:currentUser.id,
    teacherName:currentTeacher.full_name||"Teacher",
@@ -524,7 +513,6 @@ async function loadMaterials(){
   }];
  }
 
- // DISPLAY GROUPS
  for(const group of groups){
 
   if(isAdmin()){
@@ -599,34 +587,27 @@ async function loadMaterials(){
  }
 }
 
-// TEACHER SUMMARY COUNTS
+// TEACHER SUMMARY
 function updateTeacherSummary(data){
 
  const total=data.length;
 
  const approved=data.filter(item=>
-  String(item.review_status||"").toLowerCase()==="approved"
+  String(item.review_status||"").trim().toLowerCase()==="approved"
  ).length;
 
  const returned=data.filter(item=>
-  String(item.forwarding_status||"").toLowerCase()==="returned"
+  String(item.forwarding_status||"").trim().toLowerCase()==="returned"
  ).length;
 
  const forwarded=data.filter(item=>
-  String(item.forwarding_status||"").toLowerCase()==="forwarded to teacher"
+  String(item.forwarding_status||"").trim().toLowerCase()==="forwarded to teacher"
  ).length;
 
- document.getElementById("teacherMaterialCount").textContent=
-  "TOTAL MATERIALS: "+total;
-
- document.getElementById("teacherApprovedCount").textContent=
-  "APPROVED: "+approved;
-
- document.getElementById("teacherReturnedCount").textContent=
-  "RETURNED: "+returned;
-
- document.getElementById("teacherForwardedCount").textContent=
-  "FORWARDED TO TEACHER: "+forwarded;
+ document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+total;
+ document.getElementById("teacherApprovedCount").textContent="APPROVED: "+approved;
+ document.getElementById("teacherReturnedCount").textContent="RETURNED: "+returned;
+ document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+forwarded;
 }
 
 // DISPLAY ONE MATERIAL
@@ -654,24 +635,23 @@ async function renderMaterialEntry(item,list,role,peopleNames){
   item.class_name,
   item.academic_year
  ].filter(Boolean).join(" | ");
-
  entry.appendChild(details);
 
- // REVIEW STATUS
  const review=document.createElement("span");
  review.className="status "+statusClass(item.review_status);
  review.textContent="REVIEW: "+(item.review_status||"Pending").toUpperCase();
  entry.appendChild(review);
 
- // FORWARDING STATUS
- const forwarding=item.forwarding_status||"Pending";
+ const forwarding=String(item.forwarding_status||"Pending").trim();
+ const forwardingLower=forwarding.toLowerCase();
+ const reviewLower=String(item.review_status||"").trim().toLowerCase();
 
  const stage=document.createElement("div");
  stage.className="status "+statusClass(forwarding);
  stage.textContent="STATUS: "+forwarding.toUpperCase();
  entry.appendChild(stage);
 
- // TRACKING DETAILS
+ // TRACKING
  const tracking=document.createElement("div");
  tracking.className="status-details";
 
@@ -694,29 +674,27 @@ async function renderMaterialEntry(item,list,role,peopleNames){
   (item.admin_action_at?adminName+" - "+(item.review_status||"Reviewed"):"Awaiting Admin");
  tracking.appendChild(adminLine);
 
- if(forwarding==="Forwarded to Teacher"){
+ if(forwardingLower==="forwarded to teacher"){
   const receivedLine=document.createElement("p");
-  receivedLine.textContent="DESTINATION: "+teacherName+
-   " - FORWARDED TO TEACHER";
+  receivedLine.textContent="DESTINATION: "+teacherName+" - FORWARDED TO TEACHER";
   tracking.appendChild(receivedLine);
  }
 
- if(forwarding==="Returned"){
+ if(forwardingLower==="returned"){
   const returnedLine=document.createElement("p");
-  returnedLine.textContent="DESTINATION: "+teacherName+
-   " - RETURNED FOR CORRECTIONS";
+  returnedLine.textContent="DESTINATION: "+teacherName+" - RETURNED FOR CORRECTIONS";
   tracking.appendChild(returnedLine);
  }
 
  entry.appendChild(tracking);
 
- // VIEW BUTTON
+ // VIEW
  const viewButton=document.createElement("button");
  viewButton.textContent="VIEW";
  viewButton.onclick=()=>viewMaterial(item.file_path);
  entry.appendChild(viewButton);
 
- // DOWNLOAD FOR ADMIN AND OFFICES
+ // DOWNLOAD
  if(role!=="teacher"){
   const downloadButton=document.createElement("button");
   downloadButton.textContent="DOWNLOAD";
@@ -728,45 +706,80 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  addSignatureDisplay(entry,item);
 
  // ACADEMIC OFFICE
- if(role==="academic"&&forwarding==="Pending"){
+ if(role==="academic"&&forwardingLower==="pending"){
   addSignaturePad(entry,item,"academic");
  }
 
  // HEAD OF SCHOOL
- if(role==="headmaster"&&forwarding==="Checked"){
+ if(role==="headmaster"&&forwardingLower==="checked"){
   addSignaturePad(entry,item,"headmaster");
  }
 
- // ADMIN ACTIONS
- if(isAdmin()&&forwarding==="Forwarded"){
+ // ADMIN ACTIONS - IMPROVED
+ const isAlreadySent=forwardingLower==="forwarded to teacher";
 
-  if(String(item.review_status||"").toLowerCase()!=="approved"){
+ const isReadyForAdmin=
+  Boolean(item.headmaster_signature)||
+  ["forwarded","approved"].includes(forwardingLower)||
+  reviewLower==="approved";
 
-   const approveButton=document.createElement("button");
-   approveButton.className="approve-button";
-   approveButton.textContent="APPROVE";
-   approveButton.onclick=()=>adminAction(item,"Approved");
-   entry.appendChild(approveButton);
+ if(isAdmin()){
+
+  if(isAlreadySent){
+
+   const sentLabel=document.createElement("p");
+   sentLabel.className="status forwarded";
+   sentLabel.textContent="SENT TO TEACHER SUCCESSFULLY";
+   entry.appendChild(sentLabel);
+
+  }else if(forwardingLower==="returned"){
+
+   const returnedLabel=document.createElement("p");
+   returnedLabel.className="status returned";
+   returnedLabel.textContent="RETURNED TO TEACHER";
+   entry.appendChild(returnedLabel);
+
+  }else if(isReadyForAdmin){
+
+   const adminHeading=document.createElement("h4");
+   adminHeading.textContent="ADMINISTRATOR ACTIONS";
+   entry.appendChild(adminHeading);
+
+   if(reviewLower!=="approved"){
+
+    const approveButton=document.createElement("button");
+    approveButton.className="approve-button";
+    approveButton.textContent="APPROVE";
+    approveButton.onclick=()=>adminAction(item,"Approved");
+    entry.appendChild(approveButton);
+
+   }else{
+
+    const approvedLabel=document.createElement("p");
+    approvedLabel.className="status approved";
+    approvedLabel.textContent="APPROVED BY ADMIN";
+    entry.appendChild(approvedLabel);
+
+    const sendButton=document.createElement("button");
+    sendButton.className="send-button";
+    sendButton.textContent="SEND AUTOMATIC TO TEACHER";
+    sendButton.onclick=()=>adminSendToTeacher(item,sendButton);
+    entry.appendChild(sendButton);
+   }
+
+   const returnButton=document.createElement("button");
+   returnButton.className="danger";
+   returnButton.textContent="RETURN TO TEACHER";
+   returnButton.onclick=()=>adminAction(item,"Returned");
+   entry.appendChild(returnButton);
 
   }else{
 
-   const approvedLabel=document.createElement("p");
-   approvedLabel.className="status approved";
-   approvedLabel.textContent="APPROVED BY ADMIN";
-   entry.appendChild(approvedLabel);
-
-   const sendButton=document.createElement("button");
-   sendButton.className="send-button";
-   sendButton.textContent="SEND AUTOMATIC TO TEACHER";
-   sendButton.onclick=()=>adminSendToTeacher(item);
-   entry.appendChild(sendButton);
+   const waiting=document.createElement("p");
+   waiting.className="small";
+   waiting.textContent="WAITING FOR HEAD OF SCHOOL SIGNATURE";
+   entry.appendChild(waiting);
   }
-
-  const returnButton=document.createElement("button");
-  returnButton.className="danger";
-  returnButton.textContent="RETURN TO TEACHER";
-  returnButton.onclick=()=>adminAction(item,"Returned");
-  entry.appendChild(returnButton);
  }
 
  // ADMIN COMMENT
@@ -777,16 +790,14 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  }
 
  // TEACHER RESUBMISSION
- if(role==="teacher"&&forwarding==="Returned"){
+ if(role==="teacher"&&forwardingLower==="returned"){
   addResubmitControl(entry,item);
  }
 
  // TEACHER APPROVAL MESSAGE
- if(role==="teacher"&&forwarding==="Forwarded to Teacher"){
-
+ if(role==="teacher"&&forwardingLower==="forwarded to teacher"){
   const approvedNote=document.createElement("p");
-  approvedNote.textContent=
-   "This material has been approved by the Administrator and forwarded to you.";
+  approvedNote.textContent="This material has been approved by the Administrator and forwarded to you.";
   approvedNote.style.color="#166534";
   approvedNote.style.fontWeight="bold";
   entry.appendChild(approvedNote);
@@ -798,7 +809,6 @@ async function renderMaterialEntry(item,list,role,peopleNames){
 
  const commentsTitle=document.createElement("h4");
  commentsTitle.textContent="COMMENTS & REPLIES";
-
  commentsBox.appendChild(commentsTitle);
  entry.appendChild(commentsBox);
 
@@ -810,7 +820,6 @@ async function renderMaterialEntry(item,list,role,peopleNames){
  }
 
  list.appendChild(entry);
-
  await loadMaterialComments(item.id,commentsBox);
 }
 
@@ -831,7 +840,6 @@ function addSignatureDisplay(entry,item){
  academic.appendChild(academicTitle);
 
  if(item.academic_signature){
-
   const img=document.createElement("img");
   img.src=item.academic_signature;
   img.className="signature-image";
@@ -842,7 +850,6 @@ function addSignatureDisplay(entry,item){
   date.className="small";
   date.textContent="Signed: "+formatDate(item.academic_signed_at);
   academic.appendChild(date);
-
  }else{
   academic.appendChild(document.createTextNode("Not signed yet."));
  }
@@ -863,7 +870,6 @@ function addSignatureDisplay(entry,item){
  head.appendChild(headTitle);
 
  if(item.headmaster_signature){
-
   const img=document.createElement("img");
   img.src=item.headmaster_signature;
   img.className="signature-image";
@@ -874,7 +880,6 @@ function addSignatureDisplay(entry,item){
   date.className="small";
   date.textContent="Signed: "+formatDate(item.headmaster_signed_at);
   head.appendChild(date);
-
  }else{
   head.appendChild(document.createTextNode("Not signed yet."));
  }
@@ -903,7 +908,6 @@ function addSignaturePad(entry,item,office){
  title.textContent=office==="academic"?
   "ACADEMIC OFFICE - DRAW SIGNATURE":
   "HEAD OF SCHOOL - DRAW SIGNATURE";
-
  area.appendChild(title);
 
  const canvas=document.createElement("canvas");
@@ -970,7 +974,6 @@ function addSignaturePad(entry,item,office){
  const saveButton=document.createElement("button");
  saveButton.textContent=office==="academic"?
   "CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
-
  area.appendChild(saveButton);
 
  saveButton.onclick=async()=>{
@@ -1097,29 +1100,30 @@ async function adminAction(item,action){
 }
 
 // SEND APPROVED MATERIAL TO TEACHER
-async function adminSendToTeacher(item){
+async function adminSendToTeacher(item,button){
 
  if(!isAdmin()){
   alert("Administrator account required.");
   return;
  }
 
- if(String(item.review_status||"").toLowerCase()!=="approved"){
+ const review=String(item.review_status||"").trim().toLowerCase();
+ const forwarding=String(item.forwarding_status||"").trim().toLowerCase();
+
+ if(review!=="approved"){
   alert("Please approve this material first.");
   return;
  }
 
- if(item.forwarding_status!=="Approved"){
-  alert("This material is not ready to be sent.");
+ if(forwarding!=="approved"){
+  alert("This material is not ready to be sent. Please approve it first.");
   return;
  }
 
  if(!confirm(
-  "Send this approved material to "+
-  "the teacher's dashboard? The material will remain in Admin records."
+  "Send this approved material to the teacher's dashboard? The material will remain in Admin records."
  ))return;
 
- const button=event?.currentTarget;
  if(button)button.disabled=true;
 
  try{
@@ -1140,12 +1144,11 @@ async function adminSendToTeacher(item){
   }
 
   if(!data){
-   alert("Material was not sent. It may have already been sent or its status has changed.");
+   alert("Material was not sent. Its status may have changed or database permissions may prevent the update.");
    return;
   }
 
   alert("Material forwarded to the teacher successfully. It remains in Admin records.");
-
   await loadMaterials();
 
  }catch(error){
@@ -1290,7 +1293,6 @@ async function loadMaterialComments(materialId,container){
   box.appendChild(heading);
   box.appendChild(message);
   box.appendChild(date);
-
   container.appendChild(box);
  });
 }
