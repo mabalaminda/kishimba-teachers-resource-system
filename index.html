@@ -17,12 +17,14 @@ textarea{min-height:75px}
 button{background:#176b45;color:white;border:0;border-radius:6px;cursor:pointer}
 button:disabled{opacity:.6;cursor:not-allowed}
 .logout,.danger{background:#b42318}
+.send-button{background:#075985}
+.approve-button{background:#166534}
 .hidden{display:none!important}
 .item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px}
 h3,h4{color:#176b45}
 .signature-pad{width:100%;height:160px;border:2px dashed #64748b;border-radius:8px;background:#fff;touch-action:none;display:block}
 .signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}
-.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:8px 5px 8px 0}
+.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:8px 5px 8px 0;font-size:12px}
 .pending{background:#fef3c7;color:#92400e}
 .checked{background:#dbeafe;color:#1d4ed8}
 .forwarded{background:#d1fae5;color:#047857}
@@ -33,55 +35,16 @@ h3,h4{color:#176b45}
 .comments-box{background:#f8fafc;padding:10px;border-radius:8px;margin-top:12px}
 .comment-item{background:#eff6ff;color:#1e293b;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}
 .teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
-
-/* ADMIN MATERIAL CATEGORY DESIGN */
-.material-category{
- background:#f8fafc;
- border:1px solid #dbe3ea;
- border-radius:8px;
- padding:12px;
- margin:10px 0;
-}
-
-.category-header{
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:8px;
- flex-wrap:wrap;
-}
-
-.category-name{
- flex:1;
- min-width:130px;
- color:#176b45;
- font-weight:bold;
-}
-
-.count-badge{
- background:#dbeafe;
- color:#1e40af;
- width:38px;
- height:38px;
- min-width:38px;
- border-radius:50%;
- display:flex;
- align-items:center;
- justify-content:center;
- font-weight:bold;
- font-size:16px;
-}
-
-.category-toggle{
- width:auto;
- min-width:105px;
- padding:10px 14px;
- margin:0;
-}
-
-.category-content{
- margin-top:12px;
-}
+.material-category{background:#f8fafc;border:1px solid #dbe3ea;border-radius:8px;padding:12px;margin:10px 0}
+.category-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.category-name{flex:1;min-width:130px;color:#176b45;font-weight:bold}
+.count-badge{background:#dbeafe;color:#1e40af;width:38px;height:38px;min-width:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px}
+.category-toggle{width:auto;min-width:105px;padding:10px 14px;margin:0}
+.category-content{margin-top:12px}
+.summary-box{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin:10px 0}
+.summary-box p{margin:8px 0;font-weight:bold}
+.status-details{background:#f8fafc;padding:10px;border-radius:8px;margin:10px 0}
+.status-details p{margin:6px 0;font-size:13px}
 </style>
 </head>
 
@@ -130,7 +93,16 @@ h3,h4{color:#176b45}
 
 <div id="teacherSection" class="card hidden">
 <h3>TEACHER DASHBOARD</h3>
-<p>Approved materials can be viewed here. Download is not provided.</p>
+
+<div class="summary-box">
+<h4>MY MATERIALS SUMMARY</h4>
+<p id="teacherMaterialCount">TOTAL MATERIALS: 0</p>
+<p id="teacherApprovedCount">APPROVED: 0</p>
+<p id="teacherReturnedCount">RETURNED: 0</p>
+<p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p>
+</div>
+
+<p>Your uploaded materials and their review progress appear below.</p>
 <div id="teacherMaterials"></div>
 </div>
 
@@ -197,6 +169,7 @@ h3,h4{color:#176b45}
 <button id="uploadBtn" onclick="uploadMaterial()">UPLOAD MATERIAL</button>
 <p id="uploadMessage"></p>
 </div>
+
 </section>
 
 <script>
@@ -216,6 +189,17 @@ function getRole(){
 
 function isAdmin(){
  return ["admin","administrator"].includes(getRole());
+}
+
+function statusClass(value){
+ const s=String(value||"").toLowerCase();
+
+ if(s.includes("return"))return "returned";
+ if(s.includes("approv"))return "approved";
+ if(s.includes("forward"))return "forwarded";
+ if(s.includes("check"))return "checked";
+
+ return "pending";
 }
 
 // LOGIN
@@ -421,7 +405,7 @@ async function uploadMaterial(){
  }
 }
 
-// LOAD MATERIALS - ORGANIZED BY TEACHER AND CATEGORY
+// LOAD MATERIALS
 async function loadMaterials(){
 
  if(!currentTeacher||!currentUser)return;
@@ -462,33 +446,44 @@ async function loadMaterials(){
 
  if(!data||data.length===0){
   list.textContent="No teaching materials available.";
+  updateTeacherSummary([]);
   return;
  }
 
- // GET TEACHER NAMES
- const teacherNames={};
+ // TEACHER SUMMARY
+ if(role==="teacher"){
+  updateTeacherSummary(data);
+ }
+
+ // LOAD NAMES OF TEACHERS AND OFFICIALS
+ const peopleNames={};
 
  if(isAdmin()||role==="academic"||role==="headmaster"){
 
-  const teacherIds=[...new Set(
-   data.map(item=>item.teacher_id).filter(Boolean)
+  const ids=[...new Set(
+   data.flatMap(item=>[
+    item.teacher_id,
+    item.academic_signed_by,
+    item.headmaster_signed_by,
+    item.admin_action_by
+   ]).filter(Boolean)
   )];
 
-  if(teacherIds.length){
+  if(ids.length){
 
-   const {data:teachers,error:teacherError}=await db.from("teachers")
-    .select("id,full_name,email,staff_id")
-    .in("id",teacherIds);
+   const {data:people,error:peopleError}=await db.from("teachers")
+    .select("id,full_name,email,role")
+    .in("id",ids);
 
-   if(!teacherError&&teachers){
-    teachers.forEach(t=>{
-     teacherNames[t.id]=t.full_name||t.email||"Teacher";
+   if(!peopleError&&people){
+    people.forEach(person=>{
+     peopleNames[person.id]=person.full_name||person.email||person.role||"User";
     });
    }
   }
  }
 
- // ALL MATERIAL CATEGORIES
+ // CATEGORIES
  const categories=[
   "Scheme of Work",
   "Lesson Plan",
@@ -499,7 +494,7 @@ async function loadMaterials(){
   "Teaching Resources"
  ];
 
- // GROUP MATERIALS BY TEACHER
+ // GROUP MATERIALS BY TEACHER FOR ADMIN
  let groups=[];
 
  if(isAdmin()){
@@ -508,17 +503,15 @@ async function loadMaterials(){
 
   data.forEach(item=>{
    const id=item.teacher_id||"unknown";
-
    if(!grouped[id])grouped[id]=[];
-
    grouped[id].push(item);
   });
 
   groups=Object.keys(grouped).sort((a,b)=>
-   (teacherNames[a]||a).localeCompare(teacherNames[b]||b)
+   (peopleNames[a]||a).localeCompare(peopleNames[b]||b)
   ).map(id=>({
    teacherId:id,
-   teacherName:teacherNames[id]||"Teacher account",
+   teacherName:peopleNames[id]||"Teacher account",
    materials:grouped[id]
   }));
 
@@ -529,10 +522,9 @@ async function loadMaterials(){
    teacherName:currentTeacher.full_name||"Teacher",
    materials:data
   }];
-
  }
 
- // DISPLAY EACH TEACHER
+ // DISPLAY GROUPS
  for(const group of groups){
 
   if(isAdmin()){
@@ -550,7 +542,6 @@ async function loadMaterials(){
    teacherHeading.appendChild(count);
    list.appendChild(teacherHeading);
 
-   // DISPLAY EACH MATERIAL CATEGORY
    for(const category of categories){
 
     const matching=group.materials.filter(item=>
@@ -581,9 +572,9 @@ async function loadMaterials(){
     content.className="category-content hidden";
 
     openButton.onclick=()=>{
-     const isHidden=content.classList.contains("hidden");
+     const hidden=content.classList.contains("hidden");
      content.classList.toggle("hidden");
-     openButton.textContent=isHidden?"CLOSE":"OPEN / VIEW";
+     openButton.textContent=hidden?"CLOSE":"OPEN / VIEW";
     };
 
     categoryHeader.appendChild(categoryName);
@@ -592,28 +583,54 @@ async function loadMaterials(){
 
     categoryBox.appendChild(categoryHeader);
     categoryBox.appendChild(content);
-
     list.appendChild(categoryBox);
 
-    // MATERIALS INSIDE THIS CATEGORY
     for(const item of matching){
-     await renderMaterialEntry(item,content,role,teacherNames);
+     await renderMaterialEntry(item,content,role,peopleNames);
     }
    }
 
   }else{
 
-   // OFFICE AND TEACHER MATERIALS
    for(const item of group.materials){
-    await renderMaterialEntry(item,list,role,teacherNames);
+    await renderMaterialEntry(item,list,role,peopleNames);
    }
   }
  }
 }
 
+// TEACHER SUMMARY COUNTS
+function updateTeacherSummary(data){
+
+ const total=data.length;
+
+ const approved=data.filter(item=>
+  String(item.review_status||"").toLowerCase()==="approved"
+ ).length;
+
+ const returned=data.filter(item=>
+  String(item.forwarding_status||"").toLowerCase()==="returned"
+ ).length;
+
+ const forwarded=data.filter(item=>
+  String(item.forwarding_status||"").toLowerCase()==="forwarded to teacher"
+ ).length;
+
+ document.getElementById("teacherMaterialCount").textContent=
+  "TOTAL MATERIALS: "+total;
+
+ document.getElementById("teacherApprovedCount").textContent=
+  "APPROVED: "+approved;
+
+ document.getElementById("teacherReturnedCount").textContent=
+  "RETURNED: "+returned;
+
+ document.getElementById("teacherForwardedCount").textContent=
+  "FORWARDED TO TEACHER: "+forwarded;
+}
 
 // DISPLAY ONE MATERIAL
-async function renderMaterialEntry(item,list,role,teacherNames){
+async function renderMaterialEntry(item,list,role,peopleNames){
 
  const entry=document.createElement("div");
  entry.className="item";
@@ -622,10 +639,11 @@ async function renderMaterialEntry(item,list,role,teacherNames){
  heading.textContent=item.title;
  entry.appendChild(heading);
 
+ const teacherName=peopleNames[item.teacher_id]||"Teacher";
+
  if(isAdmin()){
   const teacher=document.createElement("p");
-  teacher.textContent="UPLOADED BY: "+
-   (teacherNames[item.teacher_id]||"Teacher");
+  teacher.textContent="UPLOADED BY: "+teacherName;
   entry.appendChild(teacher);
  }
 
@@ -641,33 +659,58 @@ async function renderMaterialEntry(item,list,role,teacherNames){
 
  // REVIEW STATUS
  const review=document.createElement("span");
- review.className="status";
- review.textContent=(item.review_status||"Pending").toUpperCase();
-
- review.classList.add(
-  item.review_status==="Approved"?"approved":
-  item.review_status==="Returned"?"returned":"pending"
- );
-
+ review.className="status "+statusClass(item.review_status);
+ review.textContent="REVIEW: "+(item.review_status||"Pending").toUpperCase();
  entry.appendChild(review);
 
- // OFFICE STATUS
+ // FORWARDING STATUS
  const forwarding=item.forwarding_status||"Pending";
 
  const stage=document.createElement("div");
- stage.className="status";
- stage.textContent="OFFICE STATUS: "+forwarding.toUpperCase();
-
- stage.classList.add(
-  forwarding==="Approved"?"approved":
-  forwarding==="Forwarded"?"forwarded":
-  forwarding==="Checked"?"checked":
-  forwarding==="Returned"?"returned":"pending"
- );
-
+ stage.className="status "+statusClass(forwarding);
+ stage.textContent="STATUS: "+forwarding.toUpperCase();
  entry.appendChild(stage);
 
- // VIEW
+ // TRACKING DETAILS
+ const tracking=document.createElement("div");
+ tracking.className="status-details";
+
+ const academicName=peopleNames[item.academic_signed_by]||"Not yet received";
+ const headName=peopleNames[item.headmaster_signed_by]||"Not yet received";
+ const adminName=peopleNames[item.admin_action_by]||"Not yet received";
+
+ const academicLine=document.createElement("p");
+ academicLine.textContent="ACADEMIC OFFICE: "+academicName+
+  (item.academic_signed_at?" - CHECKED":"");
+ tracking.appendChild(academicLine);
+
+ const headLine=document.createElement("p");
+ headLine.textContent="HEAD OF SCHOOL: "+headName+
+  (item.headmaster_signed_at?" - CHECKED":"");
+ tracking.appendChild(headLine);
+
+ const adminLine=document.createElement("p");
+ adminLine.textContent="ADMIN: "+
+  (item.admin_action_at?adminName+" - "+(item.review_status||"Reviewed"):"Awaiting Admin");
+ tracking.appendChild(adminLine);
+
+ if(forwarding==="Forwarded to Teacher"){
+  const receivedLine=document.createElement("p");
+  receivedLine.textContent="DESTINATION: "+teacherName+
+   " - FORWARDED TO TEACHER";
+  tracking.appendChild(receivedLine);
+ }
+
+ if(forwarding==="Returned"){
+  const returnedLine=document.createElement("p");
+  returnedLine.textContent="DESTINATION: "+teacherName+
+   " - RETURNED FOR CORRECTIONS";
+  tracking.appendChild(returnedLine);
+ }
+
+ entry.appendChild(tracking);
+
+ // VIEW BUTTON
  const viewButton=document.createElement("button");
  viewButton.textContent="VIEW";
  viewButton.onclick=()=>viewMaterial(item.file_path);
@@ -694,22 +737,39 @@ async function renderMaterialEntry(item,list,role,teacherNames){
   addSignaturePad(entry,item,"headmaster");
  }
 
- // ADMIN APPROVAL
+ // ADMIN ACTIONS
  if(isAdmin()&&forwarding==="Forwarded"){
 
-  const approveButton=document.createElement("button");
-  approveButton.textContent="APPROVE & SEND";
-  approveButton.onclick=()=>adminAction(item,"Approved");
-  entry.appendChild(approveButton);
+  if(String(item.review_status||"").toLowerCase()!=="approved"){
+
+   const approveButton=document.createElement("button");
+   approveButton.className="approve-button";
+   approveButton.textContent="APPROVE";
+   approveButton.onclick=()=>adminAction(item,"Approved");
+   entry.appendChild(approveButton);
+
+  }else{
+
+   const approvedLabel=document.createElement("p");
+   approvedLabel.className="status approved";
+   approvedLabel.textContent="APPROVED BY ADMIN";
+   entry.appendChild(approvedLabel);
+
+   const sendButton=document.createElement("button");
+   sendButton.className="send-button";
+   sendButton.textContent="SEND AUTOMATIC TO TEACHER";
+   sendButton.onclick=()=>adminSendToTeacher(item);
+   entry.appendChild(sendButton);
+  }
 
   const returnButton=document.createElement("button");
-  returnButton.textContent="RETURN TO TEACHER";
   returnButton.className="danger";
+  returnButton.textContent="RETURN TO TEACHER";
   returnButton.onclick=()=>adminAction(item,"Returned");
   entry.appendChild(returnButton);
  }
 
- // ADMIN COMMENTS
+ // ADMIN COMMENT
  if(item.admin_comment&&(isAdmin()||role==="teacher")){
   const note=document.createElement("p");
   note.textContent="ADMIN COMMENT: "+item.admin_comment;
@@ -721,11 +781,12 @@ async function renderMaterialEntry(item,list,role,teacherNames){
   addResubmitControl(entry,item);
  }
 
- // APPROVED MESSAGE
- if(role==="teacher"&&forwarding==="Approved"){
+ // TEACHER APPROVAL MESSAGE
+ if(role==="teacher"&&forwarding==="Forwarded to Teacher"){
+
   const approvedNote=document.createElement("p");
   approvedNote.textContent=
-   "This material has been approved by the Administrator. You can view it here.";
+   "This material has been approved by the Administrator and forwarded to you.";
   approvedNote.style.color="#166534";
   approvedNote.style.fontWeight="bold";
   entry.appendChild(approvedNote);
@@ -752,7 +813,6 @@ async function renderMaterialEntry(item,list,role,teacherNames){
 
  await loadMaterialComments(item.id,commentsBox);
 }
-
 
 // DISPLAY SIGNATURES
 function addSignatureDisplay(entry,item){
@@ -832,7 +892,6 @@ function addSignatureDisplay(entry,item){
 function formatDate(value){
  return value?new Date(value).toLocaleString():"Date unavailable";
 }
-
 
 // SIGNATURE PAD
 function addSignaturePad(entry,item,office){
@@ -980,7 +1039,6 @@ function addSignaturePad(entry,item,office){
  };
 }
 
-
 // ADMIN APPROVE OR RETURN
 async function adminAction(item,action){
 
@@ -1032,12 +1090,70 @@ async function adminAction(item,action){
  }
 
  alert(action==="Approved"?
-  "Material APPROVED & SENT to the teacher.":
+  "Material approved. Now use SEND AUTOMATIC TO TEACHER.":
   "Material returned to the teacher with Admin comments.");
 
  await loadMaterials();
 }
 
+// SEND APPROVED MATERIAL TO TEACHER
+async function adminSendToTeacher(item){
+
+ if(!isAdmin()){
+  alert("Administrator account required.");
+  return;
+ }
+
+ if(String(item.review_status||"").toLowerCase()!=="approved"){
+  alert("Please approve this material first.");
+  return;
+ }
+
+ if(item.forwarding_status!=="Approved"){
+  alert("This material is not ready to be sent.");
+  return;
+ }
+
+ if(!confirm(
+  "Send this approved material to "+
+  "the teacher's dashboard? The material will remain in Admin records."
+ ))return;
+
+ const button=event?.currentTarget;
+ if(button)button.disabled=true;
+
+ try{
+
+  const {data,error}=await db.from("teaching_materials")
+   .update({
+    forwarding_status:"Forwarded to Teacher"
+   })
+   .eq("id",item.id)
+   .eq("review_status","Approved")
+   .eq("forwarding_status","Approved")
+   .select("id,forwarding_status")
+   .maybeSingle();
+
+  if(error){
+   alert("SEND ERROR: "+error.message);
+   return;
+  }
+
+  if(!data){
+   alert("Material was not sent. It may have already been sent or its status has changed.");
+   return;
+  }
+
+  alert("Material forwarded to the teacher successfully. It remains in Admin records.");
+
+  await loadMaterials();
+
+ }catch(error){
+  alert("SEND ERROR: "+error.message);
+ }finally{
+  if(button)button.disabled=false;
+ }
+}
 
 // TEACHER RESUBMISSION
 function addResubmitControl(entry,item){
@@ -1136,7 +1252,6 @@ function addResubmitControl(entry,item){
  };
 }
 
-
 // LOAD COMMENTS
 async function loadMaterialComments(materialId,container){
 
@@ -1180,7 +1295,6 @@ async function loadMaterialComments(materialId,container){
  });
 }
 
-
 // TEACHER REPLY
 async function replyToMaterialComment(materialId){
 
@@ -1202,7 +1316,6 @@ async function replyToMaterialComment(materialId){
  alert("Reply sent successfully.");
  await loadMaterials();
 }
-
 
 // DOWNLOAD
 async function downloadMaterial(path){
@@ -1227,7 +1340,6 @@ async function downloadMaterial(path){
  window.open(data.signedUrl,"_blank");
 }
 
-
 // VIEW MATERIAL
 async function viewMaterial(path){
 
@@ -1245,7 +1357,6 @@ async function viewMaterial(path){
 
  window.open(data.signedUrl,"_blank");
 }
-
 
 // LOGOUT
 async function logout(){
@@ -1269,7 +1380,6 @@ async function logout(){
  document.getElementById("loginMessage").textContent=
   "You have logged out successfully.";
 }
-
 
 // CHECK SESSION
 async function checkSession(){
