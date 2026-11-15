@@ -47,6 +47,20 @@ h3,h4{color:#176b45}
 <h4>REGISTERED TEACHERS</h4>
 <div id="teachersList"></div>
 </div>
+  <div id="academicSection" class="card hidden">
+<h3>ACADEMIC OFFICE DASHBOARD</h3>
+<div id="academicMaterials"></div>
+</div>
+
+<div id="headmasterSection" class="card hidden">
+<h3>HEADMISTRESS DASHBOARD</h3>
+<div id="headmasterMaterials"></div>
+</div>
+
+<div id="teacherSection" class="card hidden">
+<h3>TEACHER DASHBOARD</h3>
+<div id="teacherMaterials"></div>
+</div>
 
 <div class="card">
 <h3>UPLOAD TEACHING MATERIALS</h3>
@@ -157,7 +171,6 @@ async function login(){
     button.disabled=false;
   }
 }
-
 // LOAD DASHBOARD
 async function loadDashboard(user){
   const message=document.getElementById("loginMessage");
@@ -190,12 +203,30 @@ async function loadDashboard(user){
     document.getElementById("welcome").textContent="WELCOME "+(teacher.full_name||user.email);
     document.getElementById("roleDisplay").textContent="Role: "+teacher.role;
 
-    if(role==="admin"||role==="administrator"){
-      document.getElementById("adminSection").classList.remove("hidden");
-      await loadTeachers();
-    }else{
-      document.getElementById("adminSection").classList.add("hidden");
-    }
+    // ADMIN DASHBOARD
+if(role==="admin"||role==="administrator"){
+  document.getElementById("adminSection").classList.remove("hidden");
+  await loadTeachers();
+}
+
+// ACADEMIC DASHBOARD
+else if(role==="academic"){
+  document.getElementById("academicSection").classList.remove("hidden");
+}
+
+// HEADMISTRESS DASHBOARD
+else if(role==="headmaster"){
+  document.getElementById("headmasterSection").classList.remove("hidden");
+}
+
+// TEACHER DASHBOARD
+else if(role==="teacher"){
+  document.getElementById("teacherSection").classList.remove("hidden");
+}
+else{
+  message.textContent="Unknown user role. Contact Administrator.";
+  return;
+}
 
     await loadMaterials();
   }catch(error){
@@ -312,8 +343,20 @@ async function uploadMaterial(){
 // LOAD MATERIALS
 
 async function loadMaterials(){
-  const list=document.getElementById("materialsList");
-  list.textContent="Loading materials...";
+  const role=String(currentTeacher?.role||"").trim().toLowerCase();
+
+const listId =
+  role==="admin" || role==="administrator" ? "materialsList" :
+  role==="academic" ? "academicMaterials" :
+  role==="headmaster" ? "headmasterMaterials" :
+  "teacherMaterials";
+
+const list=document.getElementById(listId);
+  if(!list){
+  console.error("Dashboard materials container not found");
+  return;
+}
+list.textContent="Loading materials...";
 
   if(!currentTeacher||!currentUser){
     list.textContent="Please login first.";
@@ -324,7 +367,7 @@ async function loadMaterials(){
     .select("*")
     .order("created_at",{ascending:false});
 
-  const role=String(currentTeacher.role||"").trim().toLowerCase();
+  
   const isAdmin=role==="admin"||role==="administrator";
   const isAcademic=role==="academic";
 const isHeadmaster=role==="headmaster";
@@ -411,7 +454,7 @@ entry.appendChild(commentsBox);
 loadMaterialComments(item.id, commentsBox);
     entry.appendChild(downloadButton);
 
-    if(isAdmin){
+   if(isAdmin || isAcademic){
       const approveButton=document.createElement("button");
       approveButton.textContent="APPROVE";
       approveButton.onclick=()=>updateMaterialStatus(item.id,"Approved");
