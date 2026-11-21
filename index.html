@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kishimba Secondary School Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#172033}
 header{background:#123c2c;color:#fff;padding:20px;text-align:center;border-radius:10px}header h2{color:#fff}
@@ -15,7 +16,7 @@ textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:po
 .item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px;background:#fff}.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:5px;font-size:12px}
 .pending{background:#fef3c7;color:#92400e}.checked{background:#dbeafe;color:#1d4ed8}.forwarded{background:#d1fae5;color:#047857}.approved{background:#dcfce7;color:#166534}.returned{background:#ffedd5;color:#9a3412}.draft{background:#e0e7ff;color:#3730a3}
 .signature-area,.comments-box,.status-details{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}.signature-pad{width:100%;height:160px;border:2px dashed #64748b;background:white;touch-action:none;display:block}
-.signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}.small{font-size:13px;color:#475569}
+.signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}.permission-signature{width:100%;height:145px;border:2px dashed #64748b;background:#fff;touch-action:none;display:block;border-radius:6px}.notification-card{border-left:5px solid #d97706;background:#fffbeb;padding:12px;margin:10px 0;border-radius:8px}.permission-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.received-button{background:#0f766e}.download-button{background:#1d4ed8}.small{font-size:13px;color:#475569}
 .comment-item{background:#eff6ff;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}.teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
 .summary-box,.office-action{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin:10px 0}
 .login-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px}.school-board{min-height:260px;border-radius:10px;background:linear-gradient(145deg,#123c2c,#176b45);color:white;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;border:7px solid #9a7442}
@@ -39,11 +40,33 @@ textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:po
 <section id="dashboard" class="hidden">
  <div class="card"><h3 id="welcome">WELCOME</h3><p id="roleDisplay"></p></div>
 
- <div id="adminSection" class="card hidden"><h3>ADMIN DASHBOARD</h3><h4>REGISTERED TEACHERS</h4><div id="teachersList"></div><h4>ALL TEACHING MATERIALS AND RECORDS</h4><div id="materialsList"></div></div>
+ <div id="adminSection" class="card hidden"><h3>ADMIN DASHBOARD</h3><div class="card"><h3>PERMISSION REQUEST NOTIFICATIONS</h3><div id="adminPermissionNotifications" class="notification-card">Loading requests awaiting Admin...</div></div><h4>REGISTERED TEACHERS</h4><div id="teachersList"></div><h4>ALL TEACHING MATERIALS AND RECORDS</h4><div id="materialsList"></div></div>
  <div id="academicSection" class="card hidden"><h3>ACADEMIC OFFICE DASHBOARD</h3><p>Review materials, add comments and sign using CHECKED.</p><div id="academicMaterials"></div></div>
- <div id="headmasterSection" class="card hidden"><h3>HEAD OF SCHOOL DASHBOARD</h3><p>Review checked materials, add comments and sign using FORWARDED.</p><div id="headmasterMaterials"></div></div>
+ <div id="headmasterSection" class="card hidden"><h3>HEAD OF SCHOOL DASHBOARD</h3>
+  <div class="card"><h3>PERMISSION REQUEST NOTIFICATIONS</h3><div id="headmasterPermissionNotifications" class="notification-card">Loading new permission requests...</div></div>
+  <p>Review checked materials, add comments and sign using FORWARDED.</p><div id="headmasterMaterials"></div></div>
 
  <div id="teacherSection" class="card hidden"><h3>TEACHER DASHBOARD</h3>
+  <div class="card"><h3>PERMISSION REQUEST</h3>
+   <div id="teacherPermissionNotifications" class="notification-card">Loading permission notifications...</div>
+   <h4>SUBMIT NEW PERMISSION REQUEST</h4>
+   <div class="form-grid">
+    <div><label>First Name</label><input id="permFirstName" placeholder="First name"></div>
+    <div><label>Middle Name</label><input id="permMiddleName" placeholder="Middle name"></div>
+    <div><label>Last Name</label><input id="permLastName" placeholder="Last name"></div>
+    <div><label>Department</label><input id="permDepartment" value="Elimu Sekondari" readonly></div>
+    <div><label>Cheque Number</label><input id="permCheckNumber" placeholder="Cheque number"></div>
+    <div><label>Purpose of Leave</label><input id="permPurpose" placeholder="Reason for requesting leave"></div>
+    <div><label>Start Date</label><input id="permStartDate" type="date"></div>
+    <div><label>End Date</label><input id="permEndDate" type="date"></div>
+   </div>
+   <label>Teacher Signature (draw with finger or upload image)</label>
+   <canvas id="teacherPermissionCanvas" class="permission-signature" width="900" height="220"></canvas>
+   <div class="grid2"><button type="button" class="secondary" onclick="clearPermissionCanvas('teacherPermissionCanvas')">CLEAR SIGNATURE</button><input id="teacherPermissionSignatureFile" type="file" accept="image/*"></div>
+   <button id="sendPermissionRequestBtn" onclick="submitPermissionRequest()">SEND PERMISSION REQUEST</button>
+   <p id="teacherPermissionMessage" class="small"></p>
+  </div>
+ </div>
   <div class="summary-box"><h4>MY MATERIALS SUMMARY</h4><p id="teacherMaterialCount">TOTAL MATERIALS: 0</p><p id="teacherDraftCount">DRAFT: 0</p><p id="teacherApprovedCount">APPROVED: 0</p><p id="teacherReturnedCount">RETURNED: 0</p><p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p></div>
   <p>Your uploaded materials and their review progress appear below.</p><div id="teacherMaterials"></div>
  </div>
@@ -207,6 +230,9 @@ async function loadDashboard(user){
   else if(currentRole==="teacher"){show("teacherSection");show("uploadSection");show("teacherResultsSection")}
   else{msg.textContent="Unknown user role: "+(teacher.role||roleRow.data?.role)+". Contact Administrator.";return}
   await loadMaterials();
+  if(currentRole==="teacher"){document.getElementById("permDepartment").value="Elimu Sekondari";const parts=(teacher.full_name||"").trim().split(/\s+/);if(parts.length>=3){document.getElementById("permFirstName").value=parts[0];document.getElementById("permMiddleName").value=parts.slice(1,-1).join(" ");document.getElementById("permLastName").value=parts[parts.length-1]}document.getElementById("permCheckNumber").value=teacher.staff_id||"";setupPermissionCanvas(document.getElementById("teacherPermissionCanvas"));await loadTeacherPermissionRequests()}
+  if(currentRole==="headmaster")await loadHeadmasterPermissionRequests();
+  if(currentRole==="admin")await loadAdminPermissionRequests();
   if(currentRole==="admin"||currentRole==="headmaster")await loadStudentRecords();
   if(currentRole==="admin"||currentRole==="academic"){await loadOfficeExams();await loadAssignmentTeachers();await loadTeacherAssignments();}
   if(currentRole==="teacher")await loadTeacherResults();
@@ -696,6 +722,99 @@ async function teacherGenerateReports(exam){
  box.innerHTML="";box.appendChild(el("h4",exam.exam_name+" - PUBLISHED SUBJECT REPORTS"));
  rows.forEach(r=>{const s=names[r.student_id]||{},name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");const p=el("div",undefined,"report");p.appendChild(el("strong",(s.admission_number||"")+" | "+name));p.appendChild(el("p",r.subject+": "+r.marks_obtained+"/100"));box.appendChild(p)})
 }
+
+// ---------------- PERMISSION REQUEST WORKFLOW ----------------
+function setupPermissionCanvas(canvas){
+ if(!canvas||canvas.dataset.ready==='1')return;
+ canvas.dataset.ready='1';const ctx=canvas.getContext('2d');ctx.lineWidth=3;ctx.lineCap='round';ctx.strokeStyle='#111827';let drawing=false;
+ const point=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}};
+ canvas.addEventListener('pointerdown',e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+ canvas.addEventListener('pointermove',e=>{if(!drawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()});
+ const stop=()=>{drawing=false};canvas.addEventListener('pointerup',stop);canvas.addEventListener('pointercancel',stop);
+}
+function clearPermissionCanvas(id){const c=document.getElementById(id);if(c)c.getContext('2d').clearRect(0,0,c.width,c.height)}
+function canvasHasSignature(canvas){if(!canvas)return false;const c=canvas.getContext('2d'),d=c.getImageData(0,0,canvas.width,canvas.height).data;for(let i=3;i<d.length;i+=4)if(d[i]!==0)return true;return false}
+async function imageAsPng(file){if(!file)return null;const bitmap=await createImageBitmap(file);const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);return await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));}
+async function uploadPermissionSignature(fileOrBlob,folder){
+ const path=currentUser.id+'/permission/'+folder+'_'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.png';
+ const {error}=await db.storage.from('staff-permission-signatures').upload(path,fileOrBlob,{contentType:'image/png',upsert:false});
+ if(error)throw new Error('Signature upload failed: '+error.message);return path;
+}
+async function submitPermissionRequest(){
+ if(getRole()!=='teacher')return;
+ const v=id=>document.getElementById(id).value.trim();
+ const first_name=v('permFirstName'),middle_name=v('permMiddleName'),last_name=v('permLastName'),check_number=v('permCheckNumber'),purpose=v('permPurpose'),start_date=v('permStartDate'),end_date=v('permEndDate');
+ const canvas=document.getElementById('teacherPermissionCanvas'),file=document.getElementById('teacherPermissionSignatureFile').files[0],msg=document.getElementById('teacherPermissionMessage'),btn=document.getElementById('sendPermissionRequestBtn');
+ if(!first_name||!middle_name||!last_name||!check_number||!purpose||!start_date||!end_date){msg.textContent='Jaza majina yote matatu, cheque number, sababu na tarehe zote.';return}
+ if(end_date<start_date){msg.textContent='Tarehe ya mwisho haiwezi kuwa kabla ya tarehe ya kuanza.';return}
+ if(!file&&!canvasHasSignature(canvas)){msg.textContent='Weka sahihi kwa kuchora au kupakia picha ya sahihi.';return}
+ btn.disabled=true;msg.textContent='Sending request...';
+ try{
+  const blob=file?await imageAsPng(file):await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+  const signaturePath=await uploadPermissionSignature(blob,'teacher');
+  const {error}=await db.from('staff_permission_requests').insert({teacher_id:currentTeacherId,teacher_user_id:currentUser.id,first_name,middle_name,last_name,department:'Elimu Sekondari',check_number,purpose,start_date,end_date,teacher_signature_path:signaturePath});
+  if(error)throw new Error(error.message);
+  msg.textContent='Ombi limetumwa kwa Mkuu wa Shule.';
+  ['permPurpose','permCheckNumber','permStartDate','permEndDate'].forEach(id=>document.getElementById(id).value='');clearPermissionCanvas('teacherPermissionCanvas');document.getElementById('teacherPermissionSignatureFile').value='';
+  await loadTeacherPermissionRequests();
+ }catch(e){msg.textContent='SEND ERROR: '+e.message}finally{btn.disabled=false}
+}
+async function permissionSignedUrl(path){if(!path)return null;const {data,error}=await db.storage.from('staff-permission-signatures').createSignedUrl(path,900);if(error)throw new Error(error.message);return data?.signedUrl||null}
+function permissionFullName(r){return [r.first_name,r.middle_name,r.last_name].filter(Boolean).join(' ')}
+function permissionSummary(r){return `${permissionFullName(r)} | Cheque: ${r.check_number} | ${r.start_date} mpaka ${r.end_date}`}
+async function loadTeacherPermissionRequests(){
+ const box=document.getElementById('teacherPermissionNotifications');if(!box)return;box.textContent='Loading permission notifications...';
+ const {data,error}=await db.from('staff_permission_requests').select('*').eq('teacher_user_id',currentUser.id).order('created_at',{ascending:false});
+ if(error){box.textContent='NOTIFICATION ERROR: '+error.message;return}
+ box.innerHTML='';const rows=data||[];if(!rows.length){box.textContent='Hakuna maombi ya ruhusa yaliyotumwa bado.';return}
+ rows.forEach(r=>{
+  const card=el('div',undefined,'item');card.appendChild(el('strong','PERMISSION REQUEST'));card.appendChild(el('p',permissionSummary(r)));
+  let status='Ombi limetumwa kwa Mkuu wa Shule';if(r.headmaster_decision==='Approved')status='Mkuu wa Shule ameruhusu; linasubiri Admin';if(r.headmaster_decision==='Rejected')status='Mkuu wa Shule hajaruhusu';if(r.admin_received)status='Admin amepokea na kushughulikia ombi';
+  card.appendChild(el('p',status,'status '+(r.admin_received?'approved':'pending')));
+  if(r.headmaster_comment)card.appendChild(el('p','Maoni ya Mkuu wa Shule: '+r.headmaster_comment));
+  if(r.admin_received){card.appendChild(el('p','Uamuzi wa Admin: '+(r.admin_decision==='Approved'?'APPROVED':'REJECTED')));if(r.admin_comment)card.appendChild(el('p','Maoni ya Admin: '+r.admin_comment));const actions=el('div',undefined,'permission-actions'),view=el('button','VIEW','secondary'),down=el('button','DOWNLOAD','download-button');view.onclick=()=>viewPermissionPdf(r);down.onclick=()=>downloadPermissionPdf(r);actions.append(view,down);card.appendChild(actions)}
+  box.appendChild(card);
+ });
+}
+async function loadHeadmasterPermissionRequests(){
+ const box=document.getElementById('headmasterPermissionNotifications');if(!box)return;box.textContent='Loading new permission requests...';
+ const {data,error}=await db.from('staff_permission_requests').select('*').eq('headmaster_decision','Pending').order('created_at',{ascending:true});
+ if(error){box.textContent='NOTIFICATION ERROR: '+error.message;return}box.innerHTML='';const rows=data||[];if(!rows.length){box.textContent='Hakuna maombi mapya yanayosubiri.';return}
+ box.appendChild(el('strong',`NOTIFICATIONS: ${rows.length} request(s) awaiting review`));
+ for(const r of rows){const card=el('div',undefined,'item');card.appendChild(el('h4',permissionFullName(r)));card.appendChild(el('p',`Department: ${r.department} | Cheque: ${r.check_number}`));card.appendChild(el('p','Purpose: '+r.purpose));card.appendChild(el('p',`Leave dates: ${r.start_date} to ${r.end_date}`));const sig=await permissionSignedUrl(r.teacher_signature_path);if(sig){const img=document.createElement('img');img.src=sig;img.alt='Teacher signature';img.className='signature-image';card.appendChild(img)}
+  const decision=document.createElement('select');decision.innerHTML='<option value="">Chagua uamuzi</option><option value="Approved">AMERUHUSIWA</option><option value="Rejected">HAJARUHUSIWA</option>';card.appendChild(decision);
+  const comment=el('textarea');comment.placeholder='Maelezo ya Mkuu wa Shule (hiari)';card.appendChild(comment);
+  card.appendChild(el('label','Sahihi ya Mkuu wa Shule (chora au pakia picha)'));
+  const canvas=document.createElement('canvas');canvas.className='permission-signature';canvas.width=900;canvas.height=220;canvas.id='hmSig_'+r.id;card.appendChild(canvas);setupPermissionCanvas(canvas);
+  const file=document.createElement('input');file.type='file';file.accept='image/*';card.appendChild(file);
+  const clear=el('button','CLEAR SIGNATURE','secondary');clear.onclick=()=>clearPermissionCanvas(canvas.id);card.appendChild(clear);
+  const save=el('button','SUBMIT HEADMASTER DECISION','approve-button');save.onclick=async()=>{if(!decision.value){alert('Chagua Ameruhusiwa au Hajaruhusiwa.');return}if(!file.files[0]&&!canvasHasSignature(canvas)){alert('Weka sahihi ya Mkuu wa Shule.');return}save.disabled=true;try{const blob=file.files[0]?await imageAsPng(file.files[0]):await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));const path=await uploadPermissionSignature(blob,'headmaster');const {error:upErr}=await db.from('staff_permission_requests').update({headmaster_decision:decision.value,headmaster_comment:comment.value.trim()||null,headmaster_signature_path:path,headmaster_user_id:currentUser.id,headmaster_decided_at:new Date().toISOString()}).eq('id',r.id);if(upErr)throw new Error(upErr.message);alert('Uamuzi umetumwa. Ikiwa ameruhusiwa, ombi limehamia kwa Admin.');await loadHeadmasterPermissionRequests()}catch(e){alert('ERROR: '+e.message)}finally{save.disabled=false}};card.appendChild(save);box.appendChild(card);
+ }
+}
+async function loadAdminPermissionRequests(){
+ const box=document.getElementById('adminPermissionNotifications');if(!box)return;box.textContent='Loading requests awaiting Admin...';
+ const {data,error}=await db.from('staff_permission_requests').select('*').eq('headmaster_decision','Approved').eq('admin_received',false).order('headmaster_decided_at',{ascending:true});
+ if(error){box.textContent='NOTIFICATION ERROR: '+error.message;return}box.innerHTML='';const rows=data||[];if(!rows.length){box.textContent='Hakuna ombi linalosubiri kupokelewa na Admin.';return}
+ box.appendChild(el('strong',`NOTIFICATIONS: ${rows.length} request(s) awaiting Admin`));
+ for(const r of rows){const card=el('div',undefined,'item');card.appendChild(el('h4',permissionFullName(r)));card.appendChild(el('p',`Cheque: ${r.check_number} | Department: ${r.department}`));card.appendChild(el('p','Purpose: '+r.purpose));card.appendChild(el('p',`Dates: ${r.start_date} to ${r.end_date}`));card.appendChild(el('p','Headmaster decision: AMERUHUSIWA'));
+  const hm=await permissionSignedUrl(r.headmaster_signature_path);if(hm){const img=document.createElement('img');img.src=hm;img.alt='Headmaster signature';img.className='signature-image';card.appendChild(img)}
+  const decision=document.createElement('select');decision.innerHTML='<option value="">Chagua uamuzi wa mwisho</option><option value="Approved">APPROVED</option><option value="Rejected">REJECTED</option>';card.appendChild(decision);
+  const comment=el('textarea');comment.placeholder='Admin comments (optional)';card.appendChild(comment);
+  const received=el('button','RECEIVED','received-button');received.onclick=async()=>{if(!decision.value){alert('Chagua APPROVED au REJECTED kabla ya kubonyeza RECEIVED.');return}received.disabled=true;try{const now=new Date().toISOString();const {error:upErr}=await db.from('staff_permission_requests').update({admin_decision:decision.value,admin_comment:comment.value.trim()||null,admin_user_id:currentUser.id,admin_decided_at:now,admin_received:true,admin_received_at:now}).eq('id',r.id);if(upErr)throw new Error(upErr.message);alert('RECEIVED imethibitishwa. Mwalimu husika atapata notification yenye VIEW na DOWNLOAD.');await loadAdminPermissionRequests()}catch(e){alert('ERROR: '+e.message)}finally{received.disabled=false}};card.appendChild(received);box.appendChild(card);
+ }
+}
+async function signatureDataUrl(path){const url=await permissionSignedUrl(path);if(!url)return null;const response=await fetch(url);if(!response.ok)throw new Error('Could not load signature image');const blob=await response.blob();return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob)})}
+async function makePermissionPdf(r){
+ if(!window.jspdf?.jsPDF)throw new Error('PDF library haijapakia. Hakikisha intaneti ipo kisha jaribu tena.');
+ const {jsPDF}=window.jspdf,doc=new jsPDF();doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('KISHIMBA SECONDARY SCHOOL',105,18,{align:'center'});doc.setFontSize(13);doc.text('STAFF PERMISSION REQUEST FORM',105,28,{align:'center'});doc.setFont('helvetica','normal');doc.setFontSize(11);
+ const lines=[`Teacher name: ${permissionFullName(r)}`,`Department: ${r.department}`,`Cheque number: ${r.check_number}`,`Purpose of leave: ${r.purpose}`,`Start date: ${r.start_date}`,`End date: ${r.end_date}`,`Headmaster decision: ${r.headmaster_decision}`,`Headmaster comments: ${r.headmaster_comment||'—'}`,`Admin final decision: ${r.admin_decision}`,`Admin comments: ${r.admin_comment||'—'}`,`Admin received: ${r.admin_received?'YES':'NO'}`,`Date submitted: ${formatDate(r.created_at)}`,`Headmaster decision date: ${formatDate(r.headmaster_decided_at)}`,`Admin received date: ${formatDate(r.admin_received_at)}`];let y=43;for(const line of lines){const wrapped=doc.splitTextToSize(line,175);doc.text(wrapped,17,y);y+=wrapped.length*7+2;if(y>245){doc.addPage();y=20}}
+  try{const teacherSig=await signatureDataUrl(r.teacher_signature_path);if(teacherSig){doc.text('Teacher signature:',17,y+5);doc.addImage(teacherSig,'PNG',17,y+8,55,18)}}catch(e){}
+  try{const hmSig=await signatureDataUrl(r.headmaster_signature_path);if(hmSig){doc.text('Headmaster signature:',105,y+5);doc.addImage(hmSig,'PNG',105,y+8,55,18)}}catch(e){}
+  return doc;
+}
+async function viewPermissionPdf(r){const win=window.open('about:blank','_blank');if(!win){alert('Ruhusu pop-up kwenye Chrome ili kufungua PDF.');return}try{const doc=await makePermissionPdf(r);const url=doc.output('bloburl');win.location.href=url}catch(e){win.close();alert('VIEW ERROR: '+e.message)}}
+async function downloadPermissionPdf(r){try{const doc=await makePermissionPdf(r);doc.save('Permission_Request_'+permissionFullName(r).replace(/\s+/g,'_')+'.pdf')}catch(e){alert('DOWNLOAD ERROR: '+e.message)}}
+
 async function logout(){
  const {error}=await db.auth.signOut();if(error){alert(error.message);return}
  currentUser=null;currentTeacher=null;currentRole="";currentTeacherId=null;
