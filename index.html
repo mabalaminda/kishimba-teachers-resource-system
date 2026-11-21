@@ -1,1148 +1,501 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kishimba Teachers Portal</title>
+<title>Kishimba Secondary School Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px}
-header{background:#123c2c;color:white;padding:20px;text-align:center;border-radius:10px}
-header h2{color:white}
-.card{background:white;padding:18px;margin:15px 0;border-radius:10px}
-input,select,textarea,button{width:100%;padding:12px;margin:7px 0}
-textarea{min-height:75px}
-button{background:#176b45;color:white;border:0;border-radius:6px;cursor:pointer}
-button:disabled{opacity:.6;cursor:not-allowed}
-.hidden{display:none!important}
-h3,h4{color:#176b45}
-.logout,.danger{background:#b42318}
-.send-button{background:#075985}
-.approve-button{background:#166534}
-.return-academic{background:#7c3aed}
-.submit-button{background:#075985}
-.item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px}
-.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:8px 5px 8px 0;font-size:12px}
-.pending{background:#fef3c7;color:#92400e}
-.checked{background:#dbeafe;color:#1d4ed8}
-.forwarded{background:#d1fae5;color:#047857}
-.approved{background:#dcfce7;color:#166534}
-.returned{background:#ffedd5;color:#9a3412}
-.draft{background:#e0e7ff;color:#3730a3}
-.signature-area{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}
-.signature-pad{width:100%;height:160px;border:2px dashed #64748b;border-radius:8px;background:white;touch-action:none;display:block}
-.signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}
-.small{font-size:13px;color:#475569}
-.comments-box{background:#f8fafc;padding:10px;border-radius:8px;margin-top:12px}
-.comment-item{background:#eff6ff;color:#1e293b;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}
-.teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
-.material-category{background:#f8fafc;border:1px solid #dbe3ea;border-radius:8px;padding:12px;margin:10px 0}
-.category-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.category-name{flex:1;min-width:130px;color:#176b45;font-weight:bold}
-.count-badge{background:#dbeafe;color:#1e40af;width:38px;height:38px;min-width:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.category-toggle{width:auto;min-width:105px;padding:10px;margin:0}
-.category-content{margin-top:12px}
-.summary-box{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin:10px 0}
-.status-details{background:#f8fafc;padding:10px;border-radius:8px;margin:10px 0}
-.status-details p{margin:6px 0;font-size:13px}
-.office-action{border:2px solid #176b45;background:#f0fdf4;padding:12px;border-radius:8px;margin-top:12px}
-
-/* LOGIN LAYOUT */
-.login-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px;align-items:stretch}
-.login-layout .card{margin:0}
-.school-board{
- min-height:260px;border-radius:10px;
- background:linear-gradient(145deg,#123c2c,#176b45);
- color:white;display:flex;align-items:center;justify-content:center;
- text-align:center;padding:25px;border:7px solid #9a7442;
- box-shadow:inset 0 0 0 3px #e5c58b
-}
-.school-board h2{color:white;font-size:25px}
-.school-board p{font-weight:bold;letter-spacing:1px}
-.login-layout input{border:1px solid #cbd5e1;border-radius:6px}
-.dashboard-footer{margin:20px 0 5px;text-align:center}
-.dashboard-footer button{max-width:300px}
-@media(max-width:650px){
- .login-layout{grid-template-columns:1fr}
- .school-board{min-height:170px}
-}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#172033}
+header{background:#123c2c;color:#fff;padding:20px;text-align:center;border-radius:10px}header h2{color:#fff}
+.card{background:#fff;padding:18px;margin:15px 0;border-radius:10px;box-shadow:0 1px 4px #0000000d}
+input,select,textarea,button{width:100%;padding:12px;margin:7px 0;border:1px solid #cbd5e1;border-radius:6px;font:inherit}
+textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:pointer;font-weight:bold}button:disabled{opacity:.55;cursor:not-allowed}
+.hidden{display:none!important}h3,h4{color:#176b45}.logout,.danger{background:#b42318}.send-button{background:#075985}.approve-button{background:#166534}.return-academic{background:#7c3aed}.secondary{background:#475569}
+.item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px;background:#fff}.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:5px;font-size:12px}
+.pending{background:#fef3c7;color:#92400e}.checked{background:#dbeafe;color:#1d4ed8}.forwarded{background:#d1fae5;color:#047857}.approved{background:#dcfce7;color:#166534}.returned{background:#ffedd5;color:#9a3412}.draft{background:#e0e7ff;color:#3730a3}
+.signature-area,.comments-box,.status-details{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}.signature-pad{width:100%;height:160px;border:2px dashed #64748b;background:white;touch-action:none;display:block}
+.signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}.small{font-size:13px;color:#475569}
+.comment-item{background:#eff6ff;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}.teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
+.summary-box,.office-action{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin:10px 0}
+.login-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px}.school-board{min-height:260px;border-radius:10px;background:linear-gradient(145deg,#123c2c,#176b45);color:white;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;border:7px solid #9a7442}
+.school-board h2{color:#fff;font-size:25px}.school-board p{font-weight:bold;letter-spacing:1px}.dashboard-footer{text-align:center;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.action-btn{min-height:46px}.report{border:1px solid #cbd5e1;border-radius:8px;padding:12px;margin:10px 0;background:#fff}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{padding:8px;border:1px solid #cbd5e1;text-align:left;font-size:13px}th{background:#e8f3ed}.notice{padding:10px;background:#eff6ff;border-left:4px solid #075985;margin:10px 0}
+@media(max-width:650px){.login-layout,.grid2,.grid3{grid-template-columns:1fr}.school-board{min-height:170px}}
 </style>
 </head>
-
 <body>
-
-<header>
-<h2>KISHIMBA SECONDARY SCHOOL</h2>
-<p>TEACHERS RESOURCE MANAGEMENT PORTAL</p>
-</header>
+<header><h2>KISHIMBA SECONDARY SCHOOL</h2><p>TEACHERS RESOURCE MANAGEMENT PORTAL</p></header>
 
 <section id="login" class="login-layout">
- <div class="card">
-  <h3>Teacher / Office Login</h3>
-  <input id="email" type="email" placeholder="Email Address">
-  <input id="password" type="password" placeholder="Password">
-  <button id="loginBtn" onclick="login()">LOGIN</button>
-  <p id="loginMessage"></p>
+ <div class="card"><h3>Teacher / Office Login</h3>
+  <input id="email" type="email" placeholder="Email Address" autocomplete="username">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn" onclick="login()">LOGIN</button><p id="loginMessage"></p>
  </div>
-
- <div class="school-board" id="schoolBoard">
-  <div>
-   <h2>KISHIMBA</h2>
-   <p>SECONDARY SCHOOL</p>
-   <p>TEACHERS RESOURCE MANAGEMENT PORTAL</p>
-  </div>
- </div>
+ <div class="school-board"><div><h2>KISHIMBA</h2><p>SECONDARY SCHOOL</p><p>TEACHERS RESOURCE MANAGEMENT PORTAL</p></div></div>
 </section>
 
 <section id="dashboard" class="hidden">
+ <div class="card"><h3 id="welcome">WELCOME</h3><p id="roleDisplay"></p></div>
 
-<div class="card">
- <h3 id="welcome">WELCOME</h3>
- <p id="roleDisplay"></p>
-</div>
+ <div id="adminSection" class="card hidden"><h3>ADMIN DASHBOARD</h3><h4>REGISTERED TEACHERS</h4><div id="teachersList"></div><h4>ALL TEACHING MATERIALS AND RECORDS</h4><div id="materialsList"></div></div>
+ <div id="academicSection" class="card hidden"><h3>ACADEMIC OFFICE DASHBOARD</h3><p>Review materials, add comments and sign using CHECKED.</p><div id="academicMaterials"></div></div>
+ <div id="headmasterSection" class="card hidden"><h3>HEAD OF SCHOOL DASHBOARD</h3><p>Review checked materials, add comments and sign using FORWARDED.</p><div id="headmasterMaterials"></div></div>
 
-<div id="adminSection" class="card hidden">
- <h3>ADMIN DASHBOARD</h3>
- <h4>REGISTERED TEACHERS</h4>
- <div id="teachersList"></div>
- <h4>ALL TEACHING MATERIALS AND RECORDS</h4>
- <div id="materialsList"></div>
-</div>
-
-<div id="academicSection" class="card hidden">
- <h3>ACADEMIC OFFICE DASHBOARD</h3>
- <p>Review materials, add comments and sign using CHECKED.</p>
- <div id="academicMaterials"></div>
-</div>
-
-<div id="headmasterSection" class="card hidden">
- <h3>HEAD OF SCHOOL DASHBOARD</h3>
- <p>Review checked materials, add comments and sign using FORWARDED.</p>
- <div id="headmasterMaterials"></div>
-</div>
-
-<div id="teacherSection" class="card hidden">
- <h3>TEACHER DASHBOARD</h3>
- <div class="summary-box">
-  <h4>MY MATERIALS SUMMARY</h4>
-  <p id="teacherMaterialCount">TOTAL MATERIALS: 0</p>
-  <p id="teacherDraftCount">DRAFT: 0</p>
-  <p id="teacherApprovedCount">APPROVED: 0</p>
-  <p id="teacherReturnedCount">RETURNED: 0</p>
-  <p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p>
+ <div id="teacherSection" class="card hidden"><h3>TEACHER DASHBOARD</h3>
+  <div class="summary-box"><h4>MY MATERIALS SUMMARY</h4><p id="teacherMaterialCount">TOTAL MATERIALS: 0</p><p id="teacherDraftCount">DRAFT: 0</p><p id="teacherApprovedCount">APPROVED: 0</p><p id="teacherReturnedCount">RETURNED: 0</p><p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p></div>
+  <p>Your uploaded materials and their review progress appear below.</p><div id="teacherMaterials"></div>
  </div>
- <p>Your uploaded materials and their review progress appear below.</p>
- <div id="teacherMaterials"></div>
-</div>
 
-<div id="uploadSection" class="card hidden">
- <h3>UPLOAD TEACHING MATERIALS</h3>
- <input id="title" placeholder="Material Title">
+ <div id="teacherRegistrationSection" class="card hidden">
+  <h3>TEACHER REGISTRATION / INVITATION</h3>
+  <p class="small">Only authorised office accounts can invite teachers. The invitation link returned by the function is shown here; this page does not send email by itself.</p>
+  <input id="newTeacherName" placeholder="Teacher full name">
+  <input id="newTeacherEmail" type="email" placeholder="Teacher email">
+  <input id="newTeacherPhone" placeholder="Phone number">
+  <label>Education level</label><select id="inviteEducation" onchange="updateInviteForm()"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option><option value="Both">Both</option></select>
+  <label>Form level</label><select id="inviteForm"><option value="Form One">Form One</option><option value="Form Two">Form Two</option><option value="Form Three">Form Three</option><option value="Form Four">Form Four</option></select>
+  <div id="inviteStreamWrap"><label>Stream (O-Level)</label><select id="inviteStream"><option value="">Select stream</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div>
+  <div id="inviteCombinationWrap" class="hidden"><label>Combination (A-Level)</label><input id="inviteCombination" placeholder="e.g. PCM"></div>
+  <label>Subjects (select one or more)</label><select id="inviteSubjects" multiple size="7">
+   <option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option>
+  </select><p class="small">On a phone, tap a subject to select it. To select several, use your device's multi-select method.</p>
+  <button id="inviteTeacherBtn" onclick="inviteTeacher()">REGISTER / SEND INVITATION</button><p id="inviteMessage"></p><div id="inviteLinkArea"></div>
+ </div>
 
- <label>Material Type</label>
- <select id="materialType">
-  <option value="">Select Material Type</option>
-  <option>Scheme of Work</option>
-  <option>Lesson Plan</option>
-  <option>Lesson Notes</option>
-  <option>Notices</option>
-  <option>Tests and Exams</option>
-  <option>Question Bank</option>
-  <option>Teaching Resources</option>
- </select>
+ <div id="uploadSection" class="card hidden"><h3>UPLOAD TEACHING MATERIALS</h3>
+  <input id="title" placeholder="Material Title">
+  <label>Material Type</label><select id="materialType"><option value="">Select Material Type</option><option>Scheme of Work</option><option>Lesson Plan</option><option>Lesson Notes</option><option>Notices</option><option>Tests and Exams</option><option>Question Bank</option><option>Teaching Resources</option></select>
+  <label>Subject</label><select id="subject"><option value="">Select Subject</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option></select>
+  <label>Class / Form</label><select id="className"><option value="">Select Class</option><option>Form One</option><option>Form Two</option><option>Form Three</option><option>Form Four</option><option>Form Five</option><option>Form Six</option></select>
+  <label>Academic Year</label><select id="academicYear"><option value="">Select Academic Year</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select>
+  <label>Select File</label><input id="file" type="file"><button id="uploadBtn" onclick="uploadMaterial()">UPLOAD MATERIAL</button><p id="uploadMessage"></p>
+ </div>
 
- <label>Subject</label>
- <select id="subject">
-  <option value="">Select Subject</option>
-  <option>Mathematics</option>
-  <option>Physics</option>
-  <option>Chemistry</option>
-  <option>Biology</option>
-  <option>Kiswahili</option>
-  <option>English</option>
-  <option>Geography</option>
-  <option>History</option>
-  <option>Historia ya Tanzania na Maadili</option>
-  <option>Business Studies</option>
-  <option>Book Keeping</option>
-  <option>Computer Applications</option>
-  <option>EDK</option>
-  <option>Sports Studies</option>
-  <option>Football Performance</option>
-  <option>Netball Performance</option>
- </select>
+ <div id="resultsOfficeSection" class="card hidden"><h3>EXAMINATION RESULTS - OFFICE</h3>
+  <div class="notice">Admin and Academic Office can monitor marks while teachers enter them. Only Admin or Academic Office can publish results.</div>
+  <h4>Create examination</h4><input id="examName" placeholder="Examination name">
+  <div class="grid2"><select id="examType"><option value="Terminal">Terminal</option><option value="Midterm">Midterm</option><option value="Annual">Annual</option><option value="Mock">Mock</option><option value="Other">Other</option></select>
+   <select id="examLevel"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option></select></div>
+  <div class="grid2"><select id="examClass"><option value="">Select Form / Class</option><option>Form One</option><option>Form Two</option><option>Form Three</option><option>Form Four</option><option>Form Five</option><option>Form Six</option></select>
+   <select id="examTerm"><option value="Term 1">Term 1</option><option value="Term 2">Term 2</option><option value="Annual">Annual</option></select></div>
+  <div class="grid2"><input id="examYear" type="number" value="2026" placeholder="Academic year"><input id="examDate" type="date"></div>
+  <button onclick="createExam()">CREATE EXAM</button><p id="examMessage"></p>
+  <h4>Examinations and live marks</h4><div id="officeExams"></div>
+ </div>
 
- <label>Class / Form</label>
- <select id="className">
-  <option value="">Select Class</option>
-  <option>Form One</option>
-  <option>Form Two</option>
-  <option>Form Three</option>
-  <option>Form Four</option>
-  <option>Form Five</option>
-  <option>Form Six</option>
- </select>
+ <div id="teacherResultsSection" class="card hidden"><h3>EXAMINATION RESULTS - TEACHER</h3>
+  <div class="notice">You may enter marks for your assigned classes and subjects. Student result views and reports remain locked until the office publishes the examination.</div>
+  <h4>Enter marks</h4><div id="teacherExamList"></div>
+  <h4>View</h4><div id="teacherResultsView"></div>
+  <h4>Generate Reports</h4><div id="teacherReports"></div>
+ </div>
 
- <label>Academic Year</label>
- <select id="academicYear">
-  <option value="">Select Academic Year</option>
-  <option>2026</option>
-  <option>2027</option>
-  <option>2028</option>
-  <option>2029</option>
-  <option>2030</option>
- </select>
-
- <label>Select File</label>
- <input id="file" type="file">
- <button id="uploadBtn" onclick="uploadMaterial()">UPLOAD MATERIAL</button>
- <p id="uploadMessage"></p>
-</div>
-
-<div class="dashboard-footer">
- <button class="logout" onclick="logout()">LOG OUT</button>
-</div>
-
+ <div class="dashboard-footer"><button class="logout" onclick="logout()">LOG OUT</button></div>
 </section>
 
 <script>
 const SUPABASE_URL="https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY="sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 const BUCKET="kishimba-teaching-materials";
-
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null,currentTeacher=null,currentRole="",currentTeacherId=null;
+let cachedExams=[],cachedStudents=[],cachedTeacherSubjects=[];
 
-let currentUser=null;
-let currentTeacher=null;
-
-function getRole(){
- const raw=String(currentTeacher?.role||"").trim().toLowerCase();
-
- if(["admin","administrator"].includes(raw))return "admin";
- if(["academic","academic office","taaluma","ofisi ya taaluma"].includes(raw))return "academic";
- if(["headmaster","head of school","mkuu wa shule","head teacher"].includes(raw))return "headmaster";
- if(["teacher","mwalimu"].includes(raw))return "teacher";
- return raw;
-}
-
-function isAdmin(){return getRole()==="admin";}
-function normalStatus(v){return String(v||"").trim().toLowerCase();}
-function formatDate(v){return v?new Date(v).toLocaleString():"Date unavailable";}
-
-function statusClass(value){
- const s=normalStatus(value);
- if(s==="draft")return "draft";
- if(s.includes("return"))return "returned";
- if(s.includes("approv"))return "approved";
- if(s.includes("forward")||s.includes("resend"))return "forwarded";
- if(s.includes("check"))return "checked";
- return "pending";
-}
-
-function el(tag,text,className){
- const node=document.createElement(tag);
- if(text!==undefined)node.textContent=text;
- if(className)node.className=className;
- return node;
-}
+function norm(v){return String(v??"").trim().toLowerCase()}
+function getRole(){return currentRole||norm(currentTeacher?.role)}
+function isAdmin(){return getRole()==="admin"}
+function isOffice(){return ["admin","academic"].includes(getRole())}
+function formatDate(v){return v?new Date(v).toLocaleString():"Date unavailable"}
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
+function statusClass(v){const s=norm(v);if(s==="draft")return"draft";if(s.includes("return"))return"returned";if(s.includes("approv"))return"approved";if(s.includes("forward"))return"forwarded";if(s.includes("check"))return"checked";return"pending"}
+function show(id,yes=true){document.getElementById(id).classList.toggle("hidden",!yes)}
+function safeText(v){return String(v??"")}
 
 async function login(){
- const email=document.getElementById("email").value.trim();
- const password=document.getElementById("password").value;
- const message=document.getElementById("loginMessage");
- const button=document.getElementById("loginBtn");
-
- if(!email||!password){
-  message.textContent="Enter email and password.";
-  return;
- }
-
- button.disabled=true;
- message.textContent="Please wait...";
-
- try{
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error){
-   message.textContent="LOGIN ERROR: "+error.message;
-   return;
-  }
-  await loadDashboard(data.user);
- }catch(error){
-  message.textContent="LOGIN ERROR: "+error.message;
- }finally{
-  button.disabled=false;
- }
+ const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value,msg=document.getElementById("loginMessage"),btn=document.getElementById("loginBtn");
+ if(!email||!password){msg.textContent="Enter email and password.";return}
+ btn.disabled=true;msg.textContent="Please wait...";
+ try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error){msg.textContent="LOGIN ERROR: "+error.message;return}await loadDashboard(data.user)}
+ catch(e){msg.textContent="LOGIN ERROR: "+e.message}finally{btn.disabled=false}
 }
 
 async function loadDashboard(user){
- const message=document.getElementById("loginMessage");
- currentUser=user;
-
+ const msg=document.getElementById("loginMessage");currentUser=user;
  try{
-  const {data:teacher,error}=await db.from("teachers")
-   .select("*").eq("id",user.id).maybeSingle();
-
-  if(error){
-   message.textContent="PROFILE ERROR: "+error.message;
-   return;
-  }
-
-  if(!teacher){
-   message.textContent="Teacher profile not found. Contact Administrator.";
-   await db.auth.signOut();
-   currentUser=null;
-   return;
-  }
-
-  currentTeacher=teacher;
-  const role=getRole();
-
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
+  let {data:teacher,error}=await db.from("teachers").select("*").eq("user_id",user.id).maybeSingle();
+  if(error){msg.textContent="PROFILE ERROR: "+error.message;return}
+  if(!teacher){const fallback=await db.from("teachers").select("*").eq("id",user.id).maybeSingle();if(fallback.error){msg.textContent="PROFILE ERROR: "+fallback.error.message;return}teacher=fallback.data}
+  if(!teacher){msg.textContent="Teacher profile not found. Contact Administrator.";await db.auth.signOut();currentUser=null;return}
+  currentTeacher=teacher;currentTeacherId=teacher.id;
+  const roleRow=await db.from("user_roles").select("role").eq("user_id",user.id).maybeSingle();
+  currentRole=normaliseRole(roleRow.data?.role||teacher.role);
+  document.getElementById("login").classList.add("hidden");show("dashboard");
   document.getElementById("welcome").textContent="WELCOME "+(teacher.full_name||user.email);
-  document.getElementById("roleDisplay").textContent="Role: "+teacher.role;
-
-  ["adminSection","academicSection","headmasterSection","teacherSection","uploadSection"]
-   .forEach(id=>document.getElementById(id).classList.add("hidden"));
-
-  if(role==="admin"){
-   document.getElementById("adminSection").classList.remove("hidden");
-   await loadTeachers();
-  }else if(role==="academic"){
-   document.getElementById("academicSection").classList.remove("hidden");
-  }else if(role==="headmaster"){
-   document.getElementById("headmasterSection").classList.remove("hidden");
-  }else if(role==="teacher"){
-   document.getElementById("teacherSection").classList.remove("hidden");
-   document.getElementById("uploadSection").classList.remove("hidden");
-  }else{
-   message.textContent="Unknown user role: "+teacher.role+". Contact Administrator.";
-   return;
-  }
-
+  document.getElementById("roleDisplay").textContent="Role: "+(roleRow.data?.role||teacher.role||"Unknown");
+  ["adminSection","academicSection","headmasterSection","teacherSection","teacherRegistrationSection","uploadSection","resultsOfficeSection","teacherResultsSection"].forEach(id=>show(id,false));
+  if(currentRole==="admin"){show("adminSection");show("teacherRegistrationSection");show("resultsOfficeSection");await loadTeachers()}
+  else if(currentRole==="academic"){show("academicSection");show("teacherRegistrationSection");show("resultsOfficeSection")}
+  else if(currentRole==="headmaster"){show("headmasterSection");show("teacherRegistrationSection")}
+  else if(currentRole==="teacher"){show("teacherSection");show("uploadSection");show("teacherResultsSection")}
+  else{msg.textContent="Unknown user role: "+(teacher.role||roleRow.data?.role)+". Contact Administrator.";return}
   await loadMaterials();
-
- }catch(error){
-  message.textContent="DASHBOARD ERROR: "+error.message;
- }
+  if(currentRole==="admin"||currentRole==="academic")await loadOfficeExams();
+  if(currentRole==="teacher")await loadTeacherResults();
+ }catch(e){msg.textContent="DASHBOARD ERROR: "+e.message}
 }
+function normaliseRole(v){const r=norm(v);if(["admin","administrator"].includes(r))return"admin";if(["academic","academic office","taaluma","ofisi ya taaluma"].includes(r))return"academic";if(["headmaster","headteacher","head of school","mkuu wa shule","head teacher"].includes(r))return"headmaster";if(["teacher","mwalimu"].includes(r))return"teacher";return r}
 
 async function loadTeachers(){
- const list=document.getElementById("teachersList");
- list.textContent="Loading teachers...";
-
- const {data,error}=await db.from("teachers")
-  .select("id,full_name,email,staff_id,role").order("full_name");
-
- if(error){
-  list.textContent="TEACHERS ERROR: "+error.message;
-  return;
- }
-
- list.innerHTML="";
- if(!data||!data.length){
-  list.textContent="No teachers found.";
-  return;
- }
-
- data.forEach(t=>{
-  list.appendChild(el("div",
-   (t.full_name||"Teacher")+" | "+(t.email||"")+" | "+
-   (t.staff_id||"")+" | "+(t.role||"teacher"),"item"));
- });
+ const list=document.getElementById("teachersList");list.textContent="Loading teachers...";
+ const {data,error}=await db.from("teachers").select("id,full_name,email,staff_id,role").order("full_name");
+ if(error){list.textContent="TEACHERS ERROR: "+error.message;return}list.innerHTML="";
+ if(!data?.length){list.textContent="No teachers found.";return}
+ data.forEach(t=>list.appendChild(el("div",`${t.full_name||"Teacher"} | ${t.email||""} | ${t.staff_id||""} | ${t.role||"teacher"}`,"item")))
+}
+function updateInviteForm(){
+ const level=document.getElementById("inviteEducation").value;
+ show("inviteStreamWrap",level!=="A-Level");show("inviteCombinationWrap",level!=="O-Level");
+ const form=document.getElementById("inviteForm");form.innerHTML="";
+ const forms=level==="A-Level"?["Form Five","Form Six"]:level==="Both"?["Form One","Form Five"]:["Form One","Form Two","Form Three","Form Four"];
+ forms.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;form.appendChild(o)});
+}
+async function inviteTeacher(){
+ if(!["admin","academic","headmaster"].includes(getRole())){alert("Authorised office account required.");return}
+ const full_name=document.getElementById("newTeacherName").value.trim(),email=document.getElementById("newTeacherEmail").value.trim(),phone=document.getElementById("newTeacherPhone").value.trim();
+ const education_level=document.getElementById("inviteEducation").value,form_level=document.getElementById("inviteForm").value;
+ const stream=document.getElementById("inviteStream").value,combination=document.getElementById("inviteCombination").value.trim();
+ const subjects=[...document.getElementById("inviteSubjects").selectedOptions].map(o=>o.value);
+ const msg=document.getElementById("inviteMessage"),btn=document.getElementById("inviteTeacherBtn");
+ if(!full_name||!email||!phone||!subjects.length){msg.textContent="Complete name, email, phone and select at least one subject.";return}
+ if(education_level!=="A-Level"&&!stream){msg.textContent="Select an O-Level stream.";return}
+ if(education_level!=="O-Level"&&!combination){msg.textContent="Enter the A-Level combination.";return}
+ const assignments=[];
+ if(education_level==="O-Level"||education_level==="Both")assignments.push({education_level:"O-Level",form_level:education_level==="Both"?"Form One":form_level,stream,combination:null});
+ if(education_level==="A-Level"||education_level==="Both")assignments.push({education_level:"A-Level",form_level:education_level==="Both"?"Form Five":form_level,stream:null,combination:education_level==="Both"?"":combination});
+ btn.disabled=true;msg.textContent="Registering teacher...";
+ try{
+  const {data,error}=await db.functions.invoke("teacherinvite",{body:{full_name,email,phone,subjects,assignments}});
+  if(error){msg.textContent="TEACHER INVITATION ERROR: "+error.message;return}
+  if(!data?.success){msg.textContent="REGISTRATION ERROR: "+(data?.message||"The function did not confirm success.");return}
+  msg.textContent=data.message||"Teacher account created. Invitation link generated.";
+  const linkArea=document.getElementById("inviteLinkArea");linkArea.innerHTML="";
+  if(data.invite_link){const a=el("a","Open teacher invitation link");a.href=data.invite_link;a.target="_blank";a.rel="noopener";linkArea.appendChild(a);const copy=el("button","COPY INVITATION LINK");copy.onclick=async()=>{try{await navigator.clipboard.writeText(data.invite_link);alert("Invitation link copied.")}catch(e){alert("Copy failed. Open the link and copy it manually.")}};linkArea.appendChild(copy)}
+  ["newTeacherName","newTeacherEmail","newTeacherPhone","inviteCombination"].forEach(id=>document.getElementById(id).value="");
+  await loadTeachers();
+ }catch(e){msg.textContent="INVITATION ERROR: "+e.message}finally{btn.disabled=false}
 }
 
-// UPLOAD MATERIAL
+// TEACHING MATERIALS
 async function uploadMaterial(){
- if(!currentUser||getRole()!=="teacher"){
-  alert("Teacher login required.");
-  return;
- }
-
- const title=document.getElementById("title").value.trim();
- const type=document.getElementById("materialType").value;
- const subject=document.getElementById("subject").value;
- const className=document.getElementById("className").value;
- const year=document.getElementById("academicYear").value;
- const file=document.getElementById("file").files[0];
- const message=document.getElementById("uploadMessage");
- const button=document.getElementById("uploadBtn");
-
- if(!title||!type||!subject||!className||!year||!file){
-  message.textContent="Please complete all fields and select a file.";
-  return;
- }
-
- button.disabled=true;
- message.textContent="Uploading material...";
-
- const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
- const filePath=currentUser.id+"/"+Date.now()+"_"+safeName;
-
+ if(!currentUser||getRole()!=="teacher"){alert("Teacher login required.");return}
+ const title=document.getElementById("title").value.trim(),type=document.getElementById("materialType").value,subject=document.getElementById("subject").value,className=document.getElementById("className").value,year=document.getElementById("academicYear").value,file=document.getElementById("file").files[0],msg=document.getElementById("uploadMessage"),btn=document.getElementById("uploadBtn");
+ if(!title||!type||!subject||!className||!year||!file){msg.textContent="Please complete all fields and select a file.";return}
+ btn.disabled=true;msg.textContent="Uploading material...";
+ const path=currentTeacherId+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
  try{
-  const {error:storageError}=await db.storage.from(BUCKET).upload(filePath,file);
-  if(storageError){
-   message.textContent="STORAGE ERROR: "+storageError.message;
-   return;
-  }
-
-  const {error:insertError}=await db.from("teaching_materials").insert({
-   teacher_id:currentUser.id,
-   title,
-   material_type:type,
-   subject,
-   class_name:className,
-   academic_year:year,
-   file_path:filePath,
-   review_status:"Draft",
-   forwarding_status:"Draft",
-   current_stage:"teacher",
-   academic_status:"Pending",
-   headmaster_status:"Pending",
-   admin_status:"Pending"
-  });
-
-  if(insertError){
-   await db.storage.from(BUCKET).remove([filePath]);
-   message.textContent="DATABASE ERROR: "+insertError.message;
-   return;
-  }
-
-  message.textContent="Material uploaded successfully as DRAFT. Press SUBMIT when ready.";
-  ["title","materialType","subject","className","academicYear","file"]
-   .forEach(id=>document.getElementById(id).value="");
-
+  const up=await db.storage.from(BUCKET).upload(path,file);if(up.error){msg.textContent="STORAGE ERROR: "+up.error.message;return}
+  const {error}=await db.from("teaching_materials").insert({teacher_id:currentTeacherId,title,material_type:type,subject,class_name:className,academic_year:year,file_path:path,review_status:"Draft",forwarding_status:"Draft",current_stage:"teacher"});
+  if(error){await db.storage.from(BUCKET).remove([path]);msg.textContent="DATABASE ERROR: "+error.message;return}
+  msg.textContent="Material uploaded as DRAFT. Press SUBMIT when ready.";
+  ["title","materialType","subject","className","academicYear","file"].forEach(id=>document.getElementById(id).value="");
   await loadMaterials();
- }catch(error){
-  message.textContent="UPLOAD ERROR: "+error.message;
- }finally{
-  button.disabled=false;
- }
+ }catch(e){msg.textContent="UPLOAD ERROR: "+e.message}finally{btn.disabled=false}
 }
-
-// SUBMIT TO ACADEMIC OFFICE
 async function submitMaterial(item,button){
- if(getRole()!=="teacher"||item.teacher_id!==currentUser.id)return;
-
- if(normalStatus(item.review_status)!=="draft"){
-  alert("This material is no longer a draft.");
-  return;
- }
-
+ if(getRole()!=="teacher"||item.teacher_id!==currentTeacherId)return;
+ if(norm(item.review_status)!=="draft"){alert("This material is no longer a draft.");return}
  if(!confirm("Submit this material to the Academic Office for review?"))return;
-
  button.disabled=true;
- button.textContent="SUBMITTING...";
-
  try{
-  const {data,error}=await db.from("teaching_materials")
-   .update({
-    review_status:"Pending",
-    forwarding_status:"Pending",
-    current_stage:"academic",
-    academic_status:"Pending",
-    headmaster_status:"Pending",
-    admin_status:"Pending"
-   })
-   .eq("id",item.id)
-   .eq("teacher_id",currentUser.id)
-   .eq("review_status","Draft")
-   .select("id").maybeSingle();
-
-  if(error){alert("SUBMIT ERROR: "+error.message);return;}
-  if(!data){alert("Material was not submitted. Check permissions or status.");return;}
-
-  alert("Material submitted to the Academic Office.");
-  await loadMaterials();
- }finally{
-  button.disabled=false;
-  button.textContent="SUBMIT";
- }
+  const {data,error}=await db.from("teaching_materials").update({review_status:"Pending",forwarding_status:"Pending",current_stage:"academic",submitted_at:new Date().toISOString()}).eq("id",item.id).eq("teacher_id",currentTeacherId).eq("review_status","Draft").select("id").maybeSingle();
+  if(error){alert("SUBMIT ERROR: "+error.message);return}if(!data){alert("Material was not submitted. Check permissions or status.");return}
+  alert("Material submitted to Academic Office.");await loadMaterials();
+ }finally{button.disabled=false}
 }
-
-// DELETE OWN DRAFT
 async function deleteMaterial(item,button){
- if(getRole()!=="teacher"||item.teacher_id!==currentUser.id)return;
-
- if(normalStatus(item.review_status)!=="draft"||
-    item.academic_signature||item.headmaster_signature){
-  alert("Only an unsigned DRAFT can be deleted.");
-  return;
- }
-
+ if(getRole()!=="teacher"||item.teacher_id!==currentTeacherId)return;
+ if(norm(item.review_status)!=="draft"||item.academic_signature||item.headmaster_signature){alert("Only an unsigned DRAFT can be deleted.");return}
  if(!confirm("Permanently delete this draft and its uploaded file?"))return;
-
  button.disabled=true;
- try{
-  const {data,error}=await db.from("teaching_materials")
-   .delete().eq("id",item.id)
-   .eq("teacher_id",currentUser.id)
-   .eq("review_status","Draft")
-   .select("id").maybeSingle();
-
-  if(error){alert("DELETE ERROR: "+error.message);return;}
-  if(!data){alert("Draft was not deleted. Check permissions.");return;}
-
-  const {error:storageError}=await db.storage.from(BUCKET).remove([item.file_path]);
-  if(storageError)alert("Record deleted, but file could not be removed: "+storageError.message);
-  else alert("Draft and file deleted successfully.");
-
+ try{const {data,error}=await db.from("teaching_materials").delete().eq("id",item.id).eq("teacher_id",currentTeacherId).eq("review_status","Draft").select("id").maybeSingle();
+  if(error){alert("DELETE ERROR: "+error.message);return}if(!data){alert("Draft was not deleted. Check permissions.");return}
+  const rm=await db.storage.from(BUCKET).remove([item.file_path]);if(rm.error)alert("Record deleted, but file could not be removed: "+rm.error.message);else alert("Draft and file deleted.");
   await loadMaterials();
- }finally{
-  button.disabled=false;
-  button.textContent="DELETE";
- }
+ }finally{button.disabled=false}
 }
-
-// LOAD MATERIALS
 async function loadMaterials(){
  if(!currentTeacher||!currentUser)return;
-
- const role=getRole();
- const listId=role==="admin"?"materialsList":
-  role==="academic"?"academicMaterials":
-  role==="headmaster"?"headmasterMaterials":"teacherMaterials";
-
- const list=document.getElementById(listId);
+ const role=getRole(),listId=role==="admin"?"materialsList":role==="academic"?"academicMaterials":role==="headmaster"?"headmasterMaterials":"teacherMaterials",list=document.getElementById(listId);
  list.textContent="Loading materials...";
-
- let query=db.from("teaching_materials")
-  .select("*").order("created_at",{ascending:false});
-
- if(role==="teacher")query=query.eq("teacher_id",currentUser.id);
-
- const {data,error}=await query;
- if(error){
-  list.textContent="MATERIALS ERROR: "+error.message;
-  return;
- }
-
- list.innerHTML="";
- const all=data||[];
-
- if(role==="teacher")updateTeacherSummary(all);
-
- // Filter queues using current stage and status.
- // The forwarding status is also checked for older records.
+ let q=db.from("teaching_materials").select("*").order("created_at",{ascending:false});if(role==="teacher")q=q.eq("teacher_id",currentTeacherId);
+ const {data,error}=await q;if(error){list.textContent="MATERIALS ERROR: "+error.message;return}
+ const all=data||[];list.innerHTML="";if(role==="teacher")updateTeacherSummary(all);
  let visible=all;
-
- if(role==="academic"){
-  visible=all.filter(item=>{
-   const stage=normalStatus(item.current_stage);
-   const status=normalStatus(item.academic_status);
-   const forwarding=normalStatus(item.forwarding_status);
-   return (stage==="academic"&&status!=="checked")||
-    (!stage&&["pending","resent to academic office"].includes(forwarding));
-  });
- }
-
- if(role==="headmaster"){
-  visible=all.filter(item=>{
-   const stage=normalStatus(item.current_stage);
-   const status=normalStatus(item.headmaster_status);
-   return (stage==="headmaster"&&status!=="checked")||
-    (!stage&&normalStatus(item.forwarding_status)==="checked");
-  });
- }
-
- if(!visible.length){
-  list.textContent="No teaching materials available.";
-  return;
- }
-
- const peopleNames={};
+ if(role==="academic")visible=all.filter(x=>norm(x.current_stage)==="academic"&&norm(x.forwarding_status)!=="checked");
+ if(role==="headmaster")visible=all.filter(x=>norm(x.current_stage)==="headmaster");
+ if(!visible.length){list.textContent="No teaching materials available.";return}
+ const names={};
  if(role!=="teacher"){
-  const ids=[...new Set(visible.flatMap(item=>[
-   item.teacher_id,item.academic_signed_by,item.headmaster_signed_by,
-   item.admin_action_by,item.admin_checked_by
-  ]).filter(Boolean))];
-
-  if(ids.length){
-   const {data:people}=await db.from("teachers")
-    .select("id,full_name,email,role").in("id",ids);
-
-   (people||[]).forEach(p=>{
-    peopleNames[p.id]=p.full_name||p.email||p.role||"User";
-   });
-  }
+  const ids=[...new Set(visible.map(x=>x.teacher_id).filter(Boolean))];
+  if(ids.length){const p=await db.from("teachers").select("id,full_name,email").in("id",ids);(p.data||[]).forEach(t=>names[t.id]=t.full_name||t.email||"Teacher")}
  }
-
  if(role==="admin"){
-  const grouped={};
-  visible.forEach(item=>{
-   const id=item.teacher_id||"unknown";
-   if(!grouped[id])grouped[id]=[];
-   grouped[id].push(item);
-  });
-
-  for(const id of Object.keys(grouped)){
-   const heading=el("div",undefined,"teacher-heading");
-   heading.appendChild(el("h3","TEACHER: "+(peopleNames[id]||"Teacher account")));
-   heading.appendChild(el("p","TOTAL MATERIALS: "+grouped[id].length));
-   list.appendChild(heading);
-
-   for(const item of grouped[id]){
-    await renderMaterialEntry(item,list,role,peopleNames);
-   }
-  }
- }else{
-  for(const item of visible){
-   await renderMaterialEntry(item,list,role,peopleNames);
-  }
- }
+  const groups={};visible.forEach(x=>(groups[x.teacher_id||"unknown"]??=[]).push(x));
+  for(const id of Object.keys(groups)){const h=el("div",undefined,"teacher-heading");h.appendChild(el("h3","TEACHER: "+(names[id]||"Teacher")));h.appendChild(el("p","TOTAL MATERIALS: "+groups[id].length));list.appendChild(h);for(const item of groups[id])await renderMaterialEntry(item,list,role,names)}
+ }else for(const item of visible)await renderMaterialEntry(item,list,role,names);
 }
-
 function updateTeacherSummary(data){
- const count=(fn)=>data.filter(fn).length;
+ const count=fn=>data.filter(fn).length;
  document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+data.length;
- document.getElementById("teacherDraftCount").textContent="DRAFT: "+count(x=>normalStatus(x.review_status)==="draft");
- document.getElementById("teacherApprovedCount").textContent="APPROVED: "+count(x=>normalStatus(x.admin_status)==="approved");
- document.getElementById("teacherReturnedCount").textContent="RETURNED: "+count(x=>normalStatus(x.forwarding_status).includes("returned"));
- document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+count(x=>normalStatus(x.forwarding_status)==="forwarded to teacher");
+ document.getElementById("teacherDraftCount").textContent="DRAFT: "+count(x=>norm(x.review_status)==="draft");
+ document.getElementById("teacherApprovedCount").textContent="APPROVED: "+count(x=>norm(x.review_status)==="approved");
+ document.getElementById("teacherReturnedCount").textContent="RETURNED: "+count(x=>norm(x.forwarding_status).includes("return"));
+ document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+count(x=>norm(x.forwarding_status)==="forwarded to teacher");
 }
-
-// DISPLAY MATERIAL
-async function renderMaterialEntry(item,list,role,peopleNames){
- const entry=el("div",undefined,"item");
- entry.appendChild(el("h4",item.title||"Untitled material"));
-
- if(role==="admin"){
-  entry.appendChild(el("p","UPLOADED BY: "+(peopleNames[item.teacher_id]||"Teacher")));
- }
-
- entry.appendChild(el("p",[
-  item.material_type,item.subject,item.class_name,item.academic_year
- ].filter(Boolean).join(" | ")));
-
+async function renderMaterialEntry(item,list,role,names){
+ const entry=el("div",undefined,"item");entry.appendChild(el("h4",item.title||"Untitled material"));
+ if(role==="admin")entry.appendChild(el("p","UPLOADED BY: "+(names[item.teacher_id]||"Teacher")));
+ entry.appendChild(el("p",[item.material_type,item.subject,item.class_name,item.academic_year].filter(Boolean).join(" | ")));
  entry.appendChild(el("span","REVIEW: "+(item.review_status||"Pending").toUpperCase(),"status "+statusClass(item.review_status)));
- entry.appendChild(el("span","CURRENT STAGE: "+(item.current_stage||"Not set").toUpperCase(),"status "+statusClass(item.current_stage)));
+ entry.appendChild(el("span","STAGE: "+(item.current_stage||"Not set").toUpperCase(),"status "+statusClass(item.current_stage)));
  entry.appendChild(el("span","FORWARDING: "+(item.forwarding_status||"Pending").toUpperCase(),"status "+statusClass(item.forwarding_status)));
-
- const tracking=el("div",undefined,"status-details");
- tracking.appendChild(el("p","ACADEMIC OFFICE: "+(item.academic_status||"Pending")+" | "+(peopleNames[item.academic_signed_by]||"Not yet signed")));
- tracking.appendChild(el("p","HEAD OF SCHOOL: "+(item.headmaster_status||"Pending")+" | "+(peopleNames[item.headmaster_signed_by]||"Not yet signed")));
- tracking.appendChild(el("p","ADMIN: "+(item.admin_status||"Pending")+" | "+(peopleNames[item.admin_action_by]||"Not yet reviewed")));
- entry.appendChild(tracking);
-
- const view=el("button","VIEW / OPEN MATERIAL");
- view.onclick=()=>viewMaterial(item.file_path);
- entry.appendChild(view);
-
- if(role!=="teacher"){
-  const download=el("button","DOWNLOAD MATERIAL");
-  download.onclick=()=>downloadMaterial(item.file_path);
-  entry.appendChild(download);
- }
-
+ const view=el("button","VIEW / OPEN MATERIAL");view.onclick=()=>viewMaterial(item.file_path);entry.appendChild(view);
+ if(role!=="teacher"){const d=el("button","DOWNLOAD MATERIAL");d.onclick=()=>downloadMaterial(item.file_path);entry.appendChild(d)}
  addSignatureDisplay(entry,item);
-
- const stage=normalStatus(item.current_stage);
- const review=normalStatus(item.review_status);
- const forwarding=normalStatus(item.forwarding_status);
-
- // TEACHER DRAFT
- if(role==="teacher"&&review==="draft"){
-  const submit=el("button","SUBMIT","submit-button");
-  submit.onclick=()=>submitMaterial(item,submit);
-  entry.appendChild(submit);
-
-  const del=el("button","DELETE","danger");
-  del.onclick=()=>deleteMaterial(item,del);
-  entry.appendChild(del);
- }
-
- // ACADEMIC OFFICE
- if(role==="academic"&&stage==="academic"&&normalStatus(item.academic_status)!=="checked"){
-  addSignaturePad(entry,item,"academic");
- }
-
- // HEADMASTER
- if(role==="headmaster"&&stage==="headmaster"&&normalStatus(item.headmaster_status)!=="checked"){
-  addSignaturePad(entry,item,"headmaster");
- }
-
- // ADMIN: TWO FINAL ROUTING OPTIONS
- if(role==="admin"){
-  if(stage==="admin"||
-     normalStatus(item.headmaster_status)==="checked"||
-     Boolean(item.headmaster_signature)){
-
-   const heading=el("h4","ADMINISTRATOR FINAL REVIEW");
-   entry.appendChild(heading);
-
-   if(forwarding==="forwarded to teacher"){
-    entry.appendChild(el("p","SENT TO TEACHER SUCCESSFULLY","status forwarded"));
-   }else if(forwarding==="resent to academic office"){
-    entry.appendChild(el("p","RESENT TO ACADEMIC OFFICE","status checked"));
-   }else{
-    const comment=el("textarea");
-    comment.placeholder="Administrator: Write your review comments before choosing where to send this material...";
-    entry.appendChild(comment);
-
-    const teacherButton=el("button","RESEND TO TEACHER","approve-button");
-    teacherButton.onclick=()=>adminResend(item,"teacher",comment,teacherButton);
-    entry.appendChild(teacherButton);
-
-    const academicButton=el("button","RESEND TO ACADEMIC OFFICE","return-academic");
-    academicButton.onclick=()=>adminResend(item,"academic",comment,academicButton);
-    entry.appendChild(academicButton);
-   }
-  }else{
-   entry.appendChild(el("p","WAITING FOR HEAD OF SCHOOL REVIEW","small"));
-  }
- }
-
- if(item.admin_comment&&(role==="admin"||role==="teacher")){
-  entry.appendChild(el("p","ADMIN COMMENT: "+item.admin_comment));
- }
-
- if(role==="teacher"&&forwarding.includes("return")){
-  addResubmitControl(entry,item);
- }
-
- if(role==="teacher"&&forwarding==="forwarded to teacher"){
-  const note=el("p","This material has been reviewed by the Administrator and forwarded to you.");
-  note.style.color="#166534";
-  note.style.fontWeight="bold";
-  entry.appendChild(note);
- }
-
- const commentsBox=el("div",undefined,"comments-box");
- commentsBox.appendChild(el("h4","COMMENTS & REPLIES"));
- entry.appendChild(commentsBox);
-
- if(role==="teacher"){
-  const reply=el("button","REPLY TO COMMENT");
-  reply.onclick=()=>replyToMaterialComment(item.id);
-  entry.appendChild(reply);
- }
-
- list.appendChild(entry);
- await loadMaterialComments(item.id,commentsBox);
+ if(role==="teacher"&&norm(item.review_status)==="draft"){const s=el("button","SUBMIT","send-button");s.onclick=()=>submitMaterial(item,s);entry.appendChild(s);const d=el("button","DELETE","danger");d.onclick=()=>deleteMaterial(item,d);entry.appendChild(d)}
+ if(role==="academic"&&norm(item.current_stage)==="academic")addSignaturePad(entry,item,"academic");
+ if(role==="headmaster"&&norm(item.current_stage)==="headmaster")addSignaturePad(entry,item,"headmaster");
+ if(role==="admin"&&(norm(item.current_stage)==="admin"||item.headmaster_signature)){
+  entry.appendChild(el("h4","ADMINISTRATOR FINAL REVIEW"));
+  if(norm(item.forwarding_status)==="forwarded to teacher")entry.appendChild(el("p","SENT TO TEACHER SUCCESSFULLY","status forwarded"));
+  else if(norm(item.forwarding_status)==="resent to academic office")entry.appendChild(el("p","RESENT TO ACADEMIC OFFICE","status checked"));
+  else{const c=el("textarea");c.placeholder="Administrator review comments...";entry.appendChild(c);const a=el("button","RESEND TO TEACHER","approve-button");a.onclick=()=>adminResend(item,"teacher",c,a);entry.appendChild(a);const b=el("button","RESEND TO ACADEMIC OFFICE","return-academic");b.onclick=()=>adminResend(item,"academic",c,b);entry.appendChild(b)}
+ }else if(role==="admin")entry.appendChild(el("p","WAITING FOR HEAD OF SCHOOL REVIEW","small"));
+ if(item.admin_comment&&(role==="admin"||role==="teacher"))entry.appendChild(el("p","ADMIN COMMENT: "+item.admin_comment));
+ if(role==="teacher"&&norm(item.forwarding_status).includes("return"))addResubmitControl(entry,item);
+ if(role==="teacher"&&norm(item.forwarding_status)==="forwarded to teacher")entry.appendChild(el("p","This material has been reviewed and forwarded to you."));
+ const box=el("div",undefined,"comments-box");box.appendChild(el("h4","COMMENTS & REPLIES"));entry.appendChild(box);
+ if(role==="teacher"){const reply=el("button","REPLY TO COMMENT");reply.onclick=()=>replyToMaterialComment(item.id);entry.appendChild(reply)}
+ list.appendChild(entry);await loadMaterialComments(item.id,box);
 }
-
-// SIGNATURE DISPLAY
 function addSignatureDisplay(entry,item){
- const area=el("div",undefined,"signature-area");
- area.appendChild(el("h4","OFFICIAL SIGNATURES"));
-
- const offices=[
-  ["ACADEMIC OFFICE SIGNATURE",item.academic_signature,item.academic_signed_at,item.academic_comment],
-  ["HEAD OF SCHOOL SIGNATURE",item.headmaster_signature,item.headmaster_signed_at,item.headmaster_comment]
- ];
-
- offices.forEach(([label,signature,date,comment])=>{
-  const block=el("div");
-  block.style.marginTop="12px";
-  block.appendChild(el("strong",label));
-
-  if(signature){
-   const img=el("img");
-   img.src=signature;
-   img.className="signature-image";
-   img.alt=label;
-   block.appendChild(img);
-   block.appendChild(el("p","Signed: "+formatDate(date),"small"));
-  }else{
-   block.appendChild(document.createTextNode("Not signed yet."));
-  }
-
-  if(comment)block.appendChild(el("p","Comment: "+comment));
-  area.appendChild(block);
- });
-
- entry.appendChild(area);
+ const area=el("div",undefined,"signature-area");area.appendChild(el("h4","OFFICIAL SIGNATURES"));
+ [["ACADEMIC OFFICE",item.academic_signature,item.academic_signed_at,item.academic_comment||item.academic_comments],["HEAD OF SCHOOL",item.headmaster_signature,item.headmaster_signed_at,item.headmaster_comment||item.headmaster_comments]].forEach(([label,sig,date,comment])=>{
+  const b=el("div");b.style.marginTop="12px";b.appendChild(el("strong",label));
+  if(sig){const img=el("img");img.src=sig;img.className="signature-image";img.alt=label;b.appendChild(img);b.appendChild(el("p","Signed: "+formatDate(date),"small"))}else b.appendChild(document.createTextNode("Not signed yet."));
+  if(comment)b.appendChild(el("p","Comment: "+comment));area.appendChild(b)
+ });entry.appendChild(area)
 }
-
-// SIGNATURE PAD
 function addSignaturePad(entry,item,office){
- const area=el("div",undefined,"signature-area office-action");
- area.appendChild(el("h4",office==="academic"?
-  "ACADEMIC OFFICE - REVIEW, COMMENT AND SIGN":
-  "HEAD OF SCHOOL - REVIEW, COMMENT AND SIGN"));
-
- area.appendChild(el("p",office==="academic"?
-  "Review this material, write your comments and sign below. Press CHECKED to send it to the Head of School.":
-  "Review this material, write your comments and sign below. Press FORWARDED to send it to the Administrator."));
-
- const canvas=el("canvas",undefined,"signature-pad");
- canvas.width=900;
- canvas.height=300;
- area.appendChild(canvas);
-
- const ctx=canvas.getContext("2d");
- ctx.lineWidth=5;
- ctx.lineCap="round";
- ctx.lineJoin="round";
- ctx.strokeStyle="#111827";
-
- let drawing=false;
- let hasSignature=false;
-
- function position(e){
-  const rect=canvas.getBoundingClientRect();
-  return {
-   x:(e.clientX-rect.left)*(canvas.width/rect.width),
-   y:(e.clientY-rect.top)*(canvas.height/rect.height)
-  };
- }
-
- canvas.addEventListener("pointerdown",e=>{
-  drawing=true;
-  hasSignature=true;
-  canvas.setPointerCapture(e.pointerId);
-  const p=position(e);
-  ctx.beginPath();
-  ctx.moveTo(p.x,p.y);
- });
-
- canvas.addEventListener("pointermove",e=>{
-  if(!drawing)return;
-  const p=position(e);
-  ctx.lineTo(p.x,p.y);
-  ctx.stroke();
- });
-
- const stop=()=>{drawing=false;ctx.beginPath();};
- canvas.addEventListener("pointerup",stop);
- canvas.addEventListener("pointercancel",stop);
-
- const comment=el("textarea");
- comment.placeholder="Write your office review comments here...";
- area.appendChild(comment);
-
- const clear=el("button","CLEAR SIGNATURE");
- clear.onclick=()=>{
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  hasSignature=false;
- };
- area.appendChild(clear);
-
- const save=el("button",office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE","approve-button");
- area.appendChild(save);
-
+ const area=el("div",undefined,"signature-area office-action");area.appendChild(el("h4",office==="academic"?"ACADEMIC OFFICE - REVIEW, COMMENT AND SIGN":"HEAD OF SCHOOL - REVIEW, COMMENT AND SIGN"));
+ area.appendChild(el("p",office==="academic"?"Review and sign. CHECKED sends the material to the Head of School.":"Review and sign. FORWARDED sends the material to the Administrator."));
+ const canvas=el("canvas",undefined,"signature-pad");canvas.width=900;canvas.height=300;area.appendChild(canvas);
+ const ctx=canvas.getContext("2d");ctx.lineWidth=5;ctx.lineCap="round";ctx.strokeStyle="#111827";let drawing=false,has=false;
+ const pos=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}};
+ canvas.addEventListener("pointerdown",e=>{drawing=true;has=true;canvas.setPointerCapture(e.pointerId);const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+ canvas.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()});
+ const stop=()=>{drawing=false;ctx.beginPath()};canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop);
+ const comment=el("textarea");comment.placeholder="Write office review comments...";area.appendChild(comment);
+ const clear=el("button","CLEAR SIGNATURE","secondary");clear.onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);has=false};area.appendChild(clear);
+ const save=el("button",office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE","approve-button");area.appendChild(save);
  save.onclick=async()=>{
-  if(!hasSignature){alert("Please draw your signature first.");return;}
-  if(!comment.value.trim()){alert("Please enter your office comment.");return;}
-  if(!confirm("Confirm your comment and signature?"))return;
-
-  save.disabled=true;
-  save.textContent="SAVING...";
-
-  try{
-   const now=new Date().toISOString();
-   const signature=canvas.toDataURL("image/png");
-   const text=comment.value.trim();
-
-   const updates=office==="academic"?{
-    academic_signature:signature,
-    academic_signed_by:currentUser.id,
-    academic_signed_at:now,
-    academic_comment:text,
-    academic_comments:text,
-    academic_checked_by:currentUser.id,
-    academic_checked_at:now,
-    academic_status:"Checked",
-    current_stage:"headmaster",
-    headmaster_status:"Pending",
-    forwarding_status:"Checked"
-   }:{
-    headmaster_signature:signature,
-    headmaster_signed_by:currentUser.id,
-    headmaster_signed_at:now,
-    headmaster_comment:text,
-    headmaster_comments:text,
-    headmaster_checked_by:currentUser.id,
-    headmaster_checked_at:now,
-    headmaster_status:"Checked",
-    current_stage:"admin",
-    admin_status:"Pending",
-    forwarding_status:"Forwarded"
-   };
-
-   const {data,error}=await db.from("teaching_materials")
-    .update(updates).eq("id",item.id)
-    .select("id,current_stage").maybeSingle();
-
-   if(error){alert("SIGNATURE ERROR: "+error.message);return;}
-   if(!data){alert("NOT SAVED: No row was updated. Check database permissions.");return;}
-
-   await db.from("material_comments").insert({
-    material_id:item.id,user_id:currentUser.id,
-    comment:(office==="academic"?"Academic Office: ":"Head of School: ")+text
-   });
-
-   alert("Signature and comment saved. New stage: "+data.current_stage);
-   await loadMaterials();
-  }catch(error){
-   alert("ERROR: "+error.message);
-  }finally{
-   save.disabled=false;
-   save.textContent=office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE";
-  }
- };
-
- entry.appendChild(area);
+  if(!has){alert("Please draw your signature first.");return}if(!comment.value.trim()){alert("Please enter your office comment.");return}if(!confirm("Confirm comment and signature?"))return;
+  save.disabled=true;const now=new Date().toISOString(),text=comment.value.trim();
+  const updates=office==="academic"?{academic_signature:canvas.toDataURL("image/png"),academic_signed_by:currentUser.id,academic_signed_at:now,academic_comment:text,academic_comments:text,academic_checked_by:currentUser.id,academic_checked_at:now,current_stage:"headmaster",forwarding_status:"Checked"}:
+  {headmaster_signature:canvas.toDataURL("image/png"),headmaster_signed_by:currentUser.id,headmaster_signed_at:now,headmaster_comment:text,headmaster_comments:text,headmaster_checked_by:currentUser.id,headmaster_checked_at:now,current_stage:"admin",forwarding_status:"Forwarded"};
+  try{const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).select("id,current_stage").maybeSingle();if(error){alert("SIGNATURE ERROR: "+error.message);return}if(!data){alert("No row updated. Check database permissions.");return}
+   await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:(office==="academic"?"Academic Office: ":"Head of School: ")+text});
+   alert("Signature and comment saved. New stage: "+data.current_stage);await loadMaterials()
+  }catch(e){alert("ERROR: "+e.message)}finally{save.disabled=false}
+ };entry.appendChild(area)
 }
-
-// ADMIN RESENDS TO ONE OF TWO DESTINATIONS
-async function adminResend(item,destination,commentBox,button){
- if(!isAdmin()){alert("Administrator account required.");return;}
-
- const adminComment=commentBox.value.trim();
- if(!adminComment){
-  alert("Please enter Administrator comments before resending.");
-  return;
- }
-
- const destinationName=destination==="teacher"?"Teacher":"Academic Office";
- if(!confirm("Resend this material to "+destinationName+"?"))return;
-
- button.disabled=true;
- button.textContent="SENDING...";
-
- const now=new Date().toISOString();
-
- let updates;
-
- if(destination==="teacher"){
-  updates={
-   admin_status:"Approved",
-   review_status:"Approved",
-   forwarding_status:"Forwarded to Teacher",
-   current_stage:"teacher",
-   admin_comment:adminComment,
-   admin_comments:adminComment,
-   admin_checked_by:currentUser.id,
-   admin_checked_at:now,
-   admin_action_by:currentUser.id,
-   admin_action_at:now
-  };
- }else{
-  updates={
-   admin_status:"Checked",
-   forwarding_status:"Resent to Academic Office",
-   current_stage:"academic",
-   academic_status:"Pending",
-   admin_comment:adminComment,
-   admin_comments:adminComment,
-   admin_checked_by:currentUser.id,
-   admin_checked_at:now,
-   admin_action_by:currentUser.id,
-   admin_action_at:now
-  };
- }
-
- try{
-  const {data,error}=await db.from("teaching_materials")
-   .update(updates).eq("id",item.id)
-   .select("id,current_stage,forwarding_status").maybeSingle();
-
-  if(error){alert("ADMIN RESEND ERROR: "+error.message);return;}
-  if(!data){alert("No document was updated. Check database permissions.");return;}
-
-  await db.from("material_comments").insert({
-   material_id:item.id,
-   user_id:currentUser.id,
-   comment:"Administrator: "+adminComment+" | Resent to "+destinationName+"."
-  });
-
-  alert("Material successfully resent to "+destinationName+".");
-  await loadMaterials();
- }catch(error){
-  alert("ADMIN RESEND ERROR: "+error.message);
- }finally{
-  button.disabled=false;
-  button.textContent=destination==="teacher"?"RESEND TO TEACHER":"RESEND TO ACADEMIC OFFICE";
- }
+async function adminResend(item,destination,box,button){
+ if(!isAdmin()){alert("Administrator account required.");return}const comment=box.value.trim();if(!comment){alert("Enter Administrator comments.");return}
+ const dest=destination==="teacher"?"Teacher":"Academic Office";if(!confirm("Resend this material to "+dest+"?"))return;
+ button.disabled=true;const now=new Date().toISOString();
+ const updates=destination==="teacher"?{review_status:"Approved",forwarding_status:"Forwarded to Teacher",current_stage:"teacher",admin_comment:comment,admin_comments:comment,admin_checked_by:currentUser.id,admin_checked_at:now,admin_action_by:currentUser.id,admin_action_at:now}:
+ {forwarding_status:"Resent to Academic Office",current_stage:"academic",admin_comment:comment,admin_comments:comment,admin_checked_by:currentUser.id,admin_checked_at:now,admin_action_by:currentUser.id,admin_action_at:now,returned_to:"academic"};
+ try{const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).select("id").maybeSingle();if(error){alert("ADMIN RESEND ERROR: "+error.message);return}if(!data){alert("No document updated.");return}
+  await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:"Administrator: "+comment+" | Resent to "+dest+"."});alert("Material resent to "+dest+".");await loadMaterials()
+ }catch(e){alert(e.message)}finally{button.disabled=false}
 }
-
-// TEACHER UPLOADS CORRECTED MATERIAL
 function addResubmitControl(entry,item){
- const area=el("div",undefined,"signature-area");
- area.appendChild(el("h4","MATERIAL RETURNED FOR CORRECTIONS"));
- area.appendChild(el("p","Read the comments, correct your document and upload the revised file. It will be saved as DRAFT until you press SUBMIT."));
+ const area=el("div",undefined,"signature-area");area.appendChild(el("h4","MATERIAL RETURNED FOR CORRECTIONS"));area.appendChild(el("p","Upload the revised file. It will be saved as DRAFT until submitted."));
+ const input=el("input");input.type="file";area.appendChild(input);const btn=el("button","UPLOAD CORRECTED MATERIAL");area.appendChild(btn);
+ btn.onclick=async()=>{const file=input.files[0];if(!file){alert("Select corrected file.");return}if(!confirm("Upload corrected material as draft?"))return;btn.disabled=true;
+  const path=currentTeacherId+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  try{const up=await db.storage.from(BUCKET).upload(path,file);if(up.error){alert(up.error.message);return}
+   const updates={file_path:path,forwarding_status:"Draft",review_status:"Draft",current_stage:"teacher",academic_signature:null,academic_signed_by:null,academic_signed_at:null,academic_comment:null,academic_comments:null,academic_checked_by:null,academic_checked_at:null,headmaster_signature:null,headmaster_signed_by:null,headmaster_signed_at:null,headmaster_comment:null,headmaster_comments:null,headmaster_checked_by:null,headmaster_checked_at:null,admin_comment:null,admin_comments:null,admin_checked_by:null,admin_checked_at:null,admin_action_by:null,admin_action_at:null,returned_to:null,returned_at:null};
+   const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).eq("teacher_id",currentTeacherId).select("id").maybeSingle();if(error||!data){await db.storage.from(BUCKET).remove([path]);alert("RESUBMIT ERROR: "+(error?.message||"No row updated"));return}
+   if(item.file_path)await db.storage.from(BUCKET).remove([item.file_path]);await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:"Teacher uploaded corrected version as DRAFT."});alert("Corrected material uploaded as DRAFT.");await loadMaterials()
+  }catch(e){alert(e.message)}finally{btn.disabled=false}
+ };entry.appendChild(area)
+}
+async function loadMaterialComments(id,container){
+ const {data,error}=await db.from("material_comments").select("*").eq("material_id",id).order("created_at",{ascending:true});
+ if(error){container.appendChild(document.createTextNode("Comments unavailable: "+error.message));return}
+ if(!data?.length){container.appendChild(document.createTextNode("No comments yet."));return}
+ data.forEach(c=>{const b=el("div",undefined,"comment-item");b.appendChild(el("strong",c.user_id===currentUser.id?"YOUR COMMENT":"OFFICE / TEACHER COMMENT"));b.appendChild(el("p",c.comment));b.appendChild(el("small",formatDate(c.created_at)));container.appendChild(b)})
+}
+async function replyToMaterialComment(id){const reply=prompt("Andika majibu yako:");if(reply===null||!reply.trim())return;const {error}=await db.from("material_comments").insert({material_id:id,user_id:currentUser.id,comment:reply.trim()});if(error){alert(error.message);return}alert("Reply sent.");await loadMaterials()}
+async function openSignedFile(path,action){if(!path){alert("File path not found.");return}const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);if(error){alert(action+" ERROR: "+error.message);return}window.open(data.signedUrl,"_blank")}
+async function viewMaterial(path){await openSignedFile(path,"VIEW")}
+async function downloadMaterial(path){if(getRole()==="teacher"){alert("Teachers are not allowed to download materials.");return}await openSignedFile(path,"DOWNLOAD")}
 
- const fileInput=el("input");
- fileInput.type="file";
- area.appendChild(fileInput);
-
- const button=el("button","UPLOAD CORRECTED MATERIAL");
- area.appendChild(button);
-
- button.onclick=async()=>{
-  const file=fileInput.files[0];
-  if(!file){alert("Please select the corrected file.");return;}
-  if(!confirm("Upload the corrected material as a draft?"))return;
-
-  button.disabled=true;
-  button.textContent="UPLOADING...";
-
-  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-  const newPath=currentUser.id+"/"+Date.now()+"_"+safeName;
-
+// EXAMINATIONS AND RESULTS
+async function createExam(){
+ if(!isOffice()){alert("Admin or Academic Office only.");return}
+ const exam_name=document.getElementById("examName").value.trim(),exam_type=document.getElementById("examType").value,education_level=document.getElementById("examLevel").value,class_name=document.getElementById("examClass").value,term=document.getElementById("examTerm").value,academic_year=Number(document.getElementById("examYear").value),exam_date=document.getElementById("examDate").value,msg=document.getElementById("examMessage");
+ if(!exam_name||!class_name||!academic_year){msg.textContent="Enter exam name, class and academic year.";return}
+ msg.textContent="Saving examination...";
+ const {error}=await db.from("exams").insert({exam_name,exam_type,education_level,class_name,term,academic_year,exam_date:exam_date||null,created_by:currentUser.id,results_published:false});
+ if(error){msg.textContent="CREATE EXAM ERROR: "+error.message;return}
+ msg.textContent="Examination created.";document.getElementById("examName").value="";await loadOfficeExams()
+}
+async function loadOfficeExams(){
+ const box=document.getElementById("officeExams");box.textContent="Loading examinations...";
+ const {data,error}=await db.from("exams").select("*").order("created_at",{ascending:false});
+ if(error){box.textContent="EXAMS ERROR: "+error.message;return}cachedExams=data||[];box.innerHTML="";
+ if(!cachedExams.length){box.textContent="No examinations created.";return}
+ for(const exam of cachedExams){const card=el("div",undefined,"item");card.appendChild(el("h4",exam.exam_name));card.appendChild(el("p",[exam.exam_type,exam.education_level,exam.class_name,exam.term,exam.academic_year].filter(Boolean).join(" | ")));
+  card.appendChild(el("span",exam.results_published?"PUBLISHED":"NOT PUBLISHED","status "+(exam.results_published?"approved":"pending")));
+  const view=el("button","VIEW LIVE MARKS");view.onclick=()=>showExamResults(exam,card);card.appendChild(view);
+  if(!exam.results_published){const pub=el("button","PUBLISH RESULTS","approve-button");pub.onclick=()=>publishExam(exam,pub);card.appendChild(pub)}
+  box.appendChild(card)
+ }
+}
+async function publishExam(exam,button){
+ if(!isOffice()){alert("Only Admin or Academic Office can publish results.");return}
+ const {count,error:countError}=await db.from("student_exam_results").select("*",{count:"exact",head:true}).eq("exam_id",exam.id);
+ if(countError){alert("Could not verify marks: "+countError.message);return}if(!count){alert("There are no marks to publish yet.");return}
+ if(!confirm("Publish results for "+exam.exam_name+"? Teachers will then be able to view the published results."))return;
+ button.disabled=true;
+ const {data,error}=await db.from("exams").update({results_published:true,published_at:new Date().toISOString(),published_by:currentUser.id}).eq("id",exam.id).eq("results_published",false).select("id").maybeSingle();
+ if(error){alert("PUBLISH ERROR: "+error.message);button.disabled=false;return}if(!data){alert("No exam was published. Refresh and check its status.");button.disabled=false;return}
+ alert("Results published.");await loadOfficeExams()
+}
+async function showExamResults(exam,container){
+ let old=container.querySelector(".live-result-area");if(old)old.remove();
+ const area=el("div",undefined,"live-result-area");area.appendChild(el("p","Loading live marks and student reports..."));container.appendChild(area);
+ const {data,error}=await db.from("student_exam_results").select("id,exam_id,student_id,teacher_id,subject,marks_obtained,review_status,entered_at").eq("exam_id",exam.id).order("subject");
+ area.innerHTML="";if(error){area.textContent="RESULTS ERROR: "+error.message;return}
+ const marks=data||[];if(!marks.length){area.textContent="No marks entered yet.";return}
+ const ids=[...new Set(marks.map(m=>m.student_id))];const {data:students,error:studentError}=await db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name").in("id",ids);
+ if(studentError){area.textContent="STUDENT LIST ERROR: "+studentError.message;return}
+ const sm={};(students||[]).forEach(s=>sm[s.id]=s);
+ const table=el("table"),head=el("tr");["Admission No.","Student","Subject","Marks","Status"].forEach(x=>head.appendChild(el("th",x)));table.appendChild(head);
+ const grouped={};
+ marks.forEach(m=>{
+  const s=sm[m.student_id]||{},name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");
+  const tr=el("tr");[s.admission_number||"",name,m.subject,m.marks_obtained,m.review_status||""].forEach(v=>tr.appendChild(el("td",safeText(v))));table.appendChild(tr);
+  if(!grouped[m.student_id])grouped[m.student_id]={student:s,rows:[],total:0,count:0};
+  const g=grouped[m.student_id];g.rows.push(m);g.total+=Number(m.marks_obtained)||0;g.count++;
+ });
+ const wrap=el("div",undefined,"table-wrap");wrap.appendChild(table);area.appendChild(wrap);
+ const ranking=Object.values(grouped).map(g=>({...g,average:g.count?g.total/g.count:0})).sort((a,b)=>b.average-a.average);
+ area.appendChild(el("h4","OVERALL RESULTS SUMMARY"));
+ area.appendChild(el("p","Students with marks: "+ranking.length+" | Marks records: "+marks.length));
+ if(ranking.length){area.appendChild(el("p","Highest average: "+ranking[0].average.toFixed(2)+"% - "+[ranking[0].student.first_name,ranking[0].student.middle_name,ranking[0].student.last_name].filter(Boolean).join(" ")));
+  const lowest=ranking[ranking.length-1];area.appendChild(el("p","Lowest average: "+lowest.average.toFixed(2)+"% - "+[lowest.student.first_name,lowest.student.middle_name,lowest.student.last_name].filter(Boolean).join(" ")));
+ }
+ area.appendChild(el("h4","INDIVIDUAL STUDENT REPORTS"));
+ ranking.forEach((g,index)=>{
+  const s=g.student,name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");
+  const report=el("div",undefined,"report");report.appendChild(el("strong",(index+1)+". "+(s.admission_number||"")+" | "+name));
+  report.appendChild(el("p","Class: "+(s.class_name||exam.class_name||"")+" | Average: "+g.average.toFixed(2)+"% | Total: "+g.total));
+  g.rows.forEach(r=>report.appendChild(el("p",r.subject+": "+r.marks_obtained+"/100")));
+  area.appendChild(report);
+ });
+ const print=el("button","PRINT / SAVE REPORTS");print.onclick=()=>window.print();area.appendChild(print);
+ area.appendChild(el("p","Note: Best and weakest students are determined by average marks among students with at least one recorded subject. These reports use the marks currently stored for this examination."));
+}
+async function loadTeacherResults(){
+ const box=document.getElementById("teacherExamList");box.textContent="Loading examinations...";
+ const {data,error}=await db.from("exams").select("*").order("created_at",{ascending:false});
+ if(error){box.textContent="EXAMS ERROR: "+error.message;return}
+ cachedExams=data||[];box.innerHTML="";
+ const available=cachedExams.filter(e=>!e.results_published);
+ const published=cachedExams.filter(e=>e.results_published);
+ if(!cachedExams.length){box.textContent="No examinations available.";return}
+ for(const exam of cachedExams){const card=el("div",undefined,"item");card.appendChild(el("h4",exam.exam_name));card.appendChild(el("p",[exam.class_name,exam.education_level,exam.academic_year,exam.term].filter(Boolean).join(" | ")));
+  card.appendChild(el("span",exam.results_published?"PUBLISHED":"MARKS ENTRY OPEN","status "+(exam.results_published?"approved":"pending")));
+  if(!exam.results_published){const b=el("button","ENTER MARKS");b.onclick=()=>openMarkEntry(exam,card);card.appendChild(b)}
+  else{const v=el("button","VIEW PUBLISHED RESULTS");v.onclick=()=>teacherViewPublished(exam);card.appendChild(v);const r=el("button","GENERATE REPORTS");r.onclick=()=>teacherGenerateReports(exam);card.appendChild(r)}
+  box.appendChild(card)
+ }
+ document.getElementById("teacherResultsView").textContent=published.length?"Choose VIEW PUBLISHED RESULTS on an examination above.":"Published results are not available yet.";
+ document.getElementById("teacherReports").textContent=published.length?"Choose GENERATE REPORTS on a published examination above.":"Reports become available after publication.";
+}
+async function openMarkEntry(exam,card){
+ if(getRole()!=="teacher"||exam.results_published){alert("Marks entry is not available.");return}
+ const old=card.querySelector(".mark-entry");if(old){old.remove();return}
+ const area=el("div",undefined,"mark-entry");area.appendChild(el("p","Loading students and assigned subjects..."));card.appendChild(area);
+ const [stuRes,subRes]=await Promise.all([
+  db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name,education_level,combination,registration_status").eq("class_name",exam.class_name),
+  db.from("teacher_subject_assignments").select("subject,form_level,education_level,combination,is_active").eq("teacher_id",currentTeacherId)
+ ]);
+ area.innerHTML="";
+ if(stuRes.error){area.textContent="STUDENT LIST ERROR: "+stuRes.error.message;return}
+ if(subRes.error){area.textContent="SUBJECT ASSIGNMENT ERROR: "+subRes.error.message;return}
+ const students=(stuRes.data||[]).filter(s=>!s.registration_status||norm(s.registration_status)==="approved"||norm(s.registration_status)==="active");
+ const assignments=(subRes.data||[]).filter(a=>a.is_active!==false);
+ const subjects=[...new Set(assignments.map(a=>a.subject).filter(Boolean))];
+ if(!students.length){area.textContent="No registered students found in "+exam.class_name+".";return}
+ if(!subjects.length){area.textContent="No active subject assignments found for your teacher account.";return}
+ const subject=el("select");subjects.forEach(s=>{const o=el("option",s);o.value=s;subject.appendChild(o)});area.appendChild(el("label","Subject"));area.appendChild(subject);
+ const table=el("table"),header=el("tr");["Admission No.","Student","Marks (0-100)"].forEach(x=>header.appendChild(el("th",x)));table.appendChild(header);
+ const inputs=[];
+ students.forEach(s=>{const tr=el("tr");tr.appendChild(el("td",s.admission_number||""));tr.appendChild(el("td",[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")));const td=el("td"),input=el("input");input.type="number";input.min="0";input.max="100";input.step="0.01";input.placeholder="0-100";input.style.minWidth="100px";td.appendChild(input);tr.appendChild(td);table.appendChild(tr);inputs.push({student:s,input})});
+ const wrap=el("div",undefined,"table-wrap");wrap.appendChild(table);area.appendChild(wrap);
+ const save=el("button","SAVE MARKS");area.appendChild(save);
+ save.onclick=async()=>{
+  const subjectName=subject.value,entries=inputs.filter(x=>x.input.value.trim()!=="");
+  if(!entries.length){alert("Enter at least one mark.");return}
+  const invalid=entries.find(x=>!Number.isFinite(Number(x.input.value))||Number(x.input.value)<0||Number(x.input.value)>100);
+  if(invalid){alert("Marks must be between 0 and 100.");return}
+  if(!confirm("Save "+entries.length+" marks for "+subjectName+"?"))return;
+  save.disabled=true;save.textContent="SAVING...";
   try{
-   const {error:storageError}=await db.storage.from(BUCKET).upload(newPath,file);
-   if(storageError){alert("STORAGE ERROR: "+storageError.message);return;}
-
-   const updates={
-    file_path:newPath,
-    forwarding_status:"Draft",
-    review_status:"Draft",
-    current_stage:"teacher",
-    academic_status:"Pending",
-    headmaster_status:"Pending",
-    admin_status:"Pending",
-    academic_signature:null,
-    academic_signed_by:null,
-    academic_signed_at:null,
-    academic_comment:null,
-    academic_comments:null,
-    academic_checked_by:null,
-    academic_checked_at:null,
-    headmaster_signature:null,
-    headmaster_signed_by:null,
-    headmaster_signed_at:null,
-    headmaster_comment:null,
-    headmaster_comments:null,
-    headmaster_checked_by:null,
-    headmaster_checked_at:null,
-    admin_comment:null,
-    admin_comments:null,
-    admin_checked_by:null,
-    admin_checked_at:null,
-    admin_action_by:null,
-    admin_action_at:null
-   };
-
-   const {data,error}=await db.from("teaching_materials")
-    .update(updates).eq("id",item.id)
-    .eq("teacher_id",currentUser.id)
-    .select("id").maybeSingle();
-
-   if(error){
-    await db.storage.from(BUCKET).remove([newPath]);
-    alert("RESUBMIT ERROR: "+error.message);
-    return;
+   for(const item of entries){
+    const existing=await db.from("student_exam_results").select("id").eq("exam_id",exam.id).eq("student_id",item.student.id).eq("subject",subjectName).maybeSingle();
+    if(existing.error)throw new Error(existing.error.message);
+    const values={marks_obtained:Number(item.input.value),teacher_id:currentTeacherId,review_status:"Pending",entered_at:new Date().toISOString()};
+    const result=existing.data?await db.from("student_exam_results").update(values).eq("id",existing.data.id):await db.from("student_exam_results").insert({...values,exam_id:exam.id,student_id:item.student.id,subject:subjectName});
+    if(result.error)throw new Error(result.error.message);
    }
-
-   if(!data){
-    await db.storage.from(BUCKET).remove([newPath]);
-    alert("Material was not resubmitted. Check permissions.");
-    return;
-   }
-
-   if(item.file_path)await db.storage.from(BUCKET).remove([item.file_path]);
-
-   await db.from("material_comments").insert({
-    material_id:item.id,user_id:currentUser.id,
-    comment:"Teacher uploaded a corrected version as DRAFT. Awaiting teacher submission."
-   });
-
-   alert("Corrected material uploaded as DRAFT. Press SUBMIT when ready.");
-   await loadMaterials();
-  }catch(error){
-   alert("RESUBMIT ERROR: "+error.message);
-  }finally{
-   button.disabled=false;
-   button.textContent="UPLOAD CORRECTED MATERIAL";
-  }
+   alert("Marks saved successfully. Office can view them live.");await loadTeacherResults()
+  }catch(e){alert("SAVE MARKS ERROR: "+e.message)}finally{save.disabled=false;save.textContent="SAVE MARKS"}
  };
-
- entry.appendChild(area);
 }
-
-// COMMENTS
-async function loadMaterialComments(materialId,container){
- const {data,error}=await db.from("material_comments")
-  .select("*").eq("material_id",materialId)
-  .order("created_at",{ascending:true});
-
- if(error){
-  container.appendChild(document.createTextNode("Comments could not be loaded: "+error.message));
-  return;
- }
-
- if(!data||!data.length){
-  container.appendChild(document.createTextNode("No comments yet."));
-  return;
- }
-
- data.forEach(c=>{
-  const box=el("div",undefined,"comment-item");
-  box.appendChild(el("strong",c.user_id===currentUser.id?"YOUR COMMENT":"OFFICE / TEACHER COMMENT"));
-  box.appendChild(el("p",c.comment));
-  box.appendChild(el("small",formatDate(c.created_at)));
-  container.appendChild(box);
- });
+async function teacherViewPublished(exam){
+ if(getRole()!=="teacher"||!exam.results_published){alert("Results have not been published.");return}
+ const box=document.getElementById("teacherResultsView");box.innerHTML="<p>Loading published results...</p>";
+ const {data,error}=await db.from("student_exam_results").select("student_id,subject,marks_obtained").eq("exam_id",exam.id).eq("teacher_id",currentTeacherId);
+ if(error){box.textContent="RESULTS ERROR: "+error.message;return}
+ const rows=data||[];if(!rows.length){box.textContent="No published marks are available for your account.";return}
+ box.innerHTML="";box.appendChild(el("h4",exam.exam_name));rows.forEach(r=>box.appendChild(el("p",r.subject+": "+r.marks_obtained+" marks")))
 }
-
-async function replyToMaterialComment(materialId){
- const reply=prompt("Andika majibu yako:");
- if(reply===null||!reply.trim())return;
-
- const {error}=await db.from("material_comments").insert({
-  material_id:materialId,user_id:currentUser.id,comment:reply.trim()
- });
-
- if(error){alert("REPLY ERROR: "+error.message);return;}
- alert("Reply sent successfully.");
- await loadMaterials();
+async function teacherGenerateReports(exam){
+ if(getRole()!=="teacher"||!exam.results_published){alert("Reports are locked until results are published.");return}
+ const box=document.getElementById("teacherReports");box.textContent="Generating reports...";
+ const {data,error}=await db.from("student_exam_results").select("student_id,subject,marks_obtained").eq("exam_id",exam.id).eq("teacher_id",currentTeacherId);
+ if(error){box.textContent="REPORT ERROR: "+error.message;return}
+ const rows=data||[];if(!rows.length){box.textContent="No published marks to report.";return}
+ const ids=[...new Set(rows.map(x=>x.student_id))],st=await db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name").in("id",ids);
+ if(st.error){box.textContent="STUDENT ERROR: "+st.error.message;return}
+ const names={};(st.data||[]).forEach(s=>names[s.id]=s);
+ box.innerHTML="";box.appendChild(el("h4",exam.exam_name+" - PUBLISHED SUBJECT REPORTS"));
+ rows.forEach(r=>{const s=names[r.student_id]||{},name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");const p=el("div",undefined,"report");p.appendChild(el("strong",(s.admission_number||"")+" | "+name));p.appendChild(el("p",r.subject+": "+r.marks_obtained+"/100"));box.appendChild(p)})
 }
-
-// VIEW / DOWNLOAD FILES
-async function downloadMaterial(path){
- if(getRole()==="teacher"){
-  alert("Teachers are not allowed to download materials.");
-  return;
- }
- await openSignedFile(path,"DOWNLOAD");
-}
-
-async function viewMaterial(path){
- await openSignedFile(path,"VIEW");
-}
-
-async function openSignedFile(path,action){
- if(!path){alert("File path not found.");return;}
-
- const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);
- if(error){alert(action+" ERROR: "+error.message);return;}
-
- window.open(data.signedUrl,"_blank");
-}
-
-// LOG OUT
 async function logout(){
- const {error}=await db.auth.signOut();
- if(error){alert(error.message);return;}
-
- currentUser=null;
- currentTeacher=null;
-
- document.getElementById("dashboard").classList.add("hidden");
- document.getElementById("login").classList.remove("hidden");
- document.getElementById("email").value="";
- document.getElementById("password").value="";
- document.getElementById("loginMessage").textContent="You have logged out successfully.";
+ const {error}=await db.auth.signOut();if(error){alert(error.message);return}
+ currentUser=null;currentTeacher=null;currentRole="";currentTeacherId=null;
+ show("dashboard",false);show("login");document.getElementById("email").value="";document.getElementById("password").value="";document.getElementById("loginMessage").textContent="You have logged out successfully."
 }
-
-// RESTORE SESSION
-async function checkSession(){
- const {data,error}=await db.auth.getSession();
-
- if(error){
-  document.getElementById("loginMessage").textContent=error.message;
-  return;
- }
-
- if(data.session)await loadDashboard(data.session.user);
-}
-
-checkSession();
+async function checkSession(){const {data,error}=await db.auth.getSession();if(error){document.getElementById("loginMessage").textContent=error.message;return}if(data.session)await loadDashboard(data.session.user)}
+updateInviteForm();checkSession();
 </script>
 </body>
 </html>
