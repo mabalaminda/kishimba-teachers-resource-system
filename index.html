@@ -6,215 +6,132 @@
 <title>Kishimba Secondary School Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#17212b}
-header{background:#123c2c;color:white;padding:20px;text-align:center;border-radius:10px}
-.card{background:white;padding:18px;margin:15px 0;border-radius:10px}
-input,select,textarea,button{width:100%;padding:12px;margin:7px 0;border:1px solid #cbd5e1;border-radius:6px}
-textarea{min-height:75px}button{background:#176b45;color:white;border:0;cursor:pointer;font-weight:bold}
-button:disabled{opacity:.6}.hidden{display:none!important}h3,h4{color:#176b45}
-.logout,.danger{background:#b42318}.secondary{background:#075985}.approve{background:#166534}.return{background:#7c3aed}
-.item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px}
-.status{display:inline-block;padding:6px 10px;border-radius:15px;font-size:12px;font-weight:bold;background:#e0e7ff;margin:3px}
-.pending{background:#fef3c7;color:#92400e}.approved{background:#dcfce7;color:#166534}.returned{background:#ffedd5;color:#9a3412}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.assignment-row{border:1px solid #cbd5e1;border-radius:8px;padding:12px;margin:10px 0;background:#f8fafc}.subject-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}.subject-option{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #e2e8f0;border-radius:6px}.subject-option input{width:auto;margin:0}.link-box{overflow-wrap:anywhere;background:#ecfdf5;padding:12px;border:1px solid #86efac;border-radius:8px}
-.tile{background:#e8f3ed;border:1px solid #b8d8c5;padding:16px;border-radius:9px}
-.tile button{margin-bottom:0}.note{font-size:13px;color:#475569}.message{font-weight:bold}
-
-.student-id-wrap{margin-top:14px;padding:14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:9px}
-.id-card{width:100%;max-width:760px;margin:14px auto;border:2px solid #123c2c;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 3px 12px #0002;page-break-inside:avoid}
-.id-front{background:linear-gradient(135deg,#123c2c,#176b45);color:#fff;padding:18px}
-.id-front h2,.id-front h3,.id-front p{color:#fff;margin:5px 0}
-.id-front-title{text-align:center;font-weight:800;letter-spacing:2px;border-top:1px solid #ffffff80;border-bottom:1px solid #ffffff80;padding:8px;margin:10px 0}
-.id-main{display:grid;grid-template-columns:125px 1fr;gap:16px;align-items:center;padding:12px 0}
-.id-photo{width:120px;height:145px;border:2px solid #fff;background:#e2e8f0;color:#334155;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;object-fit:cover}
-.camera-box{border:1px solid #cbd5e1;border-radius:9px;padding:12px;background:#f8fafc;margin:12px 0}.camera-video{width:100%;max-width:360px;display:block;background:#111;border-radius:8px;margin:8px auto;aspect-ratio:4/3;object-fit:cover}.photo-preview{width:130px;height:160px;object-fit:cover;border:2px solid #176b45;border-radius:6px;display:block;margin:10px auto}
-.id-info p{margin:7px 0;color:#fff;overflow-wrap:anywhere}
-.id-signatures{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:12px;color:#fff;font-size:12px}
-.id-signatures span{display:block;border-top:1px solid #fff;padding-top:5px;margin-top:22px}
-.id-back{padding:20px;color:#123c2c;min-height:180px}
-.id-back h3{text-align:center;margin-top:0}
-.id-back .return-note{font-weight:bold;text-align:center;margin-top:35px;border-top:1px solid #123c2c;padding-top:12px}
-.id-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.id-actions button{margin:4px 0}
-@media(max-width:520px){.id-main{grid-template-columns:90px 1fr;gap:10px}.id-photo{width:88px;height:110px}.id-front{padding:12px}.id-front h2{font-size:18px}}
-@media print{
- @page{size:A4;margin:12mm}
- body *{visibility:hidden!important}
- #printStudentId,#printStudentId *{visibility:visible!important}
- #printStudentId{position:absolute;left:0;top:0;width:100%;margin:0;padding:0;background:#fff}
- #printStudentId .id-card{box-shadow:none;max-width:100%;margin:0 auto 12mm;break-inside:avoid}
- #printStudentId .id-actions{display:none!important}
-}
- .marks-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}.marks-table th,.marks-table td{border:1px solid #cbd5e1;padding:8px;text-align:left}.marks-table th{background:#e8f3ed}.marks-table input{min-width:75px;margin:0}.result-actions{display:flex;gap:6px;flex-wrap:wrap}.result-actions button{width:auto;flex:1;min-width:120px}.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.summary-box{background:#e8f3ed;border:1px solid #b8d8c5;border-radius:8px;padding:12px}.small-btn{padding:8px;font-size:12px}
-@media(max-width:600px){body{padding:8px}.marks-table{font-size:12px}.marks-table th,.marks-table td{padding:5px}}
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#f1f5f9;margin:0;padding:15px;color:#172033}
+header{background:#123c2c;color:#fff;padding:20px;text-align:center;border-radius:10px}header h2{color:#fff}
+.card{background:#fff;padding:18px;margin:15px 0;border-radius:10px;box-shadow:0 1px 4px #0000000d}
+input,select,textarea,button{width:100%;padding:12px;margin:7px 0;border:1px solid #cbd5e1;border-radius:6px;font:inherit}
+textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:pointer;font-weight:bold}button:disabled{opacity:.55;cursor:not-allowed}
+.hidden{display:none!important}h3,h4{color:#176b45}.logout,.danger{background:#b42318}.send-button{background:#075985}.approve-button{background:#166534}.return-academic{background:#7c3aed}.secondary{background:#475569}
+.item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:7px;background:#fff}.status{display:inline-block;padding:6px 12px;border-radius:15px;font-weight:bold;margin:5px;font-size:12px}
+.pending{background:#fef3c7;color:#92400e}.checked{background:#dbeafe;color:#1d4ed8}.forwarded{background:#d1fae5;color:#047857}.approved{background:#dcfce7;color:#166534}.returned{background:#ffedd5;color:#9a3412}.draft{background:#e0e7ff;color:#3730a3}
+.signature-area,.comments-box,.status-details{background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px}.signature-pad{width:100%;height:160px;border:2px dashed #64748b;background:white;touch-action:none;display:block}
+.signature-image{max-width:100%;width:300px;max-height:130px;object-fit:contain;border:1px solid #ddd;background:white;padding:5px}.small{font-size:13px;color:#475569}
+.comment-item{background:#eff6ff;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #e2e8f0}.teacher-heading{background:#e8f3ed;border:2px solid #176b45;padding:14px;margin-top:20px;border-radius:8px}
+.summary-box,.office-action{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:8px;margin:10px 0}
+.login-layout{display:grid;grid-template-columns:1fr 1fr;gap:15px}.school-board{min-height:260px;border-radius:10px;background:linear-gradient(145deg,#123c2c,#176b45);color:white;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;border:7px solid #9a7442}
+.school-board h2{color:#fff;font-size:25px}.school-board p{font-weight:bold;letter-spacing:1px}.dashboard-footer{text-align:center;margin:20px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.action-btn{min-height:46px}.report{border:1px solid #cbd5e1;border-radius:8px;padding:12px;margin:10px 0;background:#fff}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin:10px 0}th,td{padding:8px;border:1px solid #cbd5e1;text-align:left;font-size:13px}th{background:#e8f3ed}.notice{padding:10px;background:#eff6ff;border-left:4px solid #075985;margin:10px 0}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.student-card{border:1px solid #cbd5e1;padding:12px;border-radius:8px;margin:10px 0}.student-card label,.form-grid label{display:block;font-size:13px;font-weight:bold;color:#334155}.student-card input,.student-card select,.student-card textarea{margin-top:3px}@media(max-width:650px){.form-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.login-layout,.grid2,.grid3{grid-template-columns:1fr}.school-board{min-height:170px}}
 </style>
 </head>
 <body>
-<header>
-<h2>KISHIMBA SECONDARY SCHOOL</h2>
-<p>INTEGRATED SCHOOL MANAGEMENT PORTAL</p>
-</header>
+<header><h2>KISHIMBA SECONDARY SCHOOL</h2><p>TEACHERS RESOURCE MANAGEMENT PORTAL</p></header>
 
-<section id="login" class="card">
-<h3>Teacher / Office Login</h3>
-<input id="email" type="email" placeholder="Email Address">
-<input id="password" type="password" placeholder="Password">
-<button id="loginBtn" onclick="login()">LOGIN</button>
-<p id="loginMessage" class="message"></p>
-</section>
-
-<section id="inviteSetup" class="card hidden">
-<h3>SET YOUR TEACHER PASSWORD</h3>
-<p class="note">Weka password yako binafsi ili kukamilisha akaunti ya Kishimba Secondary School.</p>
-<input id="invitePassword" type="password" autocomplete="new-password" placeholder="New password (at least 8 characters)">
-<input id="invitePasswordConfirm" type="password" autocomplete="new-password" placeholder="Confirm new password">
-<button id="saveInvitePasswordBtn" onclick="saveInvitePassword()">SAVE PASSWORD & CONTINUE</button>
-<p id="invitePasswordMessage" class="message"></p>
+<section id="login" class="login-layout">
+ <div class="card"><h3>Teacher / Office Login</h3>
+  <input id="email" type="email" placeholder="Email Address" autocomplete="username">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn" onclick="login()">LOGIN</button><p id="loginMessage"></p>
+ </div>
+ <div class="school-board"><div><h2>KISHIMBA</h2><p>SECONDARY SCHOOL</p><p>TEACHERS RESOURCE MANAGEMENT PORTAL</p></div></div>
 </section>
 
 <section id="dashboard" class="hidden">
-<div class="card">
-<h3 id="welcome">WELCOME</h3><p id="roleDisplay"></p>
-<div class="grid" id="mainTiles"></div>
-</div>
+ <div class="card"><h3 id="welcome">WELCOME</h3><p id="roleDisplay"></p></div>
 
-<section id="studentPanel" class="card hidden">
-<h3>STUDENT REGISTRATION DASHBOARD</h3>
-<p class="note">Usajili huu unahifadhi taarifa kwenye jedwali la public.students. Namba ya usajili inatengenezwa na trigger ya Supabase; usiandike namba mwenyewe.</p>
-<div class="grid">
-<div class="tile"><b>O-LEVEL</b><p>Format: KSC/OL/MWAKA/0001</p><span id="oCount">-</span></div>
-<div class="tile"><b>A-LEVEL</b><p>Format: KSC/AL/MWAKA/501</p><span id="aCount">-</span></div>
-</div>
-<h4>REGISTER NEW STUDENT</h4>
-<div class="grid">
-<div><label>First Name *</label><input id="sFirst" placeholder="First name"></div>
-<div><label>Middle Name</label><input id="sMiddle" placeholder="Middle name"></div>
-<div><label>Last Name *</label><input id="sLast" placeholder="Last name"></div>
-<div><label>Gender</label><select id="sGender"><option value="">Select gender</option><option>Male</option><option>Female</option></select></div>
-<div><label>Date of Birth</label><input id="sDob" type="date"></div>
-<div><label>Education Level *</label><select id="sLevel" onchange="updateClasses()"><option value="">Select level</option><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option></select></div>
-<div><label>Class / Form *</label><select id="sClass"><option value="">Select level first</option></select></div>
-<div><label>Combination (A-Level)</label><input id="sCombination" placeholder="e.g. PCM"></div>
-<div><label>Academic Year *</label><input id="sYear" type="number" min="2020" max="2100" value="2027"></div>
-<div><label>Parent / Guardian Name</label><input id="sGuardian" placeholder="Guardian full name"></div>
-<div><label>Parent / Guardian Phone</label><input id="sGuardianPhone" type="tel" placeholder="Phone number"></div>
-<div><label>Brought by (relationship)</label><input id="sRelationship" placeholder="e.g. Parent, relative"></div>
-<div><label>Brought by (full name)</label><input id="sBroughtName" placeholder="Full name"></div>
-<div><label>Brought by (phone)</label><input id="sBroughtPhone" type="tel" placeholder="Phone number"></div>
-</div>
-<div class="camera-box">
-<h4>STUDENT PHOTO CAPTURE</h4>
-<p class="note">Piga picha moja kwa moja. Ruhusu kamera inapotakiwa. Picha itahifadhiwa kwenye Supabase na kuunganishwa na usajili wa mwanafunzi.</p>
-<div class="grid"><button type="button" class="secondary" onclick="startStudentCamera()">OPEN CAMERA</button><button type="button" class="secondary" onclick="stopStudentCamera()">CLOSE CAMERA</button></div>
-<video id="studentCamera" class="camera-video" autoplay playsinline muted></video>
-<label>Brightness / Mwanga: <span id="brightnessValue">100%</span></label>
-<input id="photoBrightness" type="range" min="50" max="160" value="100" oninput="adjustPhotoBrightness(this.value)">
-<div class="grid"><button type="button" onclick="captureStudentPhoto()">CAPTURE PHOTO</button><button type="button" class="secondary" onclick="retakeStudentPhoto()">RETAKE PHOTO</button></div>
-<img id="studentPhotoPreview" class="photo-preview hidden" alt="Student photo preview">
-<p id="cameraMessage" class="message"></p>
-</div>
-<button id="registerBtn" onclick="registerStudent()">SAVE STUDENT REGISTRATION</button>
-<p id="studentMessage" class="message"></p>
+ <div id="adminSection" class="card hidden"><h3>ADMIN DASHBOARD</h3><h4>REGISTERED TEACHERS</h4><div id="teachersList"></div><h4>ALL TEACHING MATERIALS AND RECORDS</h4><div id="materialsList"></div></div>
+ <div id="academicSection" class="card hidden"><h3>ACADEMIC OFFICE DASHBOARD</h3><p>Review materials, add comments and sign using CHECKED.</p><div id="academicMaterials"></div></div>
+ <div id="headmasterSection" class="card hidden"><h3>HEAD OF SCHOOL DASHBOARD</h3><p>Review checked materials, add comments and sign using FORWARDED.</p><div id="headmasterMaterials"></div></div>
 
-<hr>
-<h4>REGISTERED STUDENTS</h4>
-<div class="grid">
-<div><label>Filter level</label><select id="filterLevel" onchange="loadStudents()"><option value="">All levels</option><option>O-Level</option><option>A-Level</option></select></div>
-<div><label>Filter year</label><input id="filterYear" type="number" placeholder="All years" onchange="loadStudents()"></div>
-<div><label>Search student</label><input id="studentSearch" placeholder="Name or admission number" oninput="filterStudentRows()"></div>
-</div>
-<div id="studentsList">Loading...</div>
-</section>
+ <div id="teacherSection" class="card hidden"><h3>TEACHER DASHBOARD</h3>
+  <div class="summary-box"><h4>MY MATERIALS SUMMARY</h4><p id="teacherMaterialCount">TOTAL MATERIALS: 0</p><p id="teacherDraftCount">DRAFT: 0</p><p id="teacherApprovedCount">APPROVED: 0</p><p id="teacherReturnedCount">RETURNED: 0</p><p id="teacherForwardedCount">FORWARDED TO TEACHER: 0</p></div>
+  <p>Your uploaded materials and their review progress appear below.</p><div id="teacherMaterials"></div>
+ </div>
 
-<section id="teacherPanel" class="card hidden">
-<h3>TEACHER REGISTRATION</h3>
-<p class="note">Sajili mwalimu mmoja mmoja. Chagua masomo na ongeza kila darasa/stream au combination anayofundisha. Kiungo cha mwaliko kitaonyeshwa baada ya usajili.</p>
-<div class="grid">
-<div><label>Full Name *</label><input id="tFullName" autocomplete="name" placeholder="Majina kamili ya mwalimu"></div>
-<div><label>Email Address *</label><input id="tEmail" type="email" autocomplete="email" placeholder="teacher@example.com"></div>
-<div><label>Phone</label><input id="tPhone" type="tel" placeholder="Namba ya simu"></div>
-</div>
-<h4>SUBJECTS / MASOMO ANAYOFUNDISHA *</h4>
-<div id="teacherSubjects" class="subject-list"></div>
-<h4>CLASSES / MADARASA ANAYOFUNDISHA *</h4>
-<div id="teacherAssignments"></div>
-<button type="button" class="secondary" onclick="addTeacherAssignment()">+ ADD CLASS / COMBINATION</button>
-<button type="button" id="registerTeacherBtn" onclick="registerTeacher()">REGISTER TEACHER & GENERATE INVITE LINK</button>
-<p id="teacherMessage" class="message"></p>
-<div id="teacherInviteResult" class="hidden"></div>
-</section>
+ <div id="teacherRegistrationSection" class="card hidden">
+  <h3>TEACHER REGISTRATION / INVITATION</h3>
+  <p class="small">Only authorised office accounts can invite teachers. The invitation link returned by the function is shown here; this page does not send email by itself.</p>
+  <input id="newTeacherName" placeholder="Teacher full name">
+  <input id="newTeacherEmail" type="email" placeholder="Teacher email">
+  <input id="newTeacherPhone" placeholder="Phone number">
+  <label>Education level</label><select id="inviteEducation" onchange="updateInviteForm()"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option><option value="Both">Both</option></select>
+  <label>Form level</label><select id="inviteForm"><option value="Form One">Form One</option><option value="Form Two">Form Two</option><option value="Form Three">Form Three</option><option value="Form Four">Form Four</option></select>
+  <div id="inviteStreamWrap"><label>Stream (O-Level)</label><select id="inviteStream"><option value="">Select stream</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></div>
+  <div id="inviteCombinationWrap" class="hidden"><label>Combination (A-Level)</label><input id="inviteCombination" placeholder="e.g. PCM"></div>
+  <label>Subjects (select one or more)</label><select id="inviteSubjects" multiple size="7">
+   <option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option>
+  </select><p class="small">On a phone, tap a subject to select it. To select several, use your device's multi-select method.</p>
+  <button id="inviteTeacherBtn" onclick="inviteTeacher()">REGISTER / SEND INVITATION</button><p id="inviteMessage"></p><div id="inviteLinkArea"></div>
+ </div>
 
+ <div id="uploadSection" class="card hidden"><h3>UPLOAD TEACHING MATERIALS</h3>
+  <input id="title" placeholder="Material Title">
+  <label>Material Type</label><select id="materialType"><option value="">Select Material Type</option><option>Scheme of Work</option><option>Lesson Plan</option><option>Lesson Notes</option><option>Notices</option><option>Tests and Exams</option><option>Question Bank</option><option>Teaching Resources</option></select>
+  <label>Subject</label><select id="subject"><option value="">Select Subject</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option></select>
+  <label>Class / Form</label><select id="className"><option value="">Select Class</option><option>Form One</option><option>Form Two</option><option>Form Three</option><option>Form Four</option><option>Form Five</option><option>Form Six</option></select>
+  <label>Academic Year</label><select id="academicYear"><option value="">Select Academic Year</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select>
+  <label>Select File</label><input id="file" type="file"><button id="uploadBtn" onclick="uploadMaterial()">UPLOAD MATERIAL</button><p id="uploadMessage"></p>
+ </div>
 
-<section id="resultsPanel" class="card hidden">
-<h3>EXAMINATION & RESULTS MANAGEMENT</h3>
-<p class="note">Alama ni kati ya 0 na 100. Walimu wanaona alama walizoingiza wao; matokeo ya jumla ya wanafunzi yanaonekana kwa walimu baada ya Admin au Taaluma kuchapisha.</p>
+ <div id="studentOfficeSection" class="card hidden"><h3>STUDENT REGISTRATION & REVIEW</h3>
+  <div id="studentFormArea" class="hidden">
+   <h4 id="studentFormTitle">REGISTER NEW STUDENT</h4>
+   <input id="studentEditId" type="hidden">
+   <div class="form-grid">
+    <div><label>Admission Number</label><input id="stAdmission" placeholder="Admission number"></div>
+    <div><label>First Name</label><input id="stFirst" placeholder="First name"></div>
+    <div><label>Middle Name</label><input id="stMiddle" placeholder="Middle name (optional)"></div>
+    <div><label>Last Name</label><input id="stLast" placeholder="Last name"></div>
+    <div><label>Gender</label><select id="stGender"><option value="">Select gender</option><option>Male</option><option>Female</option></select></div>
+    <div><label>Date of Birth</label><input id="stDob" type="date"></div>
+    <div><label>Education Level</label><select id="stLevel" onchange="updateStudentClassOptions()"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option></select></div>
+    <div><label>Class / Form</label><select id="stClass"></select></div>
+    <div><label>Combination (A-Level only)</label><input id="stCombination" placeholder="e.g. PCM"></div>
+    <div><label>Academic Year</label><input id="stYear" type="number" min="2020" max="2100" value="2026"></div>
+    <div><label>Guardian Name</label><input id="stGuardian" placeholder="Guardian name"></div>
+    <div><label>Guardian Phone</label><input id="stGuardianPhone" placeholder="Guardian phone"></div>
+    <div><label>Brought By Relationship</label><input id="stRelationship" placeholder="e.g. Parent"></div>
+    <div><label>Brought By Name</label><input id="stBroughtName" placeholder="Name of person bringing student"></div>
+    <div><label>Brought By Phone</label><input id="stBroughtPhone" placeholder="Phone number"></div>
+   </div>
+   <button id="studentSaveBtn" onclick="saveStudentRecord()">SUBMIT STUDENT FOR REVIEW</button>
+   <button class="secondary" onclick="cancelStudentEdit()">CANCEL</button><p id="studentFormMessage"></p>
+  </div>
+  <div id="studentListArea"><h4>STUDENT RECORDS</h4><div id="studentRecordsList">Loading...</div></div>
+ </div>
 
-<div id="examCreateBox" class="hidden">
-<h4>CREATE EXAMINATION</h4>
-<div class="grid">
-<div><label>Exam Name *</label><input id="examName" placeholder="e.g. Annual Examination"></div>
-<div><label>Exam Type *</label><select id="examType"><option value="">Select type</option><option>Weekly Test</option><option>Monthly Test</option><option>Mid-Term Examination</option><option>Terminal Examination</option><option>Annual Examination</option><option>Mock Examination</option><option>Other</option></select></div>
-<div><label>Education Level *</label><select id="examLevel"><option value="">Select level</option><option>O-Level</option><option>A-Level</option></select></div>
-<div><label>Class / Form *</label><select id="examClass"><option value="">Select level first</option></select></div>
-<div><label>Term *</label><select id="examTerm"><option value="">Select term</option><option>Term I</option><option>Term II</option><option>Term III</option></select></div>
-<div><label>Academic Year *</label><input id="examYear" type="number" min="2020" max="2100" value="2027"></div>
-<div><label>Exam Date</label><input id="examDate" type="date"></div>
-</div>
-<button type="button" id="createExamBtn" onclick="createExam()">CREATE EXAMINATION</button>
-<p id="examCreateMessage" class="message"></p>
-</div>
+ <div id="teacherAssignmentSection" class="card hidden"><h3>ASSIGN SUBJECTS & CLASSES TO REGISTERED TEACHERS</h3>
+  <p class="small">Admin and Academic Office can assign subjects and classes to teacher accounts that already exist.</p>
+  <label>Registered Teacher</label><select id="assignTeacher"><option value="">Select teacher</option></select>
+  <label>Education Level</label><select id="assignLevel" onchange="updateAssignmentClassOptions()"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option></select>
+  <label>Subject</label><select id="assignSubject"><option value="">Select subject</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option></select>
+  <label>Form Level</label><select id="assignForm"></select>
+  <div id="assignCombinationWrap" class="hidden"><label>A-Level Combination</label><input id="assignCombination" placeholder="e.g. PCM"></div>
+  <label>Academic Year</label><input id="assignYear" type="number" min="2020" max="2100" value="2026">
+  <button id="assignSaveBtn" onclick="saveTeacherAssignment()">SAVE TEACHER ASSIGNMENT</button><p id="assignmentMessage"></p>
+  <h4>Current Teacher Assignments</h4><div id="teacherAssignmentsList"></div>
+ </div>
 
-<div id="teacherMarksBox" class="hidden">
-<h4>TEACHER MARK ENTRY SHEET</h4>
-<div class="grid">
-<div><label>My Assigned Class & Subject *</label><select id="markAssignment" onchange="loadTeacherMarkSheet()"><option value="">Loading assignments...</option></select></div>
-<div><label>Examination *</label><select id="markExam" onchange="loadTeacherMarkSheet()"><option value="">Select assignment first</option></select></div>
-</div>
-<p id="markSheetInfo" class="note"></p>
-<div id="teacherMarkRows">Chagua assignment na examination.</div>
-<p id="teacherMarksMessage" class="message"></p>
-</div>
+ <div id="resultsOfficeSection" class="card hidden"><h3>EXAMINATION RESULTS - OFFICE</h3>
+  <div class="notice">Admin and Academic Office can monitor marks while teachers enter them. Only Admin or Academic Office can publish results.</div>
+  <h4>Create examination</h4><input id="examName" placeholder="Examination name">
+  <div class="grid2"><select id="examType"><option value="Terminal">Terminal</option><option value="Midterm">Midterm</option><option value="Annual">Annual</option><option value="Mock">Mock</option><option value="Other">Other</option></select>
+   <select id="examLevel"><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option></select></div>
+  <div class="grid2"><select id="examClass"><option value="">Select Form / Class</option><option>Form One</option><option>Form Two</option><option>Form Three</option><option>Form Four</option><option>Form Five</option><option>Form Six</option></select>
+   <select id="examTerm"><option value="Term 1">Term 1</option><option value="Term 2">Term 2</option><option value="Annual">Annual</option></select></div>
+  <div class="grid2"><input id="examYear" type="number" value="2026" placeholder="Academic year"><input id="examDate" type="date"></div>
+  <button onclick="createExam()">CREATE EXAM</button><p id="examMessage"></p>
+  <h4>Examinations and live marks</h4><div id="officeExams"></div>
+ </div>
 
-<div id="adminResultsBox" class="hidden">
-<h4>RESULTS REVIEW, MONITORING & PUBLISHING</h4>
-<div class="grid">
-<div><label>Select Examination</label><select id="adminExamSelect" onchange="loadExamReview()"> <option value="">Loading examinations...</option></select></div>
-</div>
-<p id="adminResultsMessage" class="message"></p>
-<div id="examReviewSummary"></div>
-<div id="examReviewRows">Chagua examination kuona maendeleo ya alama.</div>
-</div>
+ <div id="teacherResultsSection" class="card hidden"><h3>EXAMINATION RESULTS - TEACHER</h3>
+  <div class="notice">You may enter marks for your assigned classes and subjects. Student result views and reports remain locked until the office publishes the examination.</div>
+  <h4>Enter marks</h4><div id="teacherExamList"></div>
+  <h4>View</h4><div id="teacherResultsView"></div>
+  <h4>Generate Reports</h4><div id="teacherReports"></div>
+ </div>
 
-<div id="teacherPublishedBox" class="hidden">
-<h4>MY RESULTS</h4>
-<p class="note">Vitendo vya matokeo kwa mwalimu: View, Generate Reports na Print Results.</p>
-<div class="grid">
-<button type="button" class="secondary" onclick="viewTeacherPublishedResults()">VIEW</button>
-<button type="button" onclick="generateTeacherReports()">GENERATE REPORTS</button>
-<button type="button" class="approve" onclick="printTeacherResults()">PRINT RESULTS</button>
-</div>
-<div id="teacherPublishedResults"></div>
-</div>
-</section>
-
-<section id="printStudentId" class="hidden" aria-live="polite"></section>
-
-<section id="resourcePanel" class="card hidden">
-<h3>TEACHERS RESOURCE MANAGEMENT</h3>
-<div id="resourceUpload" class="hidden">
-<h4>UPLOAD TEACHING MATERIAL</h4>
-<input id="mTitle" placeholder="Material title">
-<select id="mType"><option value="">Select material type</option><option>Scheme of Work</option><option>Lesson Plan</option><option>Lesson Notes</option><option>Notices</option><option>Tests and Exams</option><option>Question Bank</option><option>Teaching Resources</option></select>
-<select id="mSubject"><option value="">Select subject</option><option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Kiswahili</option><option>English</option><option>Geography</option><option>History</option><option>Historia ya Tanzania na Maadili</option><option>Business Studies</option><option>Book Keeping</option><option>Computer Applications</option><option>EDK</option><option>Sports Studies</option><option>Football Performance</option><option>Netball Performance</option></select>
-<select id="mClass"><option value="">Select class</option><option>Form One</option><option>Form Two</option><option>Form Three</option><option>Form Four</option><option>Form Five</option><option>Form Six</option></select>
-<select id="mYear"><option value="">Select academic year</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select>
-<input id="mFile" type="file">
-<button onclick="uploadMaterial()" id="uploadBtn">UPLOAD MATERIAL</button><p id="uploadMessage" class="message"></p>
-</div>
-<h4>TEACHING MATERIALS</h4><div id="materialsList">Loading...</div>
-</section>
-<div class="card"><button class="logout" onclick="logout()">LOG OUT</button></div>
+ <div class="dashboard-footer"><button class="logout" onclick="logout()">LOG OUT</button></div>
 </section>
 
 <script>
@@ -222,600 +139,528 @@ const SUPABASE_URL="https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY="sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 const BUCKET="kishimba-teaching-materials";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const STUDENT_PHOTO_BUCKET="student-photos";
-let studentCameraStream=null, studentPhotoBlob=null;
-let currentUser=null,currentTeacher=null,studentRows=[];
+let currentUser=null,currentTeacher=null,currentRole="",currentTeacherId=null;
+let cachedExams=[],cachedStudents=[],cachedTeacherSubjects=[];
 
-function role(){
- const r=String(currentTeacher?.role||"").trim().toLowerCase();
- if(["admin","administrator"].includes(r))return "admin";
- if(["headmaster","head of school","mkuu wa shule","head teacher"].includes(r))return "headmaster";
- if(["academic","academic office","taaluma","ofisi ya taaluma"].includes(r))return "academic";
- if(["teacher","mwalimu"].includes(r))return "teacher";
- return r;
-}
+function norm(v){return String(v??"").trim().toLowerCase()}
+function getRole(){return currentRole||norm(currentTeacher?.role)}
+function isAdmin(){return getRole()==="admin"}
+function isOffice(){return ["admin","academic"].includes(getRole())}
+function formatDate(v){return v?new Date(v).toLocaleString():"Date unavailable"}
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n}
-function msg(id,text){document.getElementById(id).textContent=text}
-function updateClasses(){
- const level=document.getElementById("sLevel").value,sel=document.getElementById("sClass");
- sel.innerHTML='<option value="">Select class</option>';
- const classes=level==="O-Level"?["Form One","Form Two","Form Three","Form Four"]:level==="A-Level"?["Form Five","Form Six"]:[];
- classes.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;sel.appendChild(o)});
-}
+function statusClass(v){const s=norm(v);if(s==="draft")return"draft";if(s.includes("return"))return"returned";if(s.includes("approv"))return"approved";if(s.includes("forward"))return"forwarded";if(s.includes("check"))return"checked";return"pending"}
+function show(id,yes=true){document.getElementById(id).classList.toggle("hidden",!yes)}
+function safeText(v){return String(v??"")}
+
 async function login(){
- const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value,b=document.getElementById("loginBtn");
- if(!email||!password){msg("loginMessage","Enter email and password.");return}
- b.disabled=true;msg("loginMessage","Please wait...");
- try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error){msg("loginMessage","LOGIN ERROR: "+error.message);return}await loadDashboard(data.user)}
- catch(e){msg("loginMessage","LOGIN ERROR: "+e.message)}finally{b.disabled=false}
+ const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value,msg=document.getElementById("loginMessage"),btn=document.getElementById("loginBtn");
+ if(!email||!password){msg.textContent="Enter email and password.";return}
+ btn.disabled=true;msg.textContent="Please wait...";
+ try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error){msg.textContent="LOGIN ERROR: "+error.message;return}await loadDashboard(data.user)}
+ catch(e){msg.textContent="LOGIN ERROR: "+e.message}finally{btn.disabled=false}
 }
+
 async function loadDashboard(user){
- currentUser=user;
- const {data:teacher,error}=await db.from("teachers").select("*").eq("user_id",user.id).maybeSingle();
- if(error){msg("loginMessage","PROFILE ERROR: "+error.message);return}
- if(!teacher){msg("loginMessage","Teacher profile not found. Contact Administrator.");await db.auth.signOut();return}
- currentTeacher=teacher;const r=role();
- if(!["admin","headmaster","academic","teacher"].includes(r)){msg("loginMessage","Unknown role: "+teacher.role);return}
- document.getElementById("login").classList.add("hidden");document.getElementById("dashboard").classList.remove("hidden");
- document.getElementById("welcome").textContent="WELCOME "+(teacher.full_name||user.email);
- document.getElementById("roleDisplay").textContent="Role: "+teacher.role;
- const tiles=document.getElementById("mainTiles");tiles.innerHTML="";
- document.getElementById("studentPanel").classList.add("hidden");document.getElementById("resourcePanel").classList.add("hidden");document.getElementById("teacherPanel").classList.add("hidden");
- if(r==="admin"||r==="headmaster"){
-  addTile(tiles,"STUDENT REGISTRATION","Open student registration dashboard",()=>openPanel("studentPanel"));
-  document.getElementById("studentPanel").classList.remove("hidden");await loadStudents();
- }
- if(["admin","headmaster","academic"].includes(r)){
-  addTile(tiles,"TEACHER REGISTRATION","Register teachers, subjects and class assignments",()=>openPanel("teacherPanel"));
-  buildTeacherSubjectOptions();
-  if(r==="academic")document.getElementById("teacherPanel").classList.remove("hidden");
- }
- if(["admin","academic","headmaster"].includes(r)){
-  addTile(tiles,"EXAMINATIONS & RESULTS","Create examinations, review marks and publish results",()=>openPanel("resultsPanel"));
- }
- if(r==="teacher"){
-  addTile(tiles,"MY RESULTS","Enter marks and view published results",()=>openPanel("resultsPanel"));
- }
- addTile(tiles,"TEACHERS RESOURCES","Open teaching materials",()=>openPanel("resourcePanel"));
- if(r==="teacher")document.getElementById("resourcePanel").classList.remove("hidden");
- if(r==="teacher")document.getElementById("resourceUpload").classList.remove("hidden");
- else document.getElementById("resourceUpload").classList.add("hidden");
- await loadMaterials();
- await initializeResultsPanel();
+ const msg=document.getElementById("loginMessage");currentUser=user;
+ try{
+  let {data:teacher,error}=await db.from("teachers").select("*").eq("user_id",user.id).maybeSingle();
+  if(error){msg.textContent="PROFILE ERROR: "+error.message;return}
+  if(!teacher){const fallback=await db.from("teachers").select("*").eq("id",user.id).maybeSingle();if(fallback.error){msg.textContent="PROFILE ERROR: "+fallback.error.message;return}teacher=fallback.data}
+  if(!teacher){msg.textContent="Teacher profile not found. Contact Administrator.";await db.auth.signOut();currentUser=null;return}
+  currentTeacher=teacher;currentTeacherId=teacher.id;
+  const roleRow=await db.from("user_roles").select("role").eq("user_id",user.id).maybeSingle();
+  currentRole=normaliseRole(roleRow.data?.role||teacher.role);
+  document.getElementById("login").classList.add("hidden");show("dashboard");
+  document.getElementById("welcome").textContent="WELCOME "+(teacher.full_name||user.email);
+  document.getElementById("roleDisplay").textContent="Role: "+(roleRow.data?.role||teacher.role||"Unknown");
+  ["adminSection","academicSection","headmasterSection","teacherSection","teacherRegistrationSection","uploadSection","resultsOfficeSection","teacherResultsSection","studentOfficeSection","teacherAssignmentSection"].forEach(id=>show(id,false));
+  if(currentRole==="admin"){show("adminSection");show("teacherRegistrationSection");show("resultsOfficeSection");show("studentOfficeSection");show("studentFormArea");show("teacherAssignmentSection");await loadTeachers()}
+  else if(currentRole==="academic"){show("academicSection");show("teacherRegistrationSection");show("resultsOfficeSection");show("teacherAssignmentSection")}
+  else if(currentRole==="headmaster"){show("headmasterSection");show("teacherRegistrationSection");show("studentOfficeSection");show("studentFormArea")}
+  else if(currentRole==="teacher"){show("teacherSection");show("uploadSection");show("teacherResultsSection")}
+  else{msg.textContent="Unknown user role: "+(teacher.role||roleRow.data?.role)+". Contact Administrator.";return}
+  await loadMaterials();
+  if(currentRole==="admin"||currentRole==="headmaster")await loadStudentRecords();
+  if(currentRole==="admin"||currentRole==="academic"){await loadOfficeExams();await loadAssignmentTeachers();await loadTeacherAssignments();}
+  if(currentRole==="teacher")await loadTeacherResults();
+ }catch(e){msg.textContent="DASHBOARD ERROR: "+e.message}
 }
-function addTile(parent,title,desc,fn){const d=el("div",undefined,"tile");d.appendChild(el("b",title));d.appendChild(el("p",desc));const b=el("button","OPEN");b.onclick=fn;d.appendChild(b);parent.appendChild(d)}
-function openPanel(id){["studentPanel","resourcePanel","teacherPanel","resultsPanel"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden");if(id==="resultsPanel")initializeResultsPanel()}
-const TEACHER_SUBJECTS=["Mathematics","Physics","Chemistry","Biology","Kiswahili","English","Geography","History","Historia ya Tanzania na Maadili","Business Studies","Book Keeping","Computer Applications","EDK","Sports Studies","Football Performance","Netball Performance"];
-function buildTeacherSubjectOptions(){
- const box=document.getElementById("teacherSubjects");if(!box||box.children.length)return;
- TEACHER_SUBJECTS.forEach((subject,i)=>{const label=el("label",undefined,"subject-option");const input=document.createElement("input");input.type="checkbox";input.value=subject;input.id="tSubject"+i;label.appendChild(input);label.appendChild(el("span",subject));box.appendChild(label)});
- if(!document.querySelector(".assignment-row"))addTeacherAssignment();
+function normaliseRole(v){const r=norm(v);if(["admin","administrator"].includes(r))return"admin";if(["academic","academic office","taaluma","ofisi ya taaluma"].includes(r))return"academic";if(["headmaster","headteacher","head of school","mkuu wa shule","head teacher"].includes(r))return"headmaster";if(["teacher","mwalimu"].includes(r))return"teacher";return r}
+
+async function loadTeachers(){
+ const list=document.getElementById("teachersList");list.textContent="Loading teachers...";
+ const {data,error}=await db.from("teachers").select("id,full_name,email,staff_id,role").order("full_name");
+ if(error){list.textContent="TEACHERS ERROR: "+error.message;return}list.innerHTML="";
+ if(!data?.length){list.textContent="No teachers found.";return}
+ data.forEach(t=>list.appendChild(el("div",`${t.full_name||"Teacher"} | ${t.email||""} | ${t.staff_id||""} | ${t.role||"teacher"}`,"item")))
 }
-function addTeacherAssignment(){
- const box=document.getElementById("teacherAssignments");const row=el("div",undefined,"assignment-row");
- const level=document.createElement("select");level.className="assignment-level";level.innerHTML='<option value="">Select education level</option><option value="O-Level">O-Level</option><option value="A-Level">A-Level</option>';
- const form=document.createElement("select");form.className="assignment-form";form.innerHTML='<option value="">Select Form</option>';
- const combination=document.createElement("input");combination.className="assignment-combination";combination.placeholder="Combination e.g. PCM, PCB, HGL";
- const remove=el("button","REMOVE","danger");remove.type="button";remove.onclick=()=>{if(box.children.length>1)row.remove();else alert("Angalau darasa moja linahitajika.")};
- level.onchange=()=>{form.innerHTML='<option value="">Select Form</option>';const forms=level.value==="O-Level"?["Form One","Form Two","Form Three","Form Four"]:level.value==="A-Level"?["Form Five","Form Six"]:[];forms.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;form.appendChild(o)});combination.classList.toggle("hidden",level.value!=="A-Level")};
- combination.classList.add("hidden");
- row.appendChild(el("label","Education Level"));row.appendChild(level);row.appendChild(el("label","Form"));row.appendChild(form);row.appendChild(el("label","A-Level Combination"));row.appendChild(combination);row.appendChild(remove);box.appendChild(row);
+function updateStudentClassOptions(){
+ const level=document.getElementById("stLevel").value,box=document.getElementById("stClass");box.innerHTML="";
+ (level==="A-Level"?["Form Five","Form Six"]:["Form One","Form Two","Form Three","Form Four"]).forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;box.appendChild(o)});
 }
-function getTeacherAssignments(){
- return Array.from(document.querySelectorAll(".assignment-row")).map(row=>{
-  const education_level=row.querySelector(".assignment-level").value;
-  const form_level=row.querySelector(".assignment-form").value;
-  return {education_level,form_level,combination:education_level==="A-Level"?row.querySelector(".assignment-combination").value.trim().toUpperCase():null};
+function updateAssignmentClassOptions(){
+ const level=document.getElementById("assignLevel").value,box=document.getElementById("assignForm");box.innerHTML="";
+ (level==="A-Level"?["Form Five","Form Six"]:["Form One","Form Two","Form Three","Form Four"]).forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;box.appendChild(o)});
+ show("assignCombinationWrap",level==="A-Level");
+}
+function resetStudentForm(){
+ ["studentEditId","stAdmission","stFirst","stMiddle","stLast","stGender","stDob","stCombination","stGuardian","stGuardianPhone","stRelationship","stBroughtName","stBroughtPhone"].forEach(id=>document.getElementById(id).value="");
+ document.getElementById("stYear").value=new Date().getFullYear();document.getElementById("stLevel").value="O-Level";updateStudentClassOptions();
+ document.getElementById("studentFormTitle").textContent="REGISTER NEW STUDENT";document.getElementById("studentSaveBtn").textContent="SUBMIT STUDENT FOR REVIEW";document.getElementById("studentFormMessage").textContent="";
+}
+function cancelStudentEdit(){resetStudentForm();}
+async function loadStudentRecords(){
+ const box=document.getElementById("studentRecordsList");if(!box)return;box.textContent="Loading student records...";
+ let q=db.from("students").select("*").order("created_at",{ascending:false});
+ if(getRole()==="headmaster")q=q.eq("submitted_by",currentUser.id);
+ const {data,error}=await q;if(error){box.textContent="STUDENT RECORDS ERROR: "+error.message;return}
+ const rows=data||[];box.innerHTML="";if(!rows.length){box.textContent="No student records found.";return}
+ rows.forEach(st=>{
+  const card=el("div",undefined,"student-card"),name=[st.first_name,st.middle_name,st.last_name].filter(Boolean).join(" ");
+  card.appendChild(el("strong",(st.admission_number||"No admission number")+" | "+name));
+  card.appendChild(el("p",[st.education_level,st.class_name,st.combination,st.academic_year].filter(Boolean).join(" | ")));
+  const status=st.review_status||st.registration_status||"Unknown";card.appendChild(el("span",String(status).toUpperCase(),"status "+statusClass(status)));
+  if(st.admin_feedback)card.appendChild(el("p","Admin feedback: "+st.admin_feedback));
+  if(getRole()==="admin"){
+   if(norm(st.review_status)==="submitted"||norm(st.review_status)==="pending"){
+    const feedback=el("textarea");feedback.placeholder="Reason / comments (required when returning)";card.appendChild(feedback);
+    const actions=el("div",undefined,"grid2"),approve=el("button","APPROVE","approve-button"),ret=el("button","RETURN FOR CORRECTION","return-academic");
+    approve.onclick=()=>reviewStudentRecord(st,"Approved",feedback.value);ret.onclick=()=>{if(!feedback.value.trim()){alert("Write the reason for returning this form.");return}reviewStudentRecord(st,"Returned",feedback.value)};
+    actions.append(approve,ret);card.appendChild(actions);
+   }
+  }else if(getRole()==="headmaster"&&norm(st.review_status)==="returned"&&st.submitted_by===currentUser.id){
+   const edit=el("button","EDIT AND RESUBMIT","send-button");edit.onclick=()=>editReturnedStudent(st);card.appendChild(edit);
+  }
+  box.appendChild(card);
  });
 }
-async function registerTeacher(){
- if(!["admin","headmaster","academic"].includes(role())){msg("teacherMessage","Huna ruhusa ya kusajili walimu.");return}
- const full_name=document.getElementById("tFullName").value.trim();
- const email=document.getElementById("tEmail").value.trim().toLowerCase();
- const phone=document.getElementById("tPhone").value.trim();
- const subjects=Array.from(document.querySelectorAll("#teacherSubjects input:checked")).map(x=>x.value);
- const assignments=getTeacherAssignments();
- if(!full_name||!email||!subjects.length){msg("teacherMessage","Jaza jina, email na chagua angalau somo moja.");return}
- if(assignments.some(a=>!a.education_level||!a.form_level||(a.education_level==="A-Level"&&!a.combination))){msg("teacherMessage","Kamilisha taarifa za kila darasa na A-Level combination inapohitajika.");return}
- const btn=document.getElementById("registerTeacherBtn");btn.disabled=true;msg("teacherMessage","Inasajili mwalimu, tafadhali subiri...");document.getElementById("teacherInviteResult").classList.add("hidden");
+async function saveStudentRecord(){
+ if(!["admin","headmaster"].includes(getRole())){alert("Only authorised school offices can submit student registrations.");return}
+ const v=id=>document.getElementById(id).value.trim(),id=v("studentEditId"),level=v("stLevel"),cls=v("stClass"),year=Number(v("stYear"));
+ const admission_number=v("stAdmission"),first_name=v("stFirst"),last_name=v("stLast");
+ if(!admission_number||!first_name||!last_name||!cls||!year){document.getElementById("studentFormMessage").textContent="Admission number, first name, last name, class and academic year are required.";return}
+ const record={admission_number,first_name,middle_name:v("stMiddle")||null,last_name,gender:v("stGender")||null,date_of_birth:v("stDob")||null,education_level:level,class_name:cls,combination:level==="A-Level"?(v("stCombination")||null):null,academic_year:year,guardian_name:v("stGuardian")||null,guardian_phone:v("stGuardianPhone")||null,brought_by_relationship:v("stRelationship")||null,brought_by_name:v("stBroughtName")||null,brought_by_phone:v("stBroughtPhone")||null};
+ const btn=document.getElementById("studentSaveBtn"),msg=document.getElementById("studentFormMessage");btn.disabled=true;msg.textContent="Saving student record...";
+ try{
+  let result;
+  if(id){
+   result=await db.from("students").update({...record,review_status:"Submitted",registration_status:"Pending",admin_feedback:null,submitted_at:new Date().toISOString(),reviewed_at:null,reviewed_by:null}).eq("id",id).eq("submitted_by",currentUser.id).eq("review_status","Returned").select("id").maybeSingle();
+  }else{
+   result=await db.from("students").insert({...record,submitted_by:currentUser.id,review_status:"Submitted",registration_status:"Pending",submitted_at:new Date().toISOString()}).select("id").single();
+  }
+  if(result.error){msg.textContent="SAVE ERROR: "+result.error.message;return}
+  if(id&&!result.data){msg.textContent="No record updated. It may no longer be in Returned status, or permissions prevented the update.";return}
+  msg.textContent="Student submitted successfully for Administrator review.";resetStudentForm();await loadStudentRecords();
+ }catch(e){msg.textContent="SAVE ERROR: "+e.message}finally{btn.disabled=false}
+}
+function editReturnedStudent(st){
+ if(getRole()!=="headmaster"||st.submitted_by!==currentUser.id||norm(st.review_status)!=="returned")return;
+ const vals={studentEditId:st.id,stAdmission:st.admission_number,stFirst:st.first_name,stMiddle:st.middle_name,stLast:st.last_name,stGender:st.gender,stDob:st.date_of_birth,stLevel:st.education_level,stCombination:st.combination,stYear:st.academic_year,stGuardian:st.guardian_name,stGuardianPhone:st.guardian_phone,stRelationship:st.brought_by_relationship,stBroughtName:st.brought_by_name,stBroughtPhone:st.brought_by_phone};
+ Object.entries(vals).forEach(([k,v])=>document.getElementById(k).value=v??"");updateStudentClassOptions();document.getElementById("stClass").value=st.class_name||"";
+ document.getElementById("studentFormTitle").textContent="CORRECT RETURNED STUDENT DETAILS";document.getElementById("studentSaveBtn").textContent="RESUBMIT TO ADMINISTRATOR";document.getElementById("studentFormMessage").textContent="Correct the details then resubmit.";document.getElementById("studentFormArea").scrollIntoView({behavior:"smooth"});
+}
+async function reviewStudentRecord(st,status,feedback){
+ if(getRole()!=="admin")return;if(!confirm("Confirm student status: "+status+"?"))return;
+ const {data,error}=await db.from("students").update({review_status:status,registration_status:status,admin_feedback:feedback.trim()||null,reviewed_at:new Date().toISOString(),reviewed_by:currentUser.id}).eq("id",st.id).select("id").maybeSingle();
+ if(error){alert("REVIEW ERROR: "+error.message);return}if(!data){alert("No student record was updated. Check database permissions.");return}
+ alert("Student record marked "+status+".");await loadStudentRecords();
+}
+async function loadAssignmentTeachers(){
+ const box=document.getElementById("assignTeacher");if(!box)return;box.innerHTML="<option value=''>Loading teachers...</option>";
+ const {data,error}=await db.from("teachers").select("id,full_name,email,staff_id,role").order("full_name");
+ box.innerHTML="<option value=''>Select teacher</option>";
+ if(error){document.getElementById("assignmentMessage").textContent="TEACHER LIST ERROR: "+error.message;return}
+ (data||[]).filter(t=>norm(t.role)==="teacher").forEach(t=>{const o=document.createElement("option");o.value=t.id;o.textContent=(t.full_name||t.email||"Teacher")+(t.staff_id?" | "+t.staff_id:"");box.appendChild(o)});
+}
+async function saveTeacherAssignment(){
+ if(!["admin","academic"].includes(getRole())){alert("Admin or Academic Office only.");return}
+ const teacher_id=document.getElementById("assignTeacher").value,subject=document.getElementById("assignSubject").value,education_level=document.getElementById("assignLevel").value,form_level=document.getElementById("assignForm").value,combination=document.getElementById("assignCombination").value.trim(),academic_year=Number(document.getElementById("assignYear").value),msg=document.getElementById("assignmentMessage"),btn=document.getElementById("assignSaveBtn");
+ if(!teacher_id||!subject||!form_level||!academic_year||(education_level==="A-Level"&&!combination)){msg.textContent="Complete teacher, subject, class, academic year and A-Level combination where applicable.";return}
+ btn.disabled=true;msg.textContent="Saving assignment...";
+ try{
+  let matchQuery=db.from("teacher_subject_assignments").select("id").eq("teacher_id",teacher_id).eq("subject",subject).eq("education_level",education_level).eq("form_level",form_level).eq("academic_year",academic_year);
+  matchQuery=education_level==="A-Level"?matchQuery.eq("combination",combination):matchQuery.is("combination",null);
+  const match=await matchQuery.maybeSingle();
+  if(match.error)throw new Error(match.error.message);
+  const values={teacher_id,subject,education_level,form_level,combination:education_level==="A-Level"?combination:null,academic_year,is_active:true};
+  const result=match.data?await db.from("teacher_subject_assignments").update({is_active:true}).eq("id",match.data.id).select("id").maybeSingle():await db.from("teacher_subject_assignments").insert(values).select("id").single();
+  if(result.error)throw new Error(result.error.message);msg.textContent="Teacher assignment saved successfully.";await loadTeacherAssignments();
+ }catch(e){msg.textContent="ASSIGNMENT ERROR: "+e.message}finally{btn.disabled=false}
+}
+async function loadTeacherAssignments(){
+ const box=document.getElementById("teacherAssignmentsList");if(!box)return;box.textContent="Loading assignments...";
+ const {data,error}=await db.from("teacher_subject_assignments").select("id,teacher_id,subject,education_level,form_level,combination,academic_year,is_active").order("created_at",{ascending:false});
+ if(error){box.textContent="ASSIGNMENTS ERROR: "+error.message;return}
+ const rows=data||[];if(!rows.length){box.textContent="No assignments found.";return}const ids=[...new Set(rows.map(x=>x.teacher_id))],t=await db.from("teachers").select("id,full_name,email").in("id",ids),names={};(t.data||[]).forEach(x=>names[x.id]=x.full_name||x.email||"Teacher");
+ box.innerHTML="";rows.forEach(a=>{const line=el("div",undefined,"item");line.appendChild(el("strong",names[a.teacher_id]||"Teacher"));line.appendChild(el("p",[a.subject,a.education_level,a.form_level,a.combination,a.academic_year,a.is_active?"Active":"Inactive"].filter(Boolean).join(" | ")));box.appendChild(line)});
+}
+
+function updateInviteForm(){
+ const level=document.getElementById("inviteEducation").value;
+ show("inviteStreamWrap",level!=="A-Level");show("inviteCombinationWrap",level!=="O-Level");
+ const form=document.getElementById("inviteForm");form.innerHTML="";
+ const forms=level==="A-Level"?["Form Five","Form Six"]:level==="Both"?["Form One","Form Five"]:["Form One","Form Two","Form Three","Form Four"];
+ forms.forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;form.appendChild(o)});
+}
+async function inviteTeacher(){
+ if(!["admin","academic","headmaster"].includes(getRole())){alert("Authorised office account required.");return}
+ const full_name=document.getElementById("newTeacherName").value.trim(),email=document.getElementById("newTeacherEmail").value.trim(),phone=document.getElementById("newTeacherPhone").value.trim();
+ const education_level=document.getElementById("inviteEducation").value,form_level=document.getElementById("inviteForm").value;
+ const stream=document.getElementById("inviteStream").value,combination=document.getElementById("inviteCombination").value.trim();
+ const subjects=[...document.getElementById("inviteSubjects").selectedOptions].map(o=>o.value);
+ const msg=document.getElementById("inviteMessage"),btn=document.getElementById("inviteTeacherBtn");
+ if(!full_name||!email||!phone||!subjects.length){msg.textContent="Complete name, email, phone and select at least one subject.";return}
+ if(education_level!=="A-Level"&&!stream){msg.textContent="Select an O-Level stream.";return}
+ if(education_level!=="O-Level"&&!combination){msg.textContent="Enter the A-Level combination.";return}
+ const assignments=[];
+ if(education_level==="O-Level"||education_level==="Both")assignments.push({education_level:"O-Level",form_level:education_level==="Both"?"Form One":form_level,stream,combination:null});
+ if(education_level==="A-Level"||education_level==="Both")assignments.push({education_level:"A-Level",form_level:education_level==="Both"?"Form Five":form_level,stream:null,combination:education_level==="Both"?"":combination});
+ btn.disabled=true;msg.textContent="Registering teacher...";
  try{
   const {data,error}=await db.functions.invoke("teacherinvite",{body:{full_name,email,phone,subjects,assignments}});
-  if(error)throw new Error(error.message||"Edge Function request failed.");
-  if(data?.error)throw new Error(data.error);
-  if(!data?.success||!data?.invite_link)throw new Error("Majibu ya usajili hayajakamilika.");
-  msg("teacherMessage",data.message||"Mwalimu amesajiliwa.");
-  const result=document.getElementById("teacherInviteResult");result.classList.remove("hidden");result.innerHTML="";
-  result.appendChild(el("h4","TEACHER INVITATION LINK"));
-  const link=el("p",data.invite_link,"link-box");link.id="teacherInviteLink";result.appendChild(link);
-  const copy=el("button","COPY INVITE LINK","secondary");copy.type="button";copy.onclick=async()=>{try{await navigator.clipboard.writeText(data.invite_link);alert("Invite link copied. Share it privately with the teacher.")}catch(e){alert("Copy haikufanikiwa. Chagua link kisha Copy.")}};result.appendChild(copy);
-  result.appendChild(el("p","Tuma kiungo hiki kwa mwalimu husika kupitia WhatsApp. Usikishiriki hadharani.","note"));
-  document.getElementById("tFullName").value="";document.getElementById("tEmail").value="";document.getElementById("tPhone").value="";document.querySelectorAll("#teacherSubjects input").forEach(x=>x.checked=false);
-  document.getElementById("teacherAssignments").innerHTML="";addTeacherAssignment();
- }catch(e){msg("teacherMessage","REGISTRATION ERROR: "+e.message)}finally{btn.disabled=false}
-}
-
-async function startStudentCamera(){
- try{
-  if(!navigator.mediaDevices?.getUserMedia){msg("cameraMessage","Kamera haiwezi kufunguliwa hapa. Fungua tovuti kwa HTTPS na browser inayoruhusu kamera.");return}
-  stopStudentCamera();
-  studentCameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:1280},height:{ideal:960}},audio:false});
-  const video=document.getElementById("studentCamera");video.srcObject=studentCameraStream;await video.play();
-  adjustPhotoBrightness(document.getElementById("photoBrightness").value);msg("cameraMessage","Kamera imefunguka. Weka mwanafunzi vizuri kisha bonyeza CAPTURE PHOTO.");
- }catch(e){msg("cameraMessage","CAMERA ERROR: "+e.message+". Hakikisha umeruhusu camera na unatumia HTTPS.")}
-}
-function stopStudentCamera(){if(studentCameraStream){studentCameraStream.getTracks().forEach(t=>t.stop());studentCameraStream=null}const v=document.getElementById("studentCamera");if(v)v.srcObject=null}
-function adjustPhotoBrightness(value){document.getElementById("brightnessValue").textContent=value+"%";document.getElementById("studentCamera").style.filter=`brightness(${value}%)`;}
-function captureStudentPhoto(){
- const video=document.getElementById("studentCamera");if(!studentCameraStream||!video.videoWidth){msg("cameraMessage","Fungua kamera kwanza.");return}
- const canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;
- const ctx=canvas.getContext("2d"),brightness=Number(document.getElementById("photoBrightness").value)/100;
- ctx.filter=`brightness(${brightness})`;ctx.drawImage(video,0,0,canvas.width,canvas.height);
- canvas.toBlob(blob=>{if(!blob){msg("cameraMessage","Imeshindikana kutengeneza picha.");return}studentPhotoBlob=blob;const url=URL.createObjectURL(blob);const img=document.getElementById("studentPhotoPreview");img.src=url;img.classList.remove("hidden");msg("cameraMessage","Picha imepigwa. Imehifadhiwa tayari kwa kuunganishwa na usajili.");},"image/jpeg",0.92);
-}
-function retakeStudentPhoto(){studentPhotoBlob=null;const img=document.getElementById("studentPhotoPreview");img.src="";img.classList.add("hidden");msg("cameraMessage","Piga picha mpya kwa kubonyeza CAPTURE PHOTO.");}
-async function uploadStudentPhoto(studentId){
- if(!studentPhotoBlob)return null;
- const path=`${studentId}/${Date.now()}.jpg`;
- const {error}=await db.storage.from(STUDENT_PHOTO_BUCKET).upload(path,studentPhotoBlob,{contentType:"image/jpeg",upsert:true});
- if(error)throw new Error("Picha haijahifadhiwa. Hakikisha bucket 'student-photos' ipo: "+error.message);
- const {error:updateError}=await db.from("students").update({photo_path:path}).eq("id",studentId);
- if(updateError)throw new Error("Picha imepakiwa lakini photo_path haikuandikwa kwenye students: "+updateError.message);
- return path;
-}
-async function registerStudent(){
- if(!["admin","headmaster"].includes(role())){msg("studentMessage","Access denied.");return}
- const v=id=>document.getElementById(id).value.trim();
- const first=v("sFirst"),last=v("sLast"),level=v("sLevel"),cls=v("sClass"),year=Number(v("sYear")),comb=v("sCombination");
- if(!first||!last||!level||!cls||!year){msg("studentMessage","Jaza First Name, Last Name, Education Level, Class na Academic Year.");return}
- if(level==="A-Level"&&!comb){msg("studentMessage","A-Level student lazima awe na combination.");return}
- const b=document.getElementById("registerBtn");b.disabled=true;msg("studentMessage","Saving student...");
- const record={
-  first_name:first,middle_name:v("sMiddle")||null,last_name:last,
-  gender:v("sGender")||null,date_of_birth:v("sDob")||null,
-  education_level:level,class_name:cls,combination:comb||null,
-  academic_year:year,guardian_name:v("sGuardian")||null,
-  guardian_phone:v("sGuardianPhone")||null,
-  brought_by_relationship:v("sRelationship")||null,
-  brought_by_name:v("sBroughtName")||null,brought_by_phone:v("sBroughtPhone")||null,
-  review_status:"Submitted",submitted_at:new Date().toISOString()
- };
- try{
-  const {data,error}=await db.from("students").insert(record).select("id,admission_number").single();
-  if(error){msg("studentMessage","REGISTRATION ERROR: "+error.message);return}
-  if(studentPhotoBlob){try{await uploadStudentPhoto(data.id)}catch(photoError){msg("studentMessage","Usajili umehifadhiwa: "+data.admission_number+". PHOTO ERROR: "+photoError.message);return}}
-  msg("studentMessage","Student saved successfully. Admission number: "+data.admission_number+(studentPhotoBlob?" — photo saved.":" — no photo attached."));
-  studentPhotoBlob=null;document.getElementById("studentPhotoPreview").classList.add("hidden");stopStudentCamera();
-  ["sFirst","sMiddle","sLast","sDob","sCombination","sGuardian","sGuardianPhone","sRelationship","sBroughtName","sBroughtPhone"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("sGender").value="";document.getElementById("sLevel").value="";updateClasses();
-  await loadStudents();
- }catch(e){msg("studentMessage","ERROR: "+e.message)}finally{b.disabled=false}
-}
-async function loadStudents(){
- if(!["admin","headmaster"].includes(role()))return;
- const box=document.getElementById("studentsList");box.textContent="Loading students...";
- let q=db.from("students").select("*").order("created_at",{ascending:false});
- const level=document.getElementById("filterLevel").value,year=document.getElementById("filterYear").value;
- if(level)q=q.eq("education_level",level);if(year)q=q.eq("academic_year",Number(year));
- const {data,error}=await q;
- if(error){box.textContent="STUDENTS ERROR: "+error.message;return}
- studentRows=data||[];
- document.getElementById("oCount").textContent="O-Level records: "+studentRows.filter(s=>s.education_level==="O-Level").length;
- document.getElementById("aCount").textContent="A-Level records: "+studentRows.filter(s=>s.education_level==="A-Level").length;
- renderStudents(studentRows);
-}
-function filterStudentRows(){
- const term=document.getElementById("studentSearch").value.toLowerCase();
- renderStudents(studentRows.filter(s=>[s.admission_number,s.first_name,s.middle_name,s.last_name].join(" ").toLowerCase().includes(term)));
-}
-function renderStudents(rows){
- const box=document.getElementById("studentsList");box.innerHTML="";
- if(!rows.length){box.textContent="No students found.";return}
- rows.forEach(s=>{
-  const item=el("div",undefined,"item");
-  item.appendChild(el("h4",(s.admission_number||"Admission number pending")+" — "+[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")));
-  item.appendChild(el("p",[s.education_level,s.class_name,"Year "+s.academic_year,s.combination].filter(Boolean).join(" | ")));
-  item.appendChild(el("span",(s.review_status||"Not reviewed").toUpperCase(),"status "+(s.review_status==="Approved"?"approved":s.review_status==="Returned"?"returned":"pending")));
-  item.appendChild(el("p","Guardian: "+(s.guardian_name||"-")+" | Phone: "+(s.guardian_phone||"-")));
-  if(["admin","headmaster"].includes(role())){
-   const actions=el("div",undefined,"id-actions");
-   if(String(s.review_status||"").toLowerCase()==="approved"){
-    const generate=el("button","GENERATE STUDENT IDENTIFICATION","approve");
-    generate.onclick=()=>generateStudentId(s.id);
-    actions.appendChild(generate);
-   }else{
-    const approve=el("button","APPROVE","approve");approve.onclick=()=>reviewStudent(s.id,"Approved");actions.appendChild(approve);
-   }
-   const ret=el("button","RETURN FOR CORRECTION","return");ret.onclick=()=>reviewStudent(s.id,"Returned");actions.appendChild(ret);
-   item.appendChild(actions);
+  if(error){
+   let errorDetails=error.message||"";
+   let responseStatus=error.context?.status;
+   try{
+    if(error.context && typeof error.context.clone==="function"){
+     const responseCopy=error.context.clone();
+     const responseText=await responseCopy.text();
+     if(responseText){
+      try{const responseBody=JSON.parse(responseText);errorDetails+=" "+(responseBody.message||responseBody.error||responseBody.msg||responseText)}
+      catch(parseError){errorDetails+=" "+responseText}
+     }
+    }
+   }catch(readError){}
+   const duplicateEmail=responseStatus===409||/already\s*(registered|exists|used)|email.*(already|exists|in use)|user already|duplicate key/i.test(errorDetails);
+   msg.textContent=duplicateEmail
+    ?"EMAIL ALREADY USED: This email is already registered. Please use another email address."
+    :"TEACHER INVITATION ERROR: "+errorDetails;
+   return;
   }
-  box.appendChild(item);
- });
-}
-function escapeHtml(value){
- return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-}
-function studentIdMarkup(s){
- const name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");
- const level=String(s.education_level||"").toUpperCase();
- const isA=String(s.education_level||"").toLowerCase()==="a-level";
- const theme=isA?"#173b72":"#176b45";
- const start=s.academic_year||"-";
- const form=String(s.class_name||"");
- const duration=form.toLowerCase().includes("five")||form.toLowerCase().includes("six")?2:4;
- const end=Number(start)?Number(start)+duration-1:"-";
- const extra=isA?`<p><b>COMBINATION / TAASUSI:</b> ${escapeHtml(s.combination||"-")}</p>`:`<p><b>LEVEL:</b> O-LEVEL</p>`;
- return `<div class="id-card" style="border-color:${theme}">
-  <div class="id-front" style="background:linear-gradient(135deg,${theme},#123c2c)">
-   <h2 style="text-align:center">KISHIMBA SECONDARY SCHOOL</h2>
-   <p style="text-align:center">STUDENT IDENTIFICATION</p>
-   <div class="id-main">${s.photo_url?`<img class="id-photo" src="${escapeHtml(s.photo_url)}" alt="Student photo">`:`<div class="id-photo">STUDENT<br>PHOTO</div>`}<div class="id-info">
-    <p><b>FULL NAME:</b> ${escapeHtml(name)}</p>
-    <p><b>REGISTRATION NO:</b> ${escapeHtml(s.admission_number||"-")}</p>
-    <p><b>EDUCATION LEVEL:</b> ${escapeHtml(level)}</p>
-    <p><b>CLASS:</b> ${escapeHtml(s.class_name||"-")}</p>${extra}
-    <p><b>ACADEMIC PERIOD:</b> ${escapeHtml(start)} – ${escapeHtml(end)}</p>
-   </div></div>
-   <div class="id-signatures"><div><span>STUDENT SIGNATURE</span></div><div><span>HEAD OF SCHOOL SIGNATURE</span></div></div>
-  </div>
-  <div class="id-back"><h3>KISHIMBA SECONDARY SCHOOL</h3>
-   <p><b>Admission Number:</b> ${escapeHtml(s.admission_number||"-")}</p>
-   <p><b>Academic Year:</b> ${escapeHtml(start)} – ${escapeHtml(end)}</p>
-   <p><b>Parent / Guardian:</b> ${escapeHtml(s.guardian_name||"-")}</p>
-   <p><b>Contact:</b> ${escapeHtml(s.guardian_phone||"-")}</p>
-   <p class="return-note">FOR ANY ISSUES RETURNED THROUGH ADDRESS ABOVE</p>
-  </div>
- </div>`;
-}
-async function generateStudentId(id){
- if(!["admin","headmaster"].includes(role())){alert("Only Administrator or Head of School can generate student identification.");return;}
- const student=studentRows.find(x=>String(x.id)===String(id));
- if(!student){alert("Student record not found. Refresh the student list.");return;}
- if(String(student.review_status||"").toLowerCase()!=="approved"){
-  alert("Approve this student registration before generating the identification card.");return;
- }
- let photoUrl="";
- if(student.photo_path){
-  const {data,error}=await db.storage.from(STUDENT_PHOTO_BUCKET).createSignedUrl(student.photo_path,3600);
-  if(!error&&data?.signedUrl)photoUrl=data.signedUrl;
- }
- const printableStudent={...student,photo_url:photoUrl};
- const panel=document.getElementById("printStudentId");
- panel.innerHTML=`<div class="student-id-wrap"><h3>STUDENT IDENTIFICATION PREVIEW</h3>${studentIdMarkup(printableStudent)}<div class="id-actions"><button type="button" class="secondary" onclick="printStudentId()">PRINT STUDENT IDENTIFICATION</button><button type="button" onclick="closeStudentId()">CLOSE PREVIEW</button></div></div>`;
- panel.classList.remove("hidden");
- panel.scrollIntoView({behavior:"smooth",block:"start"});
-}
-function printStudentId(){
- const panel=document.getElementById("printStudentId");
- if(panel.classList.contains("hidden")||!panel.querySelector(".id-card")){alert("Generate the student identification first.");return;}
- window.print();
-}
-function closeStudentId(){
- const panel=document.getElementById("printStudentId");panel.classList.add("hidden");panel.innerHTML="";
+  if(!data?.success){
+   const responseMessage=data?.message||"The function did not confirm success.";
+   msg.textContent=/already\s*(registered|exists|used)|email.*(already|exists|in use)|user already|duplicate key/i.test(responseMessage)
+    ?"EMAIL ALREADY USED: This email is already registered. Please use another email address."
+    :"REGISTRATION ERROR: "+responseMessage;
+   return;
+  }
+  msg.textContent=data.message||"Teacher account created. Invitation link generated.";
+  const linkArea=document.getElementById("inviteLinkArea");linkArea.innerHTML="";
+  if(data.invite_link){const a=el("a","Open teacher invitation link");a.href=data.invite_link;a.target="_blank";a.rel="noopener";linkArea.appendChild(a);const copy=el("button","COPY INVITATION LINK");copy.onclick=async()=>{try{await navigator.clipboard.writeText(data.invite_link);alert("Invitation link copied.")}catch(e){alert("Copy failed. Open the link and copy it manually.")}};linkArea.appendChild(copy)}
+  ["newTeacherName","newTeacherEmail","newTeacherPhone","inviteCombination"].forEach(id=>document.getElementById(id).value="");
+  await loadTeachers();
+ }catch(e){msg.textContent="INVITATION ERROR: "+e.message}finally{btn.disabled=false}
 }
 
-async function reviewStudent(id,status){
- if(!["admin","headmaster"].includes(role()))return;
- const feedback=status==="Returned"?prompt("Write reason for returning this registration:"):prompt("Optional approval note:","");
- if(status==="Returned"&&(!feedback||!feedback.trim()))return;
- const updates={review_status:status,admin_feedback:feedback||null,reviewed_at:new Date().toISOString(),reviewed_by:currentUser.id};
- const {error}=await db.from("students").update(updates).eq("id",id);
- if(error){alert("REVIEW ERROR: "+error.message);return}
- alert("Registration marked "+status+".");await loadStudents();
-}
+// TEACHING MATERIALS
 async function uploadMaterial(){
- if(role()!=="teacher"){alert("Teacher login required.");return}
- const title=document.getElementById("mTitle").value.trim(),type=document.getElementById("mType").value,subject=document.getElementById("mSubject").value,cls=document.getElementById("mClass").value,year=document.getElementById("mYear").value,file=document.getElementById("mFile").files[0],b=document.getElementById("uploadBtn");
- if(!title||!type||!subject||!cls||!year||!file){msg("uploadMessage","Complete all fields and select a file.");return}
- b.disabled=true;msg("uploadMessage","Uploading...");
- const path=currentTeacher.id+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+ if(!currentUser||getRole()!=="teacher"){alert("Teacher login required.");return}
+ const title=document.getElementById("title").value.trim(),type=document.getElementById("materialType").value,subject=document.getElementById("subject").value,className=document.getElementById("className").value,year=document.getElementById("academicYear").value,file=document.getElementById("file").files[0],msg=document.getElementById("uploadMessage"),btn=document.getElementById("uploadBtn");
+ if(!title||!type||!subject||!className||!year||!file){msg.textContent="Please complete all fields and select a file.";return}
+ btn.disabled=true;msg.textContent="Uploading material...";
+ const path=currentTeacherId+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
  try{
-  const up=await db.storage.from(BUCKET).upload(path,file);if(up.error){msg("uploadMessage","STORAGE ERROR: "+up.error.message);return}
-  const {error}=await db.from("teaching_materials").insert({teacher_id:currentTeacher.id,title,material_type:type,subject,class_name:cls,academic_year:Number(year),file_path:path,review_status:"Draft"});
-  if(error){await db.storage.from(BUCKET).remove([path]);msg("uploadMessage","DATABASE ERROR: "+error.message);return}
-  msg("uploadMessage","Material uploaded as Draft.");["mTitle","mType","mSubject","mClass","mYear","mFile"].forEach(id=>document.getElementById(id).value="");await loadMaterials();
- }catch(e){msg("uploadMessage","UPLOAD ERROR: "+e.message)}finally{b.disabled=false}
+  const up=await db.storage.from(BUCKET).upload(path,file);if(up.error){msg.textContent="STORAGE ERROR: "+up.error.message;return}
+  const {error}=await db.from("teaching_materials").insert({teacher_id:currentTeacherId,title,material_type:type,subject,class_name:className,academic_year:year,file_path:path,review_status:"Draft",forwarding_status:"Draft",current_stage:"teacher"});
+  if(error){await db.storage.from(BUCKET).remove([path]);msg.textContent="DATABASE ERROR: "+error.message;return}
+  msg.textContent="Material uploaded as DRAFT. Press SUBMIT when ready.";
+  ["title","materialType","subject","className","academicYear","file"].forEach(id=>document.getElementById(id).value="");
+  await loadMaterials();
+ }catch(e){msg.textContent="UPLOAD ERROR: "+e.message}finally{btn.disabled=false}
+}
+async function submitMaterial(item,button){
+ if(getRole()!=="teacher"||item.teacher_id!==currentTeacherId)return;
+ if(norm(item.review_status)!=="draft"){alert("This material is no longer a draft.");return}
+ if(!confirm("Submit this material to the Academic Office for review?"))return;
+ button.disabled=true;
+ try{
+  const {data,error}=await db.from("teaching_materials").update({review_status:"Pending",forwarding_status:"Pending",current_stage:"academic",submitted_at:new Date().toISOString()}).eq("id",item.id).eq("teacher_id",currentTeacherId).eq("review_status","Draft").select("id").maybeSingle();
+  if(error){alert("SUBMIT ERROR: "+error.message);return}if(!data){alert("Material was not submitted. Check permissions or status.");return}
+  alert("Material submitted to Academic Office.");await loadMaterials();
+ }finally{button.disabled=false}
+}
+async function deleteMaterial(item,button){
+ if(getRole()!=="teacher"||item.teacher_id!==currentTeacherId)return;
+ if(norm(item.review_status)!=="draft"||item.academic_signature||item.headmaster_signature){alert("Only an unsigned DRAFT can be deleted.");return}
+ if(!confirm("Permanently delete this draft and its uploaded file?"))return;
+ button.disabled=true;
+ try{const {data,error}=await db.from("teaching_materials").delete().eq("id",item.id).eq("teacher_id",currentTeacherId).eq("review_status","Draft").select("id").maybeSingle();
+  if(error){alert("DELETE ERROR: "+error.message);return}if(!data){alert("Draft was not deleted. Check permissions.");return}
+  const rm=await db.storage.from(BUCKET).remove([item.file_path]);if(rm.error)alert("Record deleted, but file could not be removed: "+rm.error.message);else alert("Draft and file deleted.");
+  await loadMaterials();
+ }finally{button.disabled=false}
 }
 async function loadMaterials(){
- const box=document.getElementById("materialsList");if(!box)return;box.textContent="Loading materials...";
- let q=db.from("teaching_materials").select("*").order("created_at",{ascending:false});
- if(role()==="teacher")q=q.eq("teacher_id",currentTeacher.id);
- const {data,error}=await q;if(error){box.textContent="MATERIALS ERROR: "+error.message;return}
- box.innerHTML="";if(!data?.length){box.textContent="No materials found.";return}
- data.forEach(m=>{
-  const item=el("div",undefined,"item");item.appendChild(el("h4",m.title||"Untitled"));
-  item.appendChild(el("p",[m.material_type,m.subject,m.class_name,m.academic_year].filter(Boolean).join(" | ")));
-  item.appendChild(el("span",(m.review_status||"Pending").toUpperCase(),"status pending"));
-  const view=el("button","VIEW / OPEN FILE","secondary");view.onclick=async()=>{const {data:d,error:e}=await db.storage.from(BUCKET).createSignedUrl(m.file_path,3600);if(e){alert(e.message);return}window.open(d.signedUrl,"_blank")};item.appendChild(view);
-  box.appendChild(item);
- });
+ if(!currentTeacher||!currentUser)return;
+ const role=getRole(),listId=role==="admin"?"materialsList":role==="academic"?"academicMaterials":role==="headmaster"?"headmasterMaterials":"teacherMaterials",list=document.getElementById(listId);
+ list.textContent="Loading materials...";
+ let q=db.from("teaching_materials").select("*").order("created_at",{ascending:false});if(role==="teacher")q=q.eq("teacher_id",currentTeacherId);
+ const {data,error}=await q;if(error){list.textContent="MATERIALS ERROR: "+error.message;return}
+ const all=data||[];list.innerHTML="";if(role==="teacher")updateTeacherSummary(all);
+ let visible=all;
+ if(role==="academic")visible=all.filter(x=>norm(x.current_stage)==="academic"&&norm(x.forwarding_status)!=="checked");
+ if(role==="headmaster")visible=all.filter(x=>norm(x.current_stage)==="headmaster");
+ if(!visible.length){list.textContent="No teaching materials available.";return}
+ const names={};
+ if(role!=="teacher"){
+  const ids=[...new Set(visible.map(x=>x.teacher_id).filter(Boolean))];
+  if(ids.length){const p=await db.from("teachers").select("id,full_name,email").in("id",ids);(p.data||[]).forEach(t=>names[t.id]=t.full_name||t.email||"Teacher")}
+ }
+ if(role==="admin"){
+  const groups={};visible.forEach(x=>(groups[x.teacher_id||"unknown"]??=[]).push(x));
+  for(const id of Object.keys(groups)){const h=el("div",undefined,"teacher-heading");h.appendChild(el("h3","TEACHER: "+(names[id]||"Teacher")));h.appendChild(el("p","TOTAL MATERIALS: "+groups[id].length));list.appendChild(h);for(const item of groups[id])await renderMaterialEntry(item,list,role,names)}
+ }else for(const item of visible)await renderMaterialEntry(item,list,role,names);
 }
+function updateTeacherSummary(data){
+ const count=fn=>data.filter(fn).length;
+ document.getElementById("teacherMaterialCount").textContent="TOTAL MATERIALS: "+data.length;
+ document.getElementById("teacherDraftCount").textContent="DRAFT: "+count(x=>norm(x.review_status)==="draft");
+ document.getElementById("teacherApprovedCount").textContent="APPROVED: "+count(x=>norm(x.review_status)==="approved");
+ document.getElementById("teacherReturnedCount").textContent="RETURNED: "+count(x=>norm(x.forwarding_status).includes("return"));
+ document.getElementById("teacherForwardedCount").textContent="FORWARDED TO TEACHER: "+count(x=>norm(x.forwarding_status)==="forwarded to teacher");
+}
+async function renderMaterialEntry(item,list,role,names){
+ const entry=el("div",undefined,"item");entry.appendChild(el("h4",item.title||"Untitled material"));
+ if(role==="admin")entry.appendChild(el("p","UPLOADED BY: "+(names[item.teacher_id]||"Teacher")));
+ entry.appendChild(el("p",[item.material_type,item.subject,item.class_name,item.academic_year].filter(Boolean).join(" | ")));
+ entry.appendChild(el("span","REVIEW: "+(item.review_status||"Pending").toUpperCase(),"status "+statusClass(item.review_status)));
+ entry.appendChild(el("span","STAGE: "+(item.current_stage||"Not set").toUpperCase(),"status "+statusClass(item.current_stage)));
+ entry.appendChild(el("span","FORWARDING: "+(item.forwarding_status||"Pending").toUpperCase(),"status "+statusClass(item.forwarding_status)));
+ const view=el("button","VIEW / OPEN MATERIAL");view.onclick=()=>viewMaterial(item.file_path);entry.appendChild(view);
+ if(role!=="teacher"){const d=el("button","DOWNLOAD MATERIAL");d.onclick=()=>downloadMaterial(item.file_path);entry.appendChild(d)}
+ addSignatureDisplay(entry,item);
+ if(role==="teacher"&&norm(item.review_status)==="draft"){const s=el("button","SUBMIT","send-button");s.onclick=()=>submitMaterial(item,s);entry.appendChild(s);const d=el("button","DELETE","danger");d.onclick=()=>deleteMaterial(item,d);entry.appendChild(d)}
+ if(role==="academic"&&norm(item.current_stage)==="academic")addSignaturePad(entry,item,"academic");
+ if(role==="headmaster"&&norm(item.current_stage)==="headmaster")addSignaturePad(entry,item,"headmaster");
+ if(role==="admin"&&(norm(item.current_stage)==="admin"||item.headmaster_signature)){
+  entry.appendChild(el("h4","ADMINISTRATOR FINAL REVIEW"));
+  if(norm(item.forwarding_status)==="forwarded to teacher")entry.appendChild(el("p","SENT TO TEACHER SUCCESSFULLY","status forwarded"));
+  else if(norm(item.forwarding_status)==="resent to academic office")entry.appendChild(el("p","RESENT TO ACADEMIC OFFICE","status checked"));
+  else{const c=el("textarea");c.placeholder="Administrator review comments...";entry.appendChild(c);const a=el("button","RESEND TO TEACHER","approve-button");a.onclick=()=>adminResend(item,"teacher",c,a);entry.appendChild(a);const b=el("button","RESEND TO ACADEMIC OFFICE","return-academic");b.onclick=()=>adminResend(item,"academic",c,b);entry.appendChild(b)}
+ }else if(role==="admin")entry.appendChild(el("p","WAITING FOR HEAD OF SCHOOL REVIEW","small"));
+ if(item.admin_comment&&(role==="admin"||role==="teacher"))entry.appendChild(el("p","ADMIN COMMENT: "+item.admin_comment));
+ if(role==="teacher"&&norm(item.forwarding_status).includes("return"))addResubmitControl(entry,item);
+ if(role==="teacher"&&norm(item.forwarding_status)==="forwarded to teacher")entry.appendChild(el("p","This material has been reviewed and forwarded to you."));
+ const box=el("div",undefined,"comments-box");box.appendChild(el("h4","COMMENTS & REPLIES"));entry.appendChild(box);
+ if(role==="teacher"){const reply=el("button","REPLY TO COMMENT");reply.onclick=()=>replyToMaterialComment(item.id);entry.appendChild(reply)}
+ list.appendChild(entry);await loadMaterialComments(item.id,box);
+}
+function addSignatureDisplay(entry,item){
+ const area=el("div",undefined,"signature-area");area.appendChild(el("h4","OFFICIAL SIGNATURES"));
+ [["ACADEMIC OFFICE",item.academic_signature,item.academic_signed_at,item.academic_comment||item.academic_comments],["HEAD OF SCHOOL",item.headmaster_signature,item.headmaster_signed_at,item.headmaster_comment||item.headmaster_comments]].forEach(([label,sig,date,comment])=>{
+  const b=el("div");b.style.marginTop="12px";b.appendChild(el("strong",label));
+  if(sig){const img=el("img");img.src=sig;img.className="signature-image";img.alt=label;b.appendChild(img);b.appendChild(el("p","Signed: "+formatDate(date),"small"))}else b.appendChild(document.createTextNode("Not signed yet."));
+  if(comment)b.appendChild(el("p","Comment: "+comment));area.appendChild(b)
+ });entry.appendChild(area)
+}
+function addSignaturePad(entry,item,office){
+ const area=el("div",undefined,"signature-area office-action");area.appendChild(el("h4",office==="academic"?"ACADEMIC OFFICE - REVIEW, COMMENT AND SIGN":"HEAD OF SCHOOL - REVIEW, COMMENT AND SIGN"));
+ area.appendChild(el("p",office==="academic"?"Review and sign. CHECKED sends the material to the Head of School.":"Review and sign. FORWARDED sends the material to the Administrator."));
+ const canvas=el("canvas",undefined,"signature-pad");canvas.width=900;canvas.height=300;area.appendChild(canvas);
+ const ctx=canvas.getContext("2d");ctx.lineWidth=5;ctx.lineCap="round";ctx.strokeStyle="#111827";let drawing=false,has=false;
+ const pos=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}};
+ canvas.addEventListener("pointerdown",e=>{drawing=true;has=true;canvas.setPointerCapture(e.pointerId);const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+ canvas.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()});
+ const stop=()=>{drawing=false;ctx.beginPath()};canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop);
+ const comment=el("textarea");comment.placeholder="Write office review comments...";area.appendChild(comment);
+ const clear=el("button","CLEAR SIGNATURE","secondary");clear.onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);has=false};area.appendChild(clear);
+ const save=el("button",office==="academic"?"CHECKED - SAVE SIGNATURE":"FORWARDED - SAVE SIGNATURE","approve-button");area.appendChild(save);
+ save.onclick=async()=>{
+  if(!has){alert("Please draw your signature first.");return}if(!comment.value.trim()){alert("Please enter your office comment.");return}if(!confirm("Confirm comment and signature?"))return;
+  save.disabled=true;const now=new Date().toISOString(),text=comment.value.trim();
+  const updates=office==="academic"?{academic_signature:canvas.toDataURL("image/png"),academic_signed_by:currentUser.id,academic_signed_at:now,academic_comment:text,academic_comments:text,academic_checked_by:currentUser.id,academic_checked_at:now,current_stage:"headmaster",forwarding_status:"Checked"}:
+  {headmaster_signature:canvas.toDataURL("image/png"),headmaster_signed_by:currentUser.id,headmaster_signed_at:now,headmaster_comment:text,headmaster_comments:text,headmaster_checked_by:currentUser.id,headmaster_checked_at:now,current_stage:"admin",forwarding_status:"Forwarded"};
+  try{const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).select("id,current_stage").maybeSingle();if(error){alert("SIGNATURE ERROR: "+error.message);return}if(!data){alert("No row updated. Check database permissions.");return}
+   await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:(office==="academic"?"Academic Office: ":"Head of School: ")+text});
+   alert("Signature and comment saved. New stage: "+data.current_stage);await loadMaterials()
+  }catch(e){alert("ERROR: "+e.message)}finally{save.disabled=false}
+ };entry.appendChild(area)
+}
+async function adminResend(item,destination,box,button){
+ if(!isAdmin()){alert("Administrator account required.");return}const comment=box.value.trim();if(!comment){alert("Enter Administrator comments.");return}
+ const dest=destination==="teacher"?"Teacher":"Academic Office";if(!confirm("Resend this material to "+dest+"?"))return;
+ button.disabled=true;const now=new Date().toISOString();
+ const updates=destination==="teacher"?{review_status:"Approved",forwarding_status:"Forwarded to Teacher",current_stage:"teacher",admin_comment:comment,admin_comments:comment,admin_checked_by:currentUser.id,admin_checked_at:now,admin_action_by:currentUser.id,admin_action_at:now}:
+ {forwarding_status:"Resent to Academic Office",current_stage:"academic",admin_comment:comment,admin_comments:comment,admin_checked_by:currentUser.id,admin_checked_at:now,admin_action_by:currentUser.id,admin_action_at:now,returned_to:"academic"};
+ try{const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).select("id").maybeSingle();if(error){alert("ADMIN RESEND ERROR: "+error.message);return}if(!data){alert("No document updated.");return}
+  await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:"Administrator: "+comment+" | Resent to "+dest+"."});alert("Material resent to "+dest+".");await loadMaterials()
+ }catch(e){alert(e.message)}finally{button.disabled=false}
+}
+function addResubmitControl(entry,item){
+ const area=el("div",undefined,"signature-area");area.appendChild(el("h4","MATERIAL RETURNED FOR CORRECTIONS"));area.appendChild(el("p","Upload the revised file. It will be saved as DRAFT until submitted."));
+ const input=el("input");input.type="file";area.appendChild(input);const btn=el("button","UPLOAD CORRECTED MATERIAL");area.appendChild(btn);
+ btn.onclick=async()=>{const file=input.files[0];if(!file){alert("Select corrected file.");return}if(!confirm("Upload corrected material as draft?"))return;btn.disabled=true;
+  const path=currentTeacherId+"/"+Date.now()+"_"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  try{const up=await db.storage.from(BUCKET).upload(path,file);if(up.error){alert(up.error.message);return}
+   const updates={file_path:path,forwarding_status:"Draft",review_status:"Draft",current_stage:"teacher",academic_signature:null,academic_signed_by:null,academic_signed_at:null,academic_comment:null,academic_comments:null,academic_checked_by:null,academic_checked_at:null,headmaster_signature:null,headmaster_signed_by:null,headmaster_signed_at:null,headmaster_comment:null,headmaster_comments:null,headmaster_checked_by:null,headmaster_checked_at:null,admin_comment:null,admin_comments:null,admin_checked_by:null,admin_checked_at:null,admin_action_by:null,admin_action_at:null,returned_to:null,returned_at:null};
+   const {data,error}=await db.from("teaching_materials").update(updates).eq("id",item.id).eq("teacher_id",currentTeacherId).select("id").maybeSingle();if(error||!data){await db.storage.from(BUCKET).remove([path]);alert("RESUBMIT ERROR: "+(error?.message||"No row updated"));return}
+   if(item.file_path)await db.storage.from(BUCKET).remove([item.file_path]);await db.from("material_comments").insert({material_id:item.id,user_id:currentUser.id,comment:"Teacher uploaded corrected version as DRAFT."});alert("Corrected material uploaded as DRAFT.");await loadMaterials()
+  }catch(e){alert(e.message)}finally{btn.disabled=false}
+ };entry.appendChild(area)
+}
+async function loadMaterialComments(id,container){
+ const {data,error}=await db.from("material_comments").select("*").eq("material_id",id).order("created_at",{ascending:true});
+ if(error){container.appendChild(document.createTextNode("Comments unavailable: "+error.message));return}
+ if(!data?.length){container.appendChild(document.createTextNode("No comments yet."));return}
+ data.forEach(c=>{const b=el("div",undefined,"comment-item");b.appendChild(el("strong",c.user_id===currentUser.id?"YOUR COMMENT":"OFFICE / TEACHER COMMENT"));b.appendChild(el("p",c.comment));b.appendChild(el("small",formatDate(c.created_at)));container.appendChild(b)})
+}
+async function replyToMaterialComment(id){const reply=prompt("Andika majibu yako:");if(reply===null||!reply.trim())return;const {error}=await db.from("material_comments").insert({material_id:id,user_id:currentUser.id,comment:reply.trim()});if(error){alert(error.message);return}alert("Reply sent.");await loadMaterials()}
+async function openSignedFile(path,action){if(!path){alert("File path not found.");return}const {data,error}=await db.storage.from(BUCKET).createSignedUrl(path,3600);if(error){alert(action+" ERROR: "+error.message);return}window.open(data.signedUrl,"_blank")}
+async function viewMaterial(path){await openSignedFile(path,"VIEW")}
+async function downloadMaterial(path){if(getRole()==="teacher"){alert("Teachers are not allowed to download materials.");return}await openSignedFile(path,"DOWNLOAD")}
 
-/* ================= EXAMINATION & RESULTS WORKFLOW ================= */
-let myAssignments=[],allExams=[],activeMarkRows=[],activeReviewRows=[];
-function setOptions(select,items,placeholder){
- select.innerHTML="";
- const first=document.createElement("option");first.value="";first.textContent=placeholder;select.appendChild(first);
- (items||[]).forEach(item=>{const o=document.createElement("option");o.value=item.value;o.textContent=item.label;select.appendChild(o)});
-}
-function updateExamClasses(){
- const level=document.getElementById("examLevel").value,sel=document.getElementById("examClass");
- const forms=level==="O-Level"?["Form One","Form Two","Form Three","Form Four"]:level==="A-Level"?["Form Five","Form Six"]:[];
- setOptions(sel,forms.map(x=>({value:x,label:x})),"Select class");
-}
-async function initializeResultsPanel(){
- const r=role();
- const create=document.getElementById("examCreateBox"),teacher=document.getElementById("teacherMarksBox"),admin=document.getElementById("adminResultsBox"),published=document.getElementById("teacherPublishedBox");
- if(!create)return;
- create.classList.toggle("hidden",!["admin","academic","headmaster"].includes(r));
- teacher.classList.toggle("hidden",r!=="teacher");
- admin.classList.toggle("hidden",!["admin","academic","headmaster"].includes(r));
- published.classList.toggle("hidden",r!=="teacher");
- document.getElementById("examLevel").onchange=updateExamClasses;
- if(["admin","academic","headmaster"].includes(r)){await loadExamsForAdmin()}
- if(r==="teacher"){await loadMyAssignmentsForMarks();await loadExamsForTeacher()}
-}
+// EXAMINATIONS AND RESULTS
 async function createExam(){
- if(!["admin","academic","headmaster"].includes(role()))return;
- const exam_name=document.getElementById("examName").value.trim(),exam_type=document.getElementById("examType").value,education_level=document.getElementById("examLevel").value,class_name=document.getElementById("examClass").value,term=document.getElementById("examTerm").value,academic_year=Number(document.getElementById("examYear").value),exam_date=document.getElementById("examDate").value||null;
- if(!exam_name||!exam_type||!education_level||!class_name||!term||!academic_year){msg("examCreateMessage","Jaza jina, aina, level, class, term na mwaka wa mtihani.");return}
- const btn=document.getElementById("createExamBtn");btn.disabled=true;msg("examCreateMessage","Inahifadhi examination...");
- try{
-  const {error}=await db.from("exams").insert({exam_name,exam_type,education_level,class_name,term,academic_year,exam_date,created_by:currentUser.id});
-  if(error)throw error;
-  msg("examCreateMessage","Examination imetengenezwa kikamilifu.");
-  ["examName","examType","examLevel","examTerm","examDate"].forEach(id=>document.getElementById(id).value="");updateExamClasses();
-  await loadExamsForAdmin();
- }catch(e){msg("examCreateMessage","CREATE EXAM ERROR: "+e.message)}finally{btn.disabled=false}
+ if(!isOffice()){alert("Admin or Academic Office only.");return}
+ const exam_name=document.getElementById("examName").value.trim(),exam_type=document.getElementById("examType").value,education_level=document.getElementById("examLevel").value,class_name=document.getElementById("examClass").value,term=document.getElementById("examTerm").value,academic_year=Number(document.getElementById("examYear").value),exam_date=document.getElementById("examDate").value,msg=document.getElementById("examMessage");
+ if(!exam_name||!class_name||!academic_year){msg.textContent="Enter exam name, class and academic year.";return}
+ msg.textContent="Saving examination...";
+ const {error}=await db.from("exams").insert({exam_name,exam_type,education_level,class_name,term,academic_year,exam_date:exam_date||null,created_by:currentUser.id,results_published:false});
+ if(error){msg.textContent="CREATE EXAM ERROR: "+error.message;return}
+ msg.textContent="Examination created.";document.getElementById("examName").value="";await loadOfficeExams()
 }
-async function loadExamsForAdmin(){
- const sel=document.getElementById("adminExamSelect");if(!sel)return;
- sel.innerHTML='<option value="">Loading examinations...</option>';
+async function loadOfficeExams(){
+ const box=document.getElementById("officeExams");box.textContent="Loading examinations...";
  const {data,error}=await db.from("exams").select("*").order("created_at",{ascending:false});
- if(error){sel.innerHTML='<option value="">Unable to load exams</option>';msg("adminResultsMessage","EXAMS ERROR: "+error.message);return}
- allExams=data||[];
- setOptions(sel,allExams.map(e=>({value:e.id,label:`${e.exam_name} | ${e.class_name} | ${e.academic_year} | ${e.term}${e.results_published?" | PUBLISHED":""}`})),"Select examination");
+ if(error){box.textContent="EXAMS ERROR: "+error.message;return}cachedExams=data||[];box.innerHTML="";
+ if(!cachedExams.length){box.textContent="No examinations created.";return}
+ for(const exam of cachedExams){const card=el("div",undefined,"item");card.appendChild(el("h4",exam.exam_name));card.appendChild(el("p",[exam.exam_type,exam.education_level,exam.class_name,exam.term,exam.academic_year].filter(Boolean).join(" | ")));
+  card.appendChild(el("span",exam.results_published?"PUBLISHED":"NOT PUBLISHED","status "+(exam.results_published?"approved":"pending")));
+  const view=el("button","VIEW LIVE MARKS");view.onclick=()=>showExamResults(exam,card);card.appendChild(view);
+  if(!exam.results_published){const pub=el("button","PUBLISH RESULTS","approve-button");pub.onclick=()=>publishExam(exam,pub);card.appendChild(pub)}
+  box.appendChild(card)
+ }
 }
-async function loadMyAssignmentsForMarks(){
- const sel=document.getElementById("markAssignment");if(!sel)return;
- const {data,error}=await db.from("teacher_subject_assignments").select("id,teacher_id,subject,form_level,education_level,combination,academic_year,is_active").eq("teacher_id",currentTeacher.id).eq("is_active",true).order("academic_year",{ascending:false});
- if(error){sel.innerHTML='<option value="">Assignments unavailable</option>';msg("teacherMarksMessage","ASSIGNMENTS ERROR: "+error.message);return}
- myAssignments=data||[];
- setOptions(sel,myAssignments.map(a=>({value:a.id,label:`${a.subject} — ${a.education_level} ${a.form_level}${a.combination?" ("+a.combination+")":""} — ${a.academic_year}`})),"Select assigned subject and class");
+async function publishExam(exam,button){
+ if(!isOffice()){alert("Only Admin or Academic Office can publish results.");return}
+ const {count,error:countError}=await db.from("student_exam_results").select("*",{count:"exact",head:true}).eq("exam_id",exam.id);
+ if(countError){alert("Could not verify marks: "+countError.message);return}if(!count){alert("There are no marks to publish yet.");return}
+ if(!confirm("Publish results for "+exam.exam_name+"? Teachers will then be able to view the published results."))return;
+ button.disabled=true;
+ const {data,error}=await db.from("exams").update({results_published:true,published_at:new Date().toISOString(),published_by:currentUser.id}).eq("id",exam.id).eq("results_published",false).select("id").maybeSingle();
+ if(error){alert("PUBLISH ERROR: "+error.message);button.disabled=false;return}if(!data){alert("No exam was published. Refresh and check its status.");button.disabled=false;return}
+ alert("Results published.");await loadOfficeExams()
 }
-async function loadExamsForTeacher(){
+async function showExamResults(exam,container){
+ let old=container.querySelector(".live-result-area");if(old)old.remove();
+ const area=el("div",undefined,"live-result-area");area.appendChild(el("p","Loading live marks and student reports..."));container.appendChild(area);
+ const {data,error}=await db.from("student_exam_results").select("id,exam_id,student_id,teacher_id,subject,marks_obtained,review_status,entered_at").eq("exam_id",exam.id).order("subject");
+ area.innerHTML="";if(error){area.textContent="RESULTS ERROR: "+error.message;return}
+ const marks=data||[];if(!marks.length){area.textContent="No marks entered yet.";return}
+ const ids=[...new Set(marks.map(m=>m.student_id))];const {data:students,error:studentError}=await db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name").in("id",ids);
+ if(studentError){area.textContent="STUDENT LIST ERROR: "+studentError.message;return}
+ const sm={};(students||[]).forEach(s=>sm[s.id]=s);
+ const table=el("table"),head=el("tr");["Admission No.","Student","Subject","Marks","Status"].forEach(x=>head.appendChild(el("th",x)));table.appendChild(head);
+ const grouped={};
+ marks.forEach(m=>{
+  const s=sm[m.student_id]||{},name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");
+  const tr=el("tr");[s.admission_number||"",name,m.subject,m.marks_obtained,m.review_status||""].forEach(v=>tr.appendChild(el("td",safeText(v))));table.appendChild(tr);
+  if(!grouped[m.student_id])grouped[m.student_id]={student:s,rows:[],total:0,count:0};
+  const g=grouped[m.student_id];g.rows.push(m);g.total+=Number(m.marks_obtained)||0;g.count++;
+ });
+ const wrap=el("div",undefined,"table-wrap");wrap.appendChild(table);area.appendChild(wrap);
+ const ranking=Object.values(grouped).map(g=>({...g,average:g.count?g.total/g.count:0})).sort((a,b)=>b.average-a.average);
+ area.appendChild(el("h4","OVERALL RESULTS SUMMARY"));
+ area.appendChild(el("p","Students with marks: "+ranking.length+" | Marks records: "+marks.length));
+ if(ranking.length){area.appendChild(el("p","Highest average: "+ranking[0].average.toFixed(2)+"% - "+[ranking[0].student.first_name,ranking[0].student.middle_name,ranking[0].student.last_name].filter(Boolean).join(" ")));
+  const lowest=ranking[ranking.length-1];area.appendChild(el("p","Lowest average: "+lowest.average.toFixed(2)+"% - "+[lowest.student.first_name,lowest.student.middle_name,lowest.student.last_name].filter(Boolean).join(" ")));
+ }
+ area.appendChild(el("h4","INDIVIDUAL STUDENT REPORTS"));
+ ranking.forEach((g,index)=>{
+  const s=g.student,name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");
+  const report=el("div",undefined,"report");report.appendChild(el("strong",(index+1)+". "+(s.admission_number||"")+" | "+name));
+  report.appendChild(el("p","Class: "+(s.class_name||exam.class_name||"")+" | Average: "+g.average.toFixed(2)+"% | Total: "+g.total));
+  g.rows.forEach(r=>report.appendChild(el("p",r.subject+": "+r.marks_obtained+"/100")));
+  area.appendChild(report);
+ });
+ const print=el("button","PRINT / SAVE REPORTS");print.onclick=()=>window.print();area.appendChild(print);
+ area.appendChild(el("p","Note: Best and weakest students are determined by average marks among students with at least one recorded subject. These reports use the marks currently stored for this examination."));
+}
+async function loadTeacherResults(){
+ const box=document.getElementById("teacherExamList");box.textContent="Loading examinations...";
  const {data,error}=await db.from("exams").select("*").order("created_at",{ascending:false});
- if(error){msg("teacherMarksMessage","EXAMS ERROR: "+error.message);return}
- allExams=data||[];
- const sel=document.getElementById("markExam");
- setOptions(sel,[],"Select assignment first");
+ if(error){box.textContent="EXAMS ERROR: "+error.message;return}
+ cachedExams=data||[];box.innerHTML="";
+ const available=cachedExams.filter(e=>!e.results_published);
+ const published=cachedExams.filter(e=>e.results_published);
+ if(!cachedExams.length){box.textContent="No examinations available.";return}
+ for(const exam of cachedExams){const card=el("div",undefined,"item");card.appendChild(el("h4",exam.exam_name));card.appendChild(el("p",[exam.class_name,exam.education_level,exam.academic_year,exam.term].filter(Boolean).join(" | ")));
+  card.appendChild(el("span",exam.results_published?"PUBLISHED":"MARKS ENTRY OPEN","status "+(exam.results_published?"approved":"pending")));
+  if(!exam.results_published){const b=el("button","ENTER MARKS");b.onclick=()=>openMarkEntry(exam,card);card.appendChild(b)}
+  else{const v=el("button","VIEW PUBLISHED RESULTS");v.onclick=()=>teacherViewPublished(exam);card.appendChild(v);const r=el("button","GENERATE REPORTS");r.onclick=()=>teacherGenerateReports(exam);card.appendChild(r)}
+  box.appendChild(card)
+ }
+ document.getElementById("teacherResultsView").textContent=published.length?"Choose VIEW PUBLISHED RESULTS on an examination above.":"Published results are not available yet.";
+ document.getElementById("teacherReports").textContent=published.length?"Choose GENERATE REPORTS on a published examination above.":"Reports become available after publication.";
 }
-async function loadTeacherMarkSheet(){
- const assignment=myAssignments.find(a=>a.id===document.getElementById("markAssignment").value),exam=allExams.find(e=>e.id===document.getElementById("markExam").value);
- const box=document.getElementById("teacherMarkRows");box.innerHTML="";
- if(!assignment){box.textContent="Chagua assignment kwanza.";return}
- const examSel=document.getElementById("markExam"),previousExamId=examSel.value;
- const eligible=allExams.filter(e=>e.education_level===assignment.education_level&&e.class_name===assignment.form_level&&Number(e.academic_year)===Number(assignment.academic_year));
- setOptions(examSel,eligible.map(e=>({value:e.id,label:`${e.exam_name} | ${e.term} | ${e.academic_year}${e.results_published?" | PUBLISHED":""}`})),"Select examination");
- if(eligible.some(e=>e.id===previousExamId))examSel.value=previousExamId;
- const selected=eligible.find(e=>e.id===examSel.value);
- if(!selected){box.textContent="Chagua examination ya darasa hili.";return}
- if(selected.results_published){box.textContent="Matokeo ya mtihani huu yameshachapishwa. Uingizaji wa alama umefungwa.";return}
- let studentQuery=db.from("students").select("id,admission_number,first_name,middle_name,last_name,education_level,class_name,combination").eq("education_level",assignment.education_level).eq("class_name",assignment.form_level).eq("academic_year",assignment.academic_year).order("admission_number");
- if(assignment.education_level==="A-Level")studentQuery=studentQuery.eq("combination",assignment.combination);
- const {data:students,error:studentError}=await studentQuery;
- if(studentError){box.textContent="STUDENTS ERROR: "+studentError.message;return}
- if(!students?.length){box.textContent="Hakuna wanafunzi waliopatikana kwenye darasa/taasusi hii.";return}
- const {data:existing,error}=await db.from("exam_results").select("*").eq("exam_id",selected.id).eq("teacher_id",currentTeacher.id).eq("subject",assignment.subject);
+async function openMarkEntry(exam,card){
+ if(getRole()!=="teacher"||exam.results_published){alert("Marks entry is not available.");return}
+ const old=card.querySelector(".mark-entry");if(old){old.remove();return}
+ const area=el("div",undefined,"mark-entry");area.appendChild(el("p","Loading students and assigned subjects..."));card.appendChild(area);
+ const [stuRes,subRes]=await Promise.all([
+  db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name,education_level,combination,registration_status").eq("class_name",exam.class_name),
+  db.from("teacher_subject_assignments").select("subject,form_level,education_level,combination,is_active").eq("teacher_id",currentTeacherId)
+ ]);
+ area.innerHTML="";
+ if(stuRes.error){area.textContent="STUDENT LIST ERROR: "+stuRes.error.message;return}
+ if(subRes.error){area.textContent="SUBJECT ASSIGNMENT ERROR: "+subRes.error.message;return}
+ const students=(stuRes.data||[]).filter(s=>!s.registration_status||norm(s.registration_status)==="approved"||norm(s.registration_status)==="active");
+ const assignments=(subRes.data||[]).filter(a=>a.is_active!==false);
+ const subjects=[...new Set(assignments.map(a=>a.subject).filter(Boolean))];
+ if(!students.length){area.textContent="No registered students found in "+exam.class_name+".";return}
+ if(!subjects.length){area.textContent="No active subject assignments found for your teacher account.";return}
+ const subject=el("select");subjects.forEach(s=>{const o=el("option",s);o.value=s;subject.appendChild(o)});area.appendChild(el("label","Subject"));area.appendChild(subject);
+ const table=el("table"),header=el("tr");["Admission No.","Student","Marks (0-100)"].forEach(x=>header.appendChild(el("th",x)));table.appendChild(header);
+ const inputs=[];
+ students.forEach(s=>{const tr=el("tr");tr.appendChild(el("td",s.admission_number||""));tr.appendChild(el("td",[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")));const td=el("td"),input=el("input");input.type="number";input.min="0";input.max="100";input.step="0.01";input.placeholder="0-100";input.style.minWidth="100px";td.appendChild(input);tr.appendChild(td);table.appendChild(tr);inputs.push({student:s,input})});
+ const wrap=el("div",undefined,"table-wrap");wrap.appendChild(table);area.appendChild(wrap);
+ const save=el("button","SAVE MARKS");area.appendChild(save);
+ save.onclick=async()=>{
+  const subjectName=subject.value,entries=inputs.filter(x=>x.input.value.trim()!=="");
+  if(!entries.length){alert("Enter at least one mark.");return}
+  const invalid=entries.find(x=>!Number.isFinite(Number(x.input.value))||Number(x.input.value)<0||Number(x.input.value)>100);
+  if(invalid){alert("Marks must be between 0 and 100.");return}
+  if(!confirm("Save "+entries.length+" marks for "+subjectName+"?"))return;
+  save.disabled=true;save.textContent="SAVING...";
+  try{
+   for(const item of entries){
+    const existing=await db.from("student_exam_results").select("id").eq("exam_id",exam.id).eq("student_id",item.student.id).eq("subject",subjectName).maybeSingle();
+    if(existing.error)throw new Error(existing.error.message);
+    const values={marks_obtained:Number(item.input.value),teacher_id:currentTeacherId,review_status:"Pending",entered_at:new Date().toISOString()};
+    const result=existing.data?await db.from("student_exam_results").update(values).eq("id",existing.data.id):await db.from("student_exam_results").insert({...values,exam_id:exam.id,student_id:item.student.id,subject:subjectName});
+    if(result.error)throw new Error(result.error.message);
+   }
+   alert("Marks saved successfully. Office can view them live.");await loadTeacherResults()
+  }catch(e){alert("SAVE MARKS ERROR: "+e.message)}finally{save.disabled=false;save.textContent="SAVE MARKS"}
+ };
+}
+async function teacherViewPublished(exam){
+ if(getRole()!=="teacher"||!exam.results_published){alert("Results have not been published.");return}
+ const box=document.getElementById("teacherResultsView");box.innerHTML="<p>Loading published results...</p>";
+ const {data,error}=await db.from("student_exam_results").select("student_id,subject,marks_obtained").eq("exam_id",exam.id).eq("teacher_id",currentTeacherId);
  if(error){box.textContent="RESULTS ERROR: "+error.message;return}
- const byStudent=new Map((existing||[]).map(x=>[x.student_id,x]));
- activeMarkRows=students.map(s=>({student:s,existing:byStudent.get(s.id)||null}));
- document.getElementById("markSheetInfo").textContent=`${selected.exam_name} | ${assignment.subject} | ${assignment.form_level} | Marks out of 100`;
- const table=document.createElement("table");table.className="marks-table";
- table.innerHTML="<thead><tr><th>Admission No.</th><th>Student Name</th><th>Marks / 100</th><th>Status</th><th>Action</th></tr></thead>";
- const tbody=document.createElement("tbody");
- activeMarkRows.forEach((row,index)=>{
-  const tr=document.createElement("tr"),s=row.student,old=row.existing;
-  const td1=el("td",s.admission_number||"-"),td2=el("td",[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" "));
-  const td3=document.createElement("td"),input=document.createElement("input");input.type="number";input.min="0";input.max="100";input.step="0.01";input.placeholder="0–100";input.value=old?.marks_obtained??"";input.id="markValue"+index;td3.appendChild(input);
-  const td4=el("td",(old?.status||"not entered").toUpperCase());
-  const td5=document.createElement("td"),save=el("button","SAVE DRAFT","secondary");save.type="button";save.className="small-btn";save.onclick=()=>saveOneMark(index,"draft");td5.appendChild(save);
-  const submit=el("button","SUBMIT","approve");submit.type="button";submit.className="small-btn";submit.onclick=()=>saveOneMark(index,"submitted");td5.appendChild(submit);
-  if(old?.status==="submitted"||old?.status==="approved"){input.disabled=true;save.disabled=true;submit.disabled=true}
-  if(old){save.disabled=true;save.title="Tuma alama zilizopo kwa kutumia SUBMIT."}
-  if(old?.status==="returned"){input.disabled=false;submit.disabled=false}
-  tr.append(td1,td2,td3,td4,td5);tbody.appendChild(tr);
- });
- table.appendChild(tbody);box.appendChild(table);
+ const rows=data||[];if(!rows.length){box.textContent="No published marks are available for your account.";return}
+ box.innerHTML="";box.appendChild(el("h4",exam.exam_name));rows.forEach(r=>box.appendChild(el("p",r.subject+": "+r.marks_obtained+" marks")))
 }
-async function saveOneMark(index,nextStatus){
- const row=activeMarkRows[index],examId=document.getElementById("markExam").value,assignment=myAssignments.find(a=>a.id===document.getElementById("markAssignment").value);
- if(!row||!assignment||!examId)return;
- if(row.existing&&nextStatus==="draft"){msg("teacherMarksMessage","Alama hii tayari imehifadhiwa. Bonyeza SUBMIT ili kuiwasilisha.");return}
- const input=document.getElementById("markValue"+index),marks=Number(input.value);
- if(input.value.trim()===""||!Number.isFinite(marks)||marks<0||marks>100){msg("teacherMarksMessage","Alama lazima iwe namba kati ya 0 na 100.");return}
- const payload={exam_id:examId,student_id:row.student.id,teacher_id:currentTeacher.id,subject:assignment.subject,marks_obtained:marks,status:nextStatus,submitted_at:nextStatus==="submitted"?new Date().toISOString():null};
- try{
-  let error=null;
-  if(row.existing){const result=await db.from("exam_results").update(payload).eq("id",row.existing.id);error=result.error}
-  else{const result=await db.from("exam_results").insert(payload).select("*").single();error=result.error;if(!error)row.existing=result.data}
-  if(error)throw error;
-  if(row.existing){row.existing={...row.existing,...payload}}
-  msg("teacherMarksMessage",nextStatus==="submitted"?"Alama zimewasilishwa kwa Taaluma/Admin.":"Alama zimehifadhiwa kama draft.");
-  await loadTeacherMarkSheet();
- }catch(e){msg("teacherMarksMessage","SAVE MARK ERROR: "+e.message)}
+async function teacherGenerateReports(exam){
+ if(getRole()!=="teacher"||!exam.results_published){alert("Reports are locked until results are published.");return}
+ const box=document.getElementById("teacherReports");box.textContent="Generating reports...";
+ const {data,error}=await db.from("student_exam_results").select("student_id,subject,marks_obtained").eq("exam_id",exam.id).eq("teacher_id",currentTeacherId);
+ if(error){box.textContent="REPORT ERROR: "+error.message;return}
+ const rows=data||[];if(!rows.length){box.textContent="No published marks to report.";return}
+ const ids=[...new Set(rows.map(x=>x.student_id))],st=await db.from("students").select("id,admission_number,first_name,middle_name,last_name,class_name").in("id",ids);
+ if(st.error){box.textContent="STUDENT ERROR: "+st.error.message;return}
+ const names={};(st.data||[]).forEach(s=>names[s.id]=s);
+ box.innerHTML="";box.appendChild(el("h4",exam.exam_name+" - PUBLISHED SUBJECT REPORTS"));
+ rows.forEach(r=>{const s=names[r.student_id]||{},name=[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ");const p=el("div",undefined,"report");p.appendChild(el("strong",(s.admission_number||"")+" | "+name));p.appendChild(el("p",r.subject+": "+r.marks_obtained+"/100"));box.appendChild(p)})
 }
-async function loadExamReview(){
- const examId=document.getElementById("adminExamSelect").value,box=document.getElementById("examReviewRows"),summary=document.getElementById("examReviewSummary");
- box.innerHTML="";summary.innerHTML="";
- const exam=allExams.find(e=>e.id===examId);if(!exam){box.textContent="Chagua examination.";return}
- const {data,error}=await db.from("exam_results").select("*,students(admission_number,first_name,middle_name,last_name,education_level,class_name,combination),teachers(full_name)").eq("exam_id",examId).order("subject");
- if(error){box.textContent="RESULTS ERROR: "+error.message;return}
- activeReviewRows=data||[];
- const counts={draft:0,submitted:0,returned:0,approved:0};activeReviewRows.forEach(r=>counts[r.status]=(counts[r.status]||0)+1);
- const sg=el("div",undefined,"summary-grid");
- [["Total entries",activeReviewRows.length],["Draft",counts.draft],["Submitted",counts.submitted],["Returned",counts.returned],["Approved",counts.approved]].forEach(([k,v])=>{const d=el("div",undefined,"summary-box");d.appendChild(el("b",String(v)));d.appendChild(el("p",k));sg.appendChild(d)});summary.appendChild(sg);
- const table=document.createElement("table");table.className="marks-table";table.innerHTML="<thead><tr><th>Student</th><th>Subject</th><th>Teacher</th><th>Marks</th><th>Status</th><th>Review</th></tr></thead>";
- const tbody=document.createElement("tbody");
- activeReviewRows.forEach((r,i)=>{
-  const s=r.students||{},tr=document.createElement("tr");
-  tr.appendChild(el("td",`${s.admission_number||""} ${[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")}`));
-  tr.appendChild(el("td",r.subject));tr.appendChild(el("td",r.teachers?.full_name||"-"));tr.appendChild(el("td",String(r.marks_obtained)));tr.appendChild(el("td",String(r.status).toUpperCase()));
-  const td=document.createElement("td");
-  if(["admin","academic"].includes(role())&&r.status==="submitted"){
-   const approve=el("button","APPROVE","approve");approve.className="small-btn";approve.onclick=()=>reviewExamResult(r.id,"approved",null);td.appendChild(approve);
-   const ret=el("button","RETURN","return");ret.className="small-btn";ret.onclick=()=>{const feedback=prompt("Andika maelekezo ya marekebisho:");if(feedback?.trim())reviewExamResult(r.id,"returned",feedback.trim())};td.appendChild(ret);
-  }else if(r.academic_feedback){td.textContent=r.academic_feedback}else{td.textContent="-"}
-  tr.appendChild(td);tbody.appendChild(tr);
- });
- table.appendChild(tbody);box.appendChild(table);
- if(exam.results_published){
-  box.appendChild(el("p","MATOKEO YAMESHACHAPISHWA: "+new Date(exam.published_at||Date.now()).toLocaleString(),"status approved"));
-  await renderOverallExamSummary(examId,box);
- }
- else if(["admin","academic"].includes(role())){
-  const publish=el("button","PUBLISH RESULTS","approve");publish.onclick=()=>publishExamResults(exam);box.appendChild(publish);
-  box.appendChild(el("p","Matokeo yatachapishwa tu baada ya angalau alama moja kuwepo na kila alama kuidhinishwa.","note"));
- }
+async function logout(){
+ const {error}=await db.auth.signOut();if(error){alert(error.message);return}
+ currentUser=null;currentTeacher=null;currentRole="";currentTeacherId=null;
+ show("dashboard",false);show("login");document.getElementById("email").value="";document.getElementById("password").value="";document.getElementById("loginMessage").textContent="You have logged out successfully."
 }
-
-async function renderOverallExamSummary(examId,container){
- const {data,error}=await db.from("exam_results").select("student_id,subject,marks_obtained,students(admission_number,first_name,middle_name,last_name,class_name,education_level)").eq("exam_id",examId).eq("status","approved");
- if(error){container.appendChild(el("p","SUMMARY ERROR: "+error.message));return}
- const map=new Map();
- (data||[]).forEach(r=>{
-  if(!r.students)return;
-  if(!map.has(r.student_id))map.set(r.student_id,{student:r.students,marks:[],subjects:[]});
-  const entry=map.get(r.student_id);entry.marks.push(Number(r.marks_obtained));entry.subjects.push({subject:r.subject,marks:Number(r.marks_obtained)});
- });
- const rows=[...map.values()].map(x=>({...x,total:x.marks.reduce((a,b)=>a+b,0),average:x.marks.length?x.marks.reduce((a,b)=>a+b,0)/x.marks.length:0})).sort((a,b)=>b.average-a.average);
- const section=el("div",undefined,"item");section.appendChild(el("h4","OVERALL STUDENT PERFORMANCE"));
- if(!rows.length){section.appendChild(el("p","Hakuna matokeo yaliyoidhinishwa."));container.appendChild(section);return}
- const top=rows[0],bottom=rows[rows.length-1];
- section.appendChild(el("p",`Wanafunzi wenye matokeo: ${rows.length} | Best performing: ${[top.student.first_name,top.student.middle_name,top.student.last_name].filter(Boolean).join(" ")} (${top.average.toFixed(2)}%) | Needs support: ${[bottom.student.first_name,bottom.student.middle_name,bottom.student.last_name].filter(Boolean).join(" ")} (${bottom.average.toFixed(2)}%)`));
- const table=document.createElement("table");table.className="marks-table";table.innerHTML="<thead><tr><th>Admission No.</th><th>Student</th><th>Subjects</th><th>Total</th><th>Average %</th><th>Report</th></tr></thead>";
- const tbody=document.createElement("tbody");
- rows.forEach((r,i)=>{
-  const tr=document.createElement("tr"),name=[r.student.first_name,r.student.middle_name,r.student.last_name].filter(Boolean).join(" ");
-  tr.appendChild(el("td",r.student.admission_number||"-"));tr.appendChild(el("td",name));tr.appendChild(el("td",String(r.subjects.length)));tr.appendChild(el("td",r.total.toFixed(2)));tr.appendChild(el("td",r.average.toFixed(2)));
-  const td=document.createElement("td"),button=el("button","VIEW REPORT","secondary");button.className="small-btn";button.onclick=()=>showIndividualStudentReport(r,examId);td.appendChild(button);tr.appendChild(td);tbody.appendChild(tr);
- });
- table.appendChild(tbody);section.appendChild(table);container.appendChild(section);
-}
-function showIndividualStudentReport(row,examId){
- const existing=document.getElementById("individualStudentReport");if(existing)existing.remove();
- const wrap=el("div",undefined,"item");wrap.id="individualStudentReport";
- const name=[row.student.first_name,row.student.middle_name,row.student.last_name].filter(Boolean).join(" ");
- wrap.appendChild(el("h4","INDIVIDUAL STUDENT REPORT"));
- wrap.appendChild(el("p",`${name} | ${row.student.admission_number||"-"} | ${row.student.class_name||""}`));
- const table=document.createElement("table");table.className="marks-table";table.innerHTML="<thead><tr><th>Subject</th><th>Marks / 100</th></tr></thead>";
- const tbody=document.createElement("tbody");row.subjects.forEach(s=>{const tr=document.createElement("tr");tr.appendChild(el("td",s.subject));tr.appendChild(el("td",String(s.marks)));tbody.appendChild(tr)});table.appendChild(tbody);wrap.appendChild(table);
- wrap.appendChild(el("p",`Total: ${row.total.toFixed(2)} | Average: ${row.average.toFixed(2)}%`));
- const print=el("button","PRINT INDIVIDUAL REPORT","approve");print.onclick=()=>window.print();wrap.appendChild(print);
- document.getElementById("examReviewRows").appendChild(wrap);wrap.scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-async function reviewExamResult(id,status,feedback){
- if(!["admin","academic"].includes(role()))return;
- const updates={status,academic_feedback:feedback||null,reviewed_at:new Date().toISOString(),reviewed_by:currentUser.id};
- const {error}=await db.from("exam_results").update(updates).eq("id",id);
- if(error){msg("adminResultsMessage","REVIEW ERROR: "+error.message);return}
- msg("adminResultsMessage",status==="approved"?"Alama imeidhinishwa.":"Alama imerudishwa kwa mwalimu.");
- await loadExamReview();
-}
-async function publishExamResults(exam){
- if(!["admin","academic"].includes(role()))return;
- if(!confirm("Una uhakika? Kuchapisha kutafanya matokeo ya wanafunzi yaonekane kwa walimu."))return;
- const {data:assignments,error:assignmentError}=await db.from("teacher_subject_assignments").select("teacher_id,subject,education_level,form_level,combination").eq("is_active",true).eq("education_level",exam.education_level).eq("form_level",exam.class_name).eq("academic_year",exam.academic_year);
- if(assignmentError){msg("adminResultsMessage","PUBLISH CHECK ERROR: "+assignmentError.message);return}
- if(!assignments?.length){msg("adminResultsMessage","Huwezi kuchapisha: hakuna teacher subject assignments za darasa hili.");return}
- const {data:students,error:studentError}=await db.from("students").select("id,combination").eq("education_level",exam.education_level).eq("class_name",exam.class_name).eq("academic_year",exam.academic_year);
- if(studentError){msg("adminResultsMessage","STUDENT CHECK ERROR: "+studentError.message);return}
- const {data:results,error}=await db.from("exam_results").select("id,status,teacher_id,student_id,subject").eq("exam_id",exam.id);
- if(error){msg("adminResultsMessage","PUBLISH CHECK ERROR: "+error.message);return}
- const submittedRows=results||[];
- if(!submittedRows.length){msg("adminResultsMessage","Huwezi kuchapisha: hakuna alama zilizoingizwa.");return}
- const expected=[];
- assignments.forEach(a=>{
-  const classStudents=(students||[]).filter(s=>exam.education_level!=="A-Level"||String(s.combination||"").toUpperCase()===String(a.combination||"").toUpperCase());
-  classStudents.forEach(s=>expected.push({teacher_id:a.teacher_id,subject:a.subject,student_id:s.id}));
- });
- const missing=expected.filter(x=>!submittedRows.some(r=>r.teacher_id===x.teacher_id&&r.subject===x.subject&&r.student_id===x.student_id&&r.status==="approved"));
- if(missing.length){msg("adminResultsMessage",`Huwezi kuchapisha. Bado kuna ${missing.length} alama za wanafunzi/masomo ambazo hazijaidhinishwa au hazijaingizwa.`);return}
- const incomplete=submittedRows.filter(r=>r.status!=="approved");
- if(incomplete.length){msg("adminResultsMessage",`Huwezi kuchapisha. Bado kuna ${incomplete.length} alama ambazo hazijaidhinishwa.`);return}
- const {error:updateError}=await db.from("exams").update({results_published:true,published_at:new Date().toISOString(),published_by:currentUser.id}).eq("id",exam.id);
- if(updateError){msg("adminResultsMessage","PUBLISH ERROR: "+updateError.message);return}
- msg("adminResultsMessage","Matokeo yamechapishwa kikamilifu.");
- await loadExamsForAdmin();document.getElementById("adminExamSelect").value=exam.id;await loadExamReview();
-}
-async function getPublishedTeacherResults(){
- const {data:assignments,error:aError}=await db.from("teacher_subject_assignments").select("subject,form_level,education_level,combination,academic_year").eq("teacher_id",currentTeacher.id).eq("is_active",true);
- if(aError)throw aError;
- const subjects=[...new Set((assignments||[]).map(a=>a.subject))];
- if(!subjects.length)return [];
- const {data:results,error}=await db.from("exam_results").select("*,students(admission_number,first_name,middle_name,last_name,class_name,education_level,combination),exams(exam_name,term,academic_year,results_published)").eq("teacher_id",currentTeacher.id).eq("status","approved").in("subject",subjects);
- if(error)throw error;
- return (results||[]).filter(r=>r.exams?.results_published);
-}
-async function viewTeacherPublishedResults(){
- const box=document.getElementById("teacherPublishedResults");box.textContent="Inapakia matokeo yaliy published...";
- try{
-  const rows=await getPublishedTeacherResults();renderTeacherResults(rows,box);
- }catch(e){box.textContent="RESULTS ERROR: "+e.message}
-}
-async function generateTeacherReports(){
- const box=document.getElementById("teacherPublishedResults");box.textContent="Inatengeneza muhtasari wa matokeo...";
- try{
-  const rows=await getPublishedTeacherResults();renderTeacherResults(rows,box,true);
- }catch(e){box.textContent="REPORT ERROR: "+e.message}
-}
-function renderTeacherResults(rows,box,reportMode=false){
- box.innerHTML="";if(!rows.length){box.textContent="Hakuna matokeo yaliyochapishwa yanayohusiana na masomo yako.";return}
- const grouped={};rows.forEach(r=>{const key=[r.exams?.exam_name,r.exams?.academic_year,r.subject].join("|");(grouped[key] ||= []).push(r)});
- Object.entries(grouped).forEach(([key,list])=>{
-  const values=list.map(x=>Number(x.marks_obtained)).filter(Number.isFinite),avg=values.length?values.reduce((a,b)=>a+b,0)/values.length:0;
-  const section=el("div",undefined,"item");section.appendChild(el("h4",key.replaceAll("|"," — ")));
-  if(reportMode)section.appendChild(el("p",`Wanafunzi: ${values.length} | Average: ${avg.toFixed(2)} | Highest: ${Math.max(...values).toFixed(2)} | Lowest: ${Math.min(...values).toFixed(2)}`));
-  const table=document.createElement("table");table.className="marks-table";table.innerHTML="<thead><tr><th>Admission No.</th><th>Student</th><th>Marks</th></tr></thead>";
-  const tbody=document.createElement("tbody");list.forEach(r=>{const s=r.students||{},tr=document.createElement("tr");tr.appendChild(el("td",s.admission_number||"-"));tr.appendChild(el("td",[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")));tr.appendChild(el("td",String(r.marks_obtained)));tbody.appendChild(tr)});table.appendChild(tbody);section.appendChild(table);box.appendChild(section);
- });
-}
-async function printTeacherResults(){
- const box=document.getElementById("teacherPublishedResults");
- box.textContent="Inapakia matokeo kabla ya kuchapisha...";
- try{
-  const rows=await getPublishedTeacherResults();
-  renderTeacherResults(rows,box);
-  if(!rows.length){alert("Hakuna matokeo yaliyochapishwa ya kuchapisha.");return}
-  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
- }catch(e){box.textContent="PRINT ERROR: "+e.message}
-}
-
-async function saveInvitePassword(){
- const password=document.getElementById("invitePassword").value;
- const confirm=document.getElementById("invitePasswordConfirm").value;
- if(password.length<8){msg("invitePasswordMessage","Password iwe na angalau herufi/namba 8.");return}
- if(password!==confirm){msg("invitePasswordMessage","Password hazifanani.");return}
- const btn=document.getElementById("saveInvitePasswordBtn");btn.disabled=true;msg("invitePasswordMessage","Inahifadhi password...");
- try{
-  const {data,error}=await db.auth.updateUser({password});
-  if(error)throw error;
-  document.getElementById("inviteSetup").classList.add("hidden");
-  document.getElementById("invitePassword").value="";document.getElementById("invitePasswordConfirm").value="";
-  await loadDashboard(data.user);
- }catch(e){msg("invitePasswordMessage","PASSWORD ERROR: "+e.message)}finally{btn.disabled=false}
-}
-async function logout(){const {error}=await db.auth.signOut();if(error){alert(error.message);return}currentUser=null;currentTeacher=null;document.getElementById("dashboard").classList.add("hidden");document.getElementById("resultsPanel").classList.add("hidden");document.getElementById("inviteSetup").classList.add("hidden");document.getElementById("login").classList.remove("hidden");msg("loginMessage","Logged out.");}
-async function checkSession(){
- const {data,error}=await db.auth.getSession();
- if(error){msg("loginMessage",error.message);return}
- if(data.session){
-  const inviteType=/type=invite/i.test(window.location.hash);
-  if(inviteType){document.getElementById("login").classList.add("hidden");document.getElementById("inviteSetup").classList.remove("hidden");}
-  else await loadDashboard(data.session.user);
- }
-}
-checkSession();
+async function checkSession(){const {data,error}=await db.auth.getSession();if(error){document.getElementById("loginMessage").textContent=error.message;return}if(data.session)await loadDashboard(data.session.user)}
+updateInviteForm();updateStudentClassOptions();updateAssignmentClassOptions();checkSession();
 </script>
 </body>
 </html>
