@@ -177,8 +177,32 @@ async function inviteTeacher(){
  btn.disabled=true;msg.textContent="Registering teacher...";
  try{
   const {data,error}=await db.functions.invoke("teacherinvite",{body:{full_name,email,phone,subjects,assignments}});
-  if(error){msg.textContent="TEACHER INVITATION ERROR: "+error.message;return}
-  if(!data?.success){msg.textContent="REGISTRATION ERROR: "+(data?.message||"The function did not confirm success.");return}
+  if(error){
+   let errorDetails=error.message||"";
+   let responseStatus=error.context?.status;
+   try{
+    if(error.context && typeof error.context.clone==="function"){
+     const responseCopy=error.context.clone();
+     const responseText=await responseCopy.text();
+     if(responseText){
+      try{const responseBody=JSON.parse(responseText);errorDetails+=" "+(responseBody.message||responseBody.error||responseBody.msg||responseText)}
+      catch(parseError){errorDetails+=" "+responseText}
+     }
+    }
+   }catch(readError){}
+   const duplicateEmail=responseStatus===409||/already\s*(registered|exists|used)|email.*(already|exists|in use)|user already|duplicate key/i.test(errorDetails);
+   msg.textContent=duplicateEmail
+    ?"EMAIL ALREADY USED: This email is already registered. Please use another email address."
+    :"TEACHER INVITATION ERROR: "+errorDetails;
+   return;
+  }
+  if(!data?.success){
+   const responseMessage=data?.message||"The function did not confirm success.";
+   msg.textContent=/already\s*(registered|exists|used)|email.*(already|exists|in use)|user already|duplicate key/i.test(responseMessage)
+    ?"EMAIL ALREADY USED: This email is already registered. Please use another email address."
+    :"REGISTRATION ERROR: "+responseMessage;
+   return;
+  }
   msg.textContent=data.message||"Teacher account created. Invitation link generated.";
   const linkArea=document.getElementById("inviteLinkArea");linkArea.innerHTML="";
   if(data.invite_link){const a=el("a","Open teacher invitation link");a.href=data.invite_link;a.target="_blank";a.rel="noopener";linkArea.appendChild(a);const copy=el("button","COPY INVITATION LINK");copy.onclick=async()=>{try{await navigator.clipboard.writeText(data.invite_link);alert("Invitation link copied.")}catch(e){alert("Copy failed. Open the link and copy it manually.")}};linkArea.appendChild(copy)}
