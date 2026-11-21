@@ -94,6 +94,32 @@ textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:po
     <div><label>Brought By Name</label><input id="stBroughtName" placeholder="Name of person bringing student"></div>
     <div><label>Brought By Phone</label><input id="stBroughtPhone" placeholder="Phone number"></div>
    </div>
+   <h4>STUDENT REQUIREMENTS / VIFAA</h4>
+   <p class="small">Chagua hali ya kila kifaa: Ameleta au Bado.</p>
+   <div class="form-grid">
+    <div><label>Rimu</label><select id="eqRimu"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Jembe</label><select id="eqJembe"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Mfagio</label><select id="eqMfagio"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Faili</label><select id="eqFaili"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Mdondo</label><select id="eqMdondo"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Panga</label><select id="eqPanga"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Kiwanja</label><select id="eqKiwanja"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Calculator</label><select id="eqCalculator"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Dictionary</label><select id="eqDictionary"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Fedha</label><select id="eqFedha"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Kwanja</label><select id="eqKwanja"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+    <div><label>Ndoo</label><select id="eqNdoo"><option value="Bado">Bado</option><option value="Ameleta">Ameleta</option></select></div>
+   </div>
+   <h4>TAARIFA ZA AFYA (SIRI)</h4>
+   <label>Je, mwanafunzi ana tatizo la kiafya?</label>
+   <select id="stHasHealthIssue" onchange="toggleHealthFields()"><option value="false">Hapana</option><option value="true">Ndiyo</option></select>
+   <div id="stHealthFields" class="hidden">
+    <label>Aina ya tatizo / ugonjwa uliothibitishwa na daktari</label>
+    <select id="stHealthCondition"><option value="">Chagua ugonjwa au hali ya kiafya</option><option>Asthma (Pumu)</option><option>Diabetes (Kisukari)</option><option>Epilepsy (Kifafa)</option><option>Sickle Cell Disease (Seli Mundu)</option><option>Heart Disease (Ugonjwa wa moyo)</option><option>Kidney Disease (Ugonjwa wa figo)</option><option>Liver Disease (Ugonjwa wa ini)</option><option>Allergy (Mzio)</option><option>High Blood Pressure (Shinikizo la damu)</option><option>Low Blood Pressure (Shinikizo dogo la damu)</option><option>Anaemia (Upungufu wa damu)</option><option>Tuberculosis - TB (Kifua kikuu)</option><option>Malaria (Malaria)</option><option>Stomach or Digestive Condition (Tatizo la tumbo/mmeng'enyo)</option><option>Skin Condition (Tatizo la ngozi)</option><option>Vision Condition (Tatizo la macho)</option><option>Hearing Condition (Tatizo la kusikia)</option><option>Physical Disability (Ulemavu wa viungo)</option><option>Other (Mengineyo)</option></select>
+    <label>Maelezo ya ziada (si lazima)</label><textarea id="stHealthOther" placeholder="Andika maelezo au jina la ugonjwa mwingine uliothibitishwa"></textarea>
+    <label>Ripoti ya daktari (PDF au picha)</label><input id="stDoctorReport" type="file" accept="application/pdf,image/*">
+    <p class="small">Ripoti na taarifa hizi zitaonekana kwa Admin na Mkuu wa Shule walioidhinishwa tu.</p>
+   </div>
    <button id="studentSaveBtn" onclick="saveStudentRecord()">SUBMIT STUDENT FOR REVIEW</button>
    <button class="secondary" onclick="cancelStudentEdit()">CANCEL</button><p id="studentFormMessage"></p>
   </div>
@@ -138,6 +164,7 @@ textarea{min-height:75px}button{background:#176b45;color:#fff;border:0;cursor:po
 const SUPABASE_URL="https://dvgzvgnazghvowyeeapz.supabase.co";
 const SUPABASE_KEY="sb_publishable_XqfdqKhVJ3XsWNMWgl6Ytg_ypaRLn-u";
 const BUCKET="kishimba-teaching-materials";
+const HEALTH_BUCKET="student-health-reports";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null,currentTeacher=null,currentRole="",currentTeacherId=null;
 let cachedExams=[],cachedStudents=[],cachedTeacherSubjects=[];
@@ -203,8 +230,12 @@ function updateAssignmentClassOptions(){
  (level==="A-Level"?["Form Five","Form Six"]:["Form One","Form Two","Form Three","Form Four"]).forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;box.appendChild(o)});
  show("assignCombinationWrap",level==="A-Level");
 }
+function toggleHealthFields(){show("stHealthFields",document.getElementById("stHasHealthIssue").value==="true");}
+function collectEquipment(){return {"Rimu":document.getElementById("eqRimu").value,"Jembe":document.getElementById("eqJembe").value,"Mfagio":document.getElementById("eqMfagio").value,"Faili":document.getElementById("eqFaili").value,"Mdondo":document.getElementById("eqMdondo").value,"Panga":document.getElementById("eqPanga").value,"Kiwanja":document.getElementById("eqKiwanja").value,"Calculator":document.getElementById("eqCalculator").value,"Dictionary":document.getElementById("eqDictionary").value,"Fedha":document.getElementById("eqFedha").value,"Kwanja":document.getElementById("eqKwanja").value,"Ndoo":document.getElementById("eqNdoo").value};}
+function setEquipment(e){const ids={Rimu:"eqRimu",Jembe:"eqJembe",Mfagio:"eqMfagio",Faili:"eqFaili",Mdondo:"eqMdondo",Panga:"eqPanga",Kiwanja:"eqKiwanja",Calculator:"eqCalculator",Dictionary:"eqDictionary",Fedha:"eqFedha",Kwanja:"eqKwanja",Ndoo:"eqNdoo"};Object.entries(ids).forEach(([k,id])=>document.getElementById(id).value=(e&&e[k])||"Bado");}
 function resetStudentForm(){
- ["studentEditId","stAdmission","stFirst","stMiddle","stLast","stGender","stDob","stCombination","stGuardian","stGuardianPhone","stRelationship","stBroughtName","stBroughtPhone"].forEach(id=>document.getElementById(id).value="");
+ ["studentEditId","stAdmission","stFirst","stMiddle","stLast","stGender","stDob","stCombination","stGuardian","stGuardianPhone","stRelationship","stBroughtName","stBroughtPhone","stHealthCondition","stHealthOther"].forEach(id=>document.getElementById(id).value="");
+ document.getElementById("stHasHealthIssue").value="false";document.getElementById("stDoctorReport").value="";toggleHealthFields();setEquipment(null);
  document.getElementById("stYear").value=new Date().getFullYear();document.getElementById("stLevel").value="O-Level";updateStudentClassOptions();
  document.getElementById("studentFormTitle").textContent="REGISTER NEW STUDENT";document.getElementById("studentSaveBtn").textContent="SUBMIT STUDENT FOR REVIEW";document.getElementById("studentFormMessage").textContent="";
 }
@@ -215,11 +246,14 @@ async function loadStudentRecords(){
  if(getRole()==="headmaster")q=q.eq("submitted_by",currentUser.id);
  const {data,error}=await q;if(error){box.textContent="STUDENT RECORDS ERROR: "+error.message;return}
  const rows=data||[];box.innerHTML="";if(!rows.length){box.textContent="No student records found.";return}
- rows.forEach(st=>{
+ for(const st of rows){
   const card=el("div",undefined,"student-card"),name=[st.first_name,st.middle_name,st.last_name].filter(Boolean).join(" ");
   card.appendChild(el("strong",(st.admission_number||"No admission number")+" | "+name));
   card.appendChild(el("p",[st.education_level,st.class_name,st.combination,st.academic_year].filter(Boolean).join(" | ")));
   const status=st.review_status||st.registration_status||"Unknown";card.appendChild(el("span",String(status).toUpperCase(),"status "+statusClass(status)));
+  if(st.equipment_status){const eq=Object.entries(st.equipment_status).map(([k,v])=>k+": "+v).join(" | ");card.appendChild(el("p","Vifaa: "+eq));}
+  const {data:health}=await db.from("student_health_records").select("has_health_issue,condition_name,details,doctor_report_path").eq("student_id",st.id).maybeSingle();
+  if(health&&health.has_health_issue){card.appendChild(el("p","TAARIFA ZA AFYA (SIRI): "+(health.condition_name||"Haijatajwa")+(health.details?" — "+health.details:"")));if(health.doctor_report_path){const {data:signed}=await db.storage.from(HEALTH_BUCKET).createSignedUrl(health.doctor_report_path,900);if(signed?.signedUrl){const a=el("a","Fungua ripoti ya daktari");a.href=signed.signedUrl;a.target="_blank";a.rel="noopener";card.appendChild(a);}}}
   if(st.admin_feedback)card.appendChild(el("p","Admin feedback: "+st.admin_feedback));
   if(getRole()==="admin"){
    if(norm(st.review_status)==="submitted"||norm(st.review_status)==="pending"){
@@ -232,14 +266,14 @@ async function loadStudentRecords(){
    const edit=el("button","EDIT AND RESUBMIT","send-button");edit.onclick=()=>editReturnedStudent(st);card.appendChild(edit);
   }
   box.appendChild(card);
- });
+ }
 }
 async function saveStudentRecord(){
  if(!["admin","headmaster"].includes(getRole())){alert("Only authorised school offices can submit student registrations.");return}
  const v=id=>document.getElementById(id).value.trim(),id=v("studentEditId"),level=v("stLevel"),cls=v("stClass"),year=Number(v("stYear"));
  const admission_number=v("stAdmission"),first_name=v("stFirst"),last_name=v("stLast");
  if(!admission_number||!first_name||!last_name||!cls||!year){document.getElementById("studentFormMessage").textContent="Admission number, first name, last name, class and academic year are required.";return}
- const record={admission_number,first_name,middle_name:v("stMiddle")||null,last_name,gender:v("stGender")||null,date_of_birth:v("stDob")||null,education_level:level,class_name:cls,combination:level==="A-Level"?(v("stCombination")||null):null,academic_year:year,guardian_name:v("stGuardian")||null,guardian_phone:v("stGuardianPhone")||null,brought_by_relationship:v("stRelationship")||null,brought_by_name:v("stBroughtName")||null,brought_by_phone:v("stBroughtPhone")||null};
+ const record={admission_number,first_name,middle_name:v("stMiddle")||null,last_name,gender:v("stGender")||null,date_of_birth:v("stDob")||null,education_level:level,class_name:cls,combination:level==="A-Level"?(v("stCombination")||null):null,academic_year:year,guardian_name:v("stGuardian")||null,guardian_phone:v("stGuardianPhone")||null,brought_by_relationship:v("stRelationship")||null,brought_by_name:v("stBroughtName")||null,brought_by_phone:v("stBroughtPhone")||null,equipment_status:collectEquipment()};
  const btn=document.getElementById("studentSaveBtn"),msg=document.getElementById("studentFormMessage");btn.disabled=true;msg.textContent="Saving student record...";
  try{
   let result;
@@ -250,13 +284,21 @@ async function saveStudentRecord(){
   }
   if(result.error){msg.textContent="SAVE ERROR: "+result.error.message;return}
   if(id&&!result.data){msg.textContent="No record updated. It may no longer be in Returned status, or permissions prevented the update.";return}
+  const studentId=result.data.id,hasHealth=v("stHasHealthIssue")==="true";
+  const existingHealth=await db.from("student_health_records").select("doctor_report_path").eq("student_id",studentId).maybeSingle();
+  let reportPath=hasHealth?(existingHealth.data?.doctor_report_path||null):null;
+  const reportFile=document.getElementById("stDoctorReport").files[0];
+  if(hasHealth&&reportFile){const safeName=reportFile.name.replace(/[^a-zA-Z0-9._-]/g,"_");const path=currentUser.id+"/"+studentId+"/"+Date.now()+"_"+safeName;const upload=await db.storage.from(HEALTH_BUCKET).upload(path,reportFile,{upsert:false});if(upload.error){msg.textContent="STUDENT SAVED, BUT DOCTOR REPORT UPLOAD FAILED: "+upload.error.message;return}reportPath=path;}
+  const healthSave=await db.from("student_health_records").upsert({student_id:studentId,has_health_issue:hasHealth,condition_name:hasHealth?(v("stHealthCondition")||"Other"):null,details:hasHealth?(v("stHealthOther")||null):null,doctor_report_path:reportPath,created_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:"student_id"});
+  if(healthSave.error){msg.textContent="STUDENT SAVED, BUT HEALTH DETAILS FAILED: "+healthSave.error.message;return}
   msg.textContent="Student submitted successfully for Administrator review.";resetStudentForm();await loadStudentRecords();
  }catch(e){msg.textContent="SAVE ERROR: "+e.message}finally{btn.disabled=false}
 }
-function editReturnedStudent(st){
+async function editReturnedStudent(st){
  if(getRole()!=="headmaster"||st.submitted_by!==currentUser.id||norm(st.review_status)!=="returned")return;
  const vals={studentEditId:st.id,stAdmission:st.admission_number,stFirst:st.first_name,stMiddle:st.middle_name,stLast:st.last_name,stGender:st.gender,stDob:st.date_of_birth,stLevel:st.education_level,stCombination:st.combination,stYear:st.academic_year,stGuardian:st.guardian_name,stGuardianPhone:st.guardian_phone,stRelationship:st.brought_by_relationship,stBroughtName:st.brought_by_name,stBroughtPhone:st.brought_by_phone};
- Object.entries(vals).forEach(([k,v])=>document.getElementById(k).value=v??"");updateStudentClassOptions();document.getElementById("stClass").value=st.class_name||"";
+ Object.entries(vals).forEach(([k,v])=>document.getElementById(k).value=v??"");updateStudentClassOptions();document.getElementById("stClass").value=st.class_name||"";setEquipment(st.equipment_status||null);
+ const {data:health}=await db.from("student_health_records").select("has_health_issue,condition_name,details").eq("student_id",st.id).maybeSingle();if(health){document.getElementById("stHasHealthIssue").value=health.has_health_issue?"true":"false";document.getElementById("stHealthCondition").value=health.condition_name||"";document.getElementById("stHealthOther").value=health.details||"";toggleHealthFields();}
  document.getElementById("studentFormTitle").textContent="CORRECT RETURNED STUDENT DETAILS";document.getElementById("studentSaveBtn").textContent="RESUBMIT TO ADMINISTRATOR";document.getElementById("studentFormMessage").textContent="Correct the details then resubmit.";document.getElementById("studentFormArea").scrollIntoView({behavior:"smooth"});
 }
 async function reviewStudentRecord(st,status,feedback){
@@ -660,7 +702,7 @@ async function logout(){
  show("dashboard",false);show("login");document.getElementById("email").value="";document.getElementById("password").value="";document.getElementById("loginMessage").textContent="You have logged out successfully."
 }
 async function checkSession(){const {data,error}=await db.auth.getSession();if(error){document.getElementById("loginMessage").textContent=error.message;return}if(data.session)await loadDashboard(data.session.user)}
-updateInviteForm();updateStudentClassOptions();updateAssignmentClassOptions();checkSession();
+updateInviteForm();updateStudentClassOptions();updateAssignmentClassOptions();toggleHealthFields();setEquipment(null);checkSession();
 </script>
 </body>
 </html>
