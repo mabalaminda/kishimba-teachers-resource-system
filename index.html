@@ -868,7 +868,22 @@ async function loadHeadmasterPermissionRequests(){
   const canvas=document.createElement('canvas');canvas.className='permission-signature';canvas.width=900;canvas.height=220;canvas.id='hmSig_'+r.id;card.appendChild(canvas);setupPermissionCanvas(canvas);
   const file=document.createElement('input');file.type='file';file.accept='image/*';card.appendChild(file);
   const clear=el('button','CLEAR SIGNATURE','secondary');clear.onclick=()=>clearPermissionCanvas(canvas.id);card.appendChild(clear);
-  const save=el('button','SUBMIT HEADMASTER DECISION','approve-button');save.onclick=async()=>{if(!decision.value){alert('Chagua Ameruhusiwa au Hajaruhusiwa.');return}if(!file.files[0]&&!canvasHasSignature(canvas)){alert('Weka sahihi ya Mkuu wa Shule.');return}save.disabled=true;try{const blob=file.files[0]?await imageAsPng(file.files[0]):await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));const path=await uploadPermissionSignature(blob,'headmaster');const {error:upErr}=await db.from('staff_permission_requests').update({headmaster_decision:decision.value,headmaster_comment:comment.value.trim()||null,headmaster_signature_path:path,headmaster_user_id:currentUser.id,headmaster_decided_at:new Date().toISOString()}).eq('id',r.id);if(upErr)throw new Error(upErr.message);alert('Uamuzi umetumwa. Ikiwa ameruhusiwa, ombi limehamia kwa Admin.');await loadHeadmasterPermissionRequests()}catch(e){alert('ERROR: '+e.message)}finally{save.disabled=false}};card.appendChild(save);box.appendChild(card);
+  const save=el('button','SUBMIT HEADMASTER DECISION','approve-button');save.onclick=async()=>{
+   if(!decision.value){alert('Chagua Ameruhusiwa au Hajaruhusiwa.');return}
+   if(!file.files[0]&&!canvasHasSignature(canvas)){alert('Weka sahihi ya Mkuu wa Shule.');return}
+   save.disabled=true;let uploadedPath=null;
+   try{
+    const blob=file.files[0]?await imageAsPng(file.files[0]):await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Imeshindikana kutengeneza picha ya sahihi.')),'image/png'));
+    if(!blob)throw new Error('Picha ya sahihi haikupatikana.');
+    uploadedPath=await uploadPermissionSignature(blob,'headmaster');
+    const updates={headmaster_decision:decision.value,headmaster_comment:comment.value.trim()||null,headmaster_signature_path:uploadedPath,headmaster_decided_at:new Date().toISOString()};
+    const {data,error:upErr}=await db.from('staff_permission_requests').update(updates).eq('id',r.id).eq('headmaster_decision','Pending').select('id,headmaster_decision').maybeSingle();
+    if(upErr)throw new Error('Imeshindikana kuhifadhi uamuzi kwenye jedwali: '+upErr.message);
+    if(!data)throw new Error('Hakuna rekodi iliyobadilishwa. Hakiki ruhusa za UPDATE (RLS) na kama ombi bado lina hali ya Pending.');
+    alert('Uamuzi wa Mkuu wa Shule umehifadhiwa kikamilifu.');
+    await loadHeadmasterPermissionRequests();
+   }catch(e){if(uploadedPath){await db.storage.from('staff-permission-signatures').remove([uploadedPath]).catch(()=>{})}alert('ERROR: '+(e?.message||String(e)))}finally{save.disabled=false}
+  };card.appendChild(save);box.appendChild(card);
  }
 }
 async function loadAdminPermissionRequests(){
